@@ -1,0 +1,23 @@
+{
+  "name": "piserver",
+  "version": "1.0.0",
+  "description": "Homeserver",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/helblingjoel/piserver.git"
+  },
+  "author": "Joel Helbling",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/helblingjoel/piserver/issues"
+  },
+  "homepage": "https://github.com/helblingjoel/piserver#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "jest": "^27.3.1"
+  }
+}
