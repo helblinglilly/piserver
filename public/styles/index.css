@@ -1,2 +1,32 @@
 .header {
+  padding: 1px;
+  text-align: center;
+  background: #bc1aa1;
+  color: white;
+  font-size: 50px;
+}
+
+* {
+  font-family: "Roboto", sans-serif;
+}
+
+div.container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  height: 300px;
+}
+
+div.application {
+  margin: 20px;
+  width: 45%;
+  text-align: center;
+  font-size: 40px;
+  color: rgb(236, 236, 236);
+}
+p.applicationText {
+  vertical-align: center;
+}
+#ac {
+  background-color: rgb(36, 138, 151);
 }

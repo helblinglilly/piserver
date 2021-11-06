@@ -4,12 +4,36 @@
     <link
       type="text/css"
       rel="stylesheet"
-      href="http://127.0.0.1:9090/static/styles/index.css"
+      href="http://192.168.0.18:9090/static/styles/index.css"
     />
+    <link
+      rel="icon"
+      type="image/png"
+      href="http://192.168.0.18:9090/static/images/favicon.ico"
+    />
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Roboto&display=swap");
+    </style>
   </head>
   <body>
     <div class="header">
       <h1>Home Server</h1>
+    </div>
+
+    <div class="container">
+      <div
+        class="application"
+        id="ac"
+        onclick="location.href = 'http://127.0.0.1:9090/ac'"
+      >
+        <p class="applicationText">Animal Crossing</p>
+      </div>
+      <div
+        class="application"
+        onclick="location.href = 'http://127.0.0.1:9090/ac'"
+      >
+        <p class="applicationText">Something else</p>
+      </div>
     </div>
     <p>Haha some content</p>
   </body>
