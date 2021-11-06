@@ -4,7 +4,8 @@
   "description": "Homeserver",
   "main": "index.js",
   "scripts": {
-    "test": "jest test"
+    "test": "jest test",
+    "dev": "nodemon listen.js"
   },
   "repository": {
     "type": "git",
@@ -17,6 +18,7 @@
   },
   "homepage": "https://github.com/helblingjoel/piserver#readme",
   "dependencies": {
+    "dotenv": "^10.0.0",
     "express": "^4.17.1",
     "jest": "^27.3.1"
   }
