@@ -7846,19 +7846,9 @@ a.has-text-danger-dark:hover, a.has-text-danger-dark:focus {
   background-color: #fafafa;
   padding: 3rem 1.5rem 6rem; }
 
-html {
-  font-size: 100%; }
-
-.columns {
-  padding: 2%;
-  height: 25%; }
-
-.column {
-  margin: 20px;
-  height: 25%; }
-
-.input {
-  width: 100%; }
-
-#ac {
-  background-color: #248a97; }
+.header {
+  padding: 1px;
+  text-align: center;
+  background: #bc1aa1;
+  color: white;
+  font-size: 50px; }

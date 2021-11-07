@@ -72,19 +72,22 @@
       </div>
     </nav>
 
-    <div class="columns">
-      <div class="column">
-        <div class="card">
-          <a href="http://192.168.0.18:9090/ac/fish">
-            <div class="card-content">
-              <div class="content">
-                <p class="title is-5">Fish</p>
-                <p>Get Fish price</p>
-              </div>
-            </div>
-          </a>
+    <div class="column">
+      <p class="title is-2">Get Fish Details</p>
+
+      <form action="http://192.168.0.18:9090/ac/fish" method="GET">
+        <div class="column">
+          <input
+            class="input"
+            type="text"
+            name="name"
+            placeholder="Fish name"
+          />
         </div>
-      </div>
+        <div class="column">
+          <button class="button is-link">Get Details</button>
+        </div>
+      </form>
     </div>
   </body>
 </html>

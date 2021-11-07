@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link
       type="text/css"
       rel="stylesheet"
@@ -14,27 +15,76 @@
     <style>
       @import url("https://fonts.googleapis.com/css2?family=Roboto&display=swap");
     </style>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        // Get all "navbar-burger" elements
+        const $navbarBurgers = Array.prototype.slice.call(
+          document.querySelectorAll(".navbar-burger"),
+          0
+        );
+
+        // Check if there are any navbar burgers
+        if ($navbarBurgers.length > 0) {
+          // Add a click event on each of them
+          $navbarBurgers.forEach((el) => {
+            el.addEventListener("click", () => {
+              // Get the target from the "data-target" attribute
+              const target = el.dataset.target;
+              const $target = document.getElementById(target);
+
+              // Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
+              el.classList.toggle("is-active");
+              $target.classList.toggle("is-active");
+            });
+          });
+        }
+      });
+    </script>
   </head>
   <body>
-    <div class="header">
-      <h1>Home Server</h1>
-    </div>
+    <nav class="navbar" role="navigation" aria-label="main navigation">
+      <div class="navbar-brand">
+        <a class="navbar-item" href="http://192.168.0.18:9090/">
+          <img src="http://192.168.0.18:9090/static/images/favicon.ico" />
+        </a>
 
-    <div class="container">
-      <div
-        class="application"
-        id="ac"
-        onclick="location.href = 'http://127.0.0.1:9090/ac'"
-      >
-        <p class="applicationText">Animal Crossing</p>
+        <a
+          role="button"
+          class="navbar-burger"
+          aria-label="menu"
+          aria-expanded="false"
+          data-target="navbarBasicExample"
+        >
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+        </a>
       </div>
-      <div
-        class="application"
-        onclick="location.href = 'http://127.0.0.1:9090/ac'"
-      >
-        <p class="applicationText">Something else</p>
+
+      <div id="navbarBasicExample" class="navbar-menu">
+        <div class="navbar-start">
+          <a class="navbar-item" href="http://192.168.0.18:9090/"> Home </a>
+
+          <a class="navbar-item" href="http://192.168.0.18:9090/ac">
+            Animal Crossing
+          </a>
+        </div>
+      </div>
+    </nav>
+
+    <div class="columns">
+      <div class="column">
+        <div class="card">
+          <a href="http://192.168.0.18:9090/ac">
+            <div class="card-content">
+              <div class="content">
+                <p class="title is-5">Animal Crossing</p>
+                <p>Look up Fish prices</p>
+              </div>
+            </div>
+          </a>
+        </div>
       </div>
     </div>
-    <p>Haha some content</p>
   </body>
 </html>
