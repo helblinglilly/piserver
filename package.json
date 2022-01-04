@@ -4,16 +4,21 @@
   "description": "",
   "main": "setup.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon setup.js"
+    "test": "jest test",
+    "dev": "nodemon setup.js",
+    "lint": "npx eslint"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "express": "^4.17.2",
+    "jest": "^27.4.5",
     "pug": "^3.0.2"
   },
   "devDependencies": {
+    "eslint": "^8.6.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.25.4",
     "nodemon": "^2.0.15"
   }
 }
