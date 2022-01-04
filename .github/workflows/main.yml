@@ -20,6 +20,7 @@ jobs:
       - name: Run linting
         run: npm run lint
   test:
+    needs: lint
     name: Testing
     runs-on: self-hosted
     if: github.event_name == 'pull_request'
