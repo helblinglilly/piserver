@@ -1,7 +1,8 @@
 const acRouter = require("express").Router();
-const acController = require("../controllers/ac.controller");
+const error = require("../controllers/error.controller");
+const acc = require("../controllers/ac.controller");
 
-acRouter.get("/", acController.getRoot);
-acRouter.get("/fish", acController.getFish);
+acRouter.get("/", acc.getAnimalCrossing);
+acRouter.all("/", error.methodNotAllowed);
 
 module.exports = acRouter;

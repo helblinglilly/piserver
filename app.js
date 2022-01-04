@@ -1,14 +1,23 @@
 const express = require("express");
-const apiRouter = require("./routers/api.router");
-const acRouter = require("./routers/ac.router");
-const path = require("path");
+const error = require("./controllers/error.controller");
+const timesheetRouter = require("./routers/timesheets.router.js");
+const acRouter = require("./routers/ac.router.js");
+const pokemonRouter = require("./routers/pokemon.router.js");
 
 const app = express();
+app.set("view engine", "pug");
 app.use("/static", express.static("public"));
 app.set("views", "./views");
-app.set("view engine", "pug");
 app.use(express.json());
 
-app.use("/", apiRouter);
+app.use("/timesheet", timesheetRouter);
 app.use("/ac", acRouter);
+app.use("/pokemon", pokemonRouter);
+
+app.get("/", (_, res, req) => {
+  res.render("index.pug", { host: "http://127.0.0.1:9090" });
+});
+
+app.all("/", error.methodNotAllowed);
+
 module.exports = app;

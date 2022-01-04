@@ -1,34 +1,16 @@
 {
   "name": "piserver",
   "version": "1.0.0",
-  "description": "Homeserver",
-  "main": "index.js",
+  "description": "",
+  "main": "listen.js",
   "scripts": {
-    "css-build": "node-sass --omit-source-map-url sass/index.sass public/styles/index.css",
-    "css-watch": "npm run css-build -- --watch",
-    "start": "npm run css-watch",
-    "test": "jest test",
-    "dev": "nodemon listen.js"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/helblingjoel/piserver.git"
-  },
-  "author": "Joel Helbling",
+  "author": "",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/helblingjoel/piserver/issues"
-  },
-  "homepage": "https://github.com/helblingjoel/piserver#readme",
   "dependencies": {
-    "axios": "^0.24.0",
-    "dotenv": "^10.0.0",
-    "express": "^4.17.1",
-    "jest": "^27.3.1",
+    "express": "^4.17.2",
+    "nodemon": "^2.0.15",
     "pug": "^3.0.2"
-  },
-  "devDependencies": {
-    "bulma": "^0.9.3",
-    "node-sass": "^6.0.1"
   }
 }

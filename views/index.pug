@@ -1,45 +1,21 @@
-doctype html
-head
-  meta(name='viewport' content='width=device-width, initial-scale=1')
-  link(type='text/css' rel='stylesheet' href=host + '/static/styles/index.css')
-  link(rel='icon' type='image/png' href=host + '/static/images/favicon.ico')
-  style.
-    @import url("https://fonts.googleapis.com/css2?family=Roboto&display=swap");
-  script.
-    document.addEventListener("DOMContentLoaded", () => {
-    const $navbarBurgers = Array.prototype.slice.call(
-    document.querySelectorAll(".navbar-burger"),
-    0
-    );
-    if ($navbarBurgers.length > 0) {
-    $navbarBurgers.forEach((el) => {
-    el.addEventListener("click", () => {
-    const target = el.dataset.target;
-    const $target = document.getElementById(target);
-    el.classList.toggle("is-active");
-    $target.classList.toggle("is-active");
-    });
-    });
-    }
-    });
-nav.navbar(role='navigation' aria-label='main navigation')
-  .navbar-brand
-    a.navbar-item(href=host)
-      img(src=host + '/static/images/favicon.ico')
-    a.navbar-burger(role='button' aria-label='menu' aria-expanded='false' data-target='navbarBasicExample')
-      span(aria-hidden='true')
-      span(aria-hidden='true')
-      span(aria-hidden='true')
-  #navbarBasicExample.navbar-menu
-    .navbar-start
-      a.navbar-item(href=host)  Home 
-      a.navbar-item(href=host + '/ac')
-        | Animal Crossing
-.columns
-  .column
-    .card
-      a(href=host + '/ac')
-        .card-content
-          .content
-            p.title.is-5 Animal Crossing
-            p Look up Fish prices
+include components/header.pug
+
+.container.is-max-desktop.p-6
+  .card(onclick='pihole()')
+    .card-content
+      img.icon(src=host + '/static/assets/pihole.svg', alt='Pi Hole Icon')
+      a.card-text(href=host + '/admin') Pi Hole
+    footer.card-footer
+      p.card-footer-item Password: O4LQXFll
+  .card.mt-6(onclick='timesheet()')
+    .card-content
+      img.icon(src=host + '/static/assets/clock.png', alt='Clock Icon')
+      a.card-text(href=host + '/timesheet') Timesheet
+  .card.mt-6(onclick='animalcrossing()')
+    .card-content
+      img.icon(src=host + '/static/assets/ac.png', alt='Animal Crossing Leaf')
+      a.card-text(href=host + '/ac') Animal Crossing
+  .card.mt-6(onclick='pokemon()')
+    .card-content
+      img.icon(src=host + '/static/assets/pokemon.png', alt='Pokeball Icon')
+      a.card-text(href=host + '/pokemon') Pokemon
