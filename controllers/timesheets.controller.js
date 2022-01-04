@@ -1,5 +1,6 @@
+const setup = require("../setup");
 const timesheetsModel = require("../models/timsheets.model");
 
 exports.getTimesheets = (_, res, next) => {
-  res.render("timesheets/index", { host: "http://127.0.0.1:9090" });
+  res.render("timesheets/index", { host: setup.HOST });
 };
