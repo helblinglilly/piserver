@@ -1,5 +1,5 @@
 describe("Mock Test Suite", () => {
   it("Mock Test", () => {
-    expect(2).toBe(2);
+    expect(1).toBe(1);
   });
 });
