@@ -51,7 +51,6 @@ jobs:
       - name: Install dependencies
         run: npm ci --production
       - name: Restarting pm2 service
-        run: pm2 stop 0
-        run: pm2 start 0
+        run: pm2 stop 0 && pm2 start 0
         env:
           NODE_ENV: production
