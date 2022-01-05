@@ -51,6 +51,6 @@ jobs:
       - name: Install dependencies
         run: npm ci --production
       - name: Test node .
-        run: node .
+        run: pm2 restart 0
         env:
           NODE_ENV: production
