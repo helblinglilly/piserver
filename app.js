@@ -1,4 +1,5 @@
 const express = require("express");
+const { host, port } = require("./setup");
 const error = require("./controllers/error.controller");
 const timesheetRouter = require("./routers/timesheets.router.js");
 const acRouter = require("./routers/ac.router.js");
@@ -15,7 +16,7 @@ app.use("/ac", acRouter);
 app.use("/pokemon", pokemonRouter);
 
 app.get("/", (_, res, req) => {
-  res.render("index.pug", { host: "http://127.0.0.1:9090" });
+  res.render("index.pug", { host: `${host}:${port}` });
 });
 
 app.all("/", error.methodNotAllowed);

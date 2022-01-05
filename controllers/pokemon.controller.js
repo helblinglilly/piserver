@@ -1,6 +1,7 @@
-const setup = require("../setup");
+const { host } = require("../setup");
 const pkmnModel = require("../models/pokemon.model");
 
 exports.getPokemon = (_, res, next) => {
-  res.render("pokemon/index", { host: setup.HOST });
+  console.log(host);
+  res.render("pokemon/index", { host: host });
 };
