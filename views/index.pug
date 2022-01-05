@@ -3,19 +3,19 @@ include components/header.pug
 .container.is-max-desktop.p-6
   .card(onclick='pihole()')
     .card-content
-      img.icon(src=host + '/static/assets/pihole.svg', alt='Pi Hole Icon')
-      a.card-text(href=host + '/admin') Pi Hole
+      img.icon(src='/static/assets/pihole.svg', alt='Pi Hole Icon')
+      a.card-text(href='/admin') Pi Hole
     footer.card-footer
       p.card-footer-item Password: O4LQXFll
   .card.mt-6(onclick='timesheet()')
     .card-content
-      img.icon(src=host + '/static/assets/clock.png', alt='Clock Icon')
-      a.card-text(href=host + '/timesheet') Timesheet
+      img.icon(src='/static/assets/clock.png', alt='Clock Icon')
+      a.card-text(href='/timesheet') Timesheet
   .card.mt-6(onclick='animalcrossing()')
     .card-content
-      img.icon(src=host + '/static/assets/ac.png', alt='Animal Crossing Leaf')
-      a.card-text(href=host + '/ac') Animal Crossing
+      img.icon(src='/static/assets/ac.png', alt='Animal Crossing Leaf')
+      a.card-text(href='/ac') Animal Crossing
   .card.mt-6(onclick='pokemon()')
     .card-content
-      img.icon(src=host + '/static/assets/pokemon.png', alt='Pokeball Icon')
-      a.card-text(href=host + '/pokemon') Pokemon
+      img.icon(src='/static/assets/pokemon.png', alt='Pokeball Icon')
+      a.card-text(href='/pokemon') Pokemon

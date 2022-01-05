@@ -1,10 +1,17 @@
 const app = require("./app");
 
-const PORT = process.env.port || 9090;
-const HOST = process.env.host || "http://127.0.0.1";
+let port = 9090;
+let host = "http://127.0.0.1";
 
-app.listen(PORT, () => {
-  console.log(`Listening on ${HOST}:${PORT}`);
+if (process.env.NODE_ENV === "production") {
+  port = 8080;
+  host = "http://raspberry.pi";
+}
+
+app.listen(port, () => {
+  console.log(`Listening on ${host}:${port}`);
+  console.log(process.env.NODE_ENV);
 });
 
-module.exports = HOST;
+exports.port;
+exports.host;

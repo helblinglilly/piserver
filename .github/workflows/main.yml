@@ -1,10 +1,12 @@
 name: Main
-on: [push]
+on:
+  pull_request:
+    branches:
+      - main
 jobs:
   lint:
     name: Linting
     runs-on: self-hosted
-    if: github.event_name == 'pull_request'
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2
@@ -17,6 +19,7 @@ jobs:
       - name: Run linting
         run: npm run lint
   test:
+    needs: lint
     name: Testing
     runs-on: self-hosted
     if: github.event_name == 'pull_request'
@@ -28,40 +31,26 @@ jobs:
         with:
           node-version: 12
       - name: Install dependencies
-        run: npm install
+        run: npm ci --development
       - name: Run tests
         run: npm run test
-# name: main
-# on:
-#   pull_request:
-#     branches:
-#       - main
-#   push:
-#     branches:
-#       - main
-
-#   unit-tests:
-#     name: Unit tests
-#     runs-on: self-hosted
-#     if: github.event_name == 'pull_request'
-#     steps:
-#       - name: Checkout repo
-#         uses: actions/checkout@v2
-#       - name: Use node.js
-#         uses: actions/setup-node@v2
-#         with:
-#           node-version: 12
-#       - name: Install dependencies
-#         run: npm install
-#       - name: Run tests
-#         run: npm test
-#   deploy:
-#     name: Deploy code locally
-#     runs-on: self-hosted
-#     if: github.event_name == 'push'
-#     steps:
-#       - name: Install SSH Key
-#         env:
-#         NODE_ENV: production
-#         PORT: 8080
-#         HOST: http://raspberry.pi
+  deploy:
+    needs: test
+    name: Deploying
+    runs-on: self-hosted
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+      - name: Use node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 12
+      - name: Move files
+        run: cp -r * /home/joel/piserver/ && cd /home/joel/piserver
+      - name: Install dependencies
+        run: npm ci --production
+      - name: Restarting pm2 service
+        run: pm2 stop 0 && pm2 start 0
+        env:
+          NODE_ENV: production
