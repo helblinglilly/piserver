@@ -36,7 +36,7 @@ jobs:
         run: npm run test
   deploy:
     needs: test
-    name: Deploy
+    name: Deploying
     runs-on: self-hosted
     if: github.event_name == 'pull_request'
     steps:
