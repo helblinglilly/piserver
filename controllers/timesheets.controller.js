@@ -1,4 +1,3 @@
-const { host } = require("../setup");
 const timesheetsModel = require("../models/timsheets.model");
 
 exports.getTimesheets = (_, res, next) => {

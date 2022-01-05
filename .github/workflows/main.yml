@@ -50,7 +50,8 @@ jobs:
         run: cp -r * /home/joel/piserver/ && cd /home/joel/piserver
       - name: Install dependencies
         run: npm ci --production
-      - name: Test node .
-        run: pm2 restart 0
+      - name: Restarting pm2 service
+        run: pm2 stop 0
+        run: pm2 start 0
         env:
           NODE_ENV: production
