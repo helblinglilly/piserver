@@ -13,7 +13,5 @@ app.listen(port, () => {
   console.log(process.env.NODE_ENV);
 });
 
-module.exports = Object.freeze({
-  host: host,
-  port: port,
-});
+exports.port;
+exports.host;
