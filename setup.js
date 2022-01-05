@@ -8,7 +8,7 @@ if (process.env.NODE_ENV === "production") {
   host = "http://raspberry.pi";
 }
 
-app.listen(PORT, () => {
+app.listen(port, () => {
   console.log(`Listening on ${host}:${port}`);
   console.log(process.env.NODE_ENV);
 });
