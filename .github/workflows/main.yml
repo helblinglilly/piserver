@@ -47,7 +47,7 @@ jobs:
         with:
           node-version: 12
       - name: Move files
-        run: cp * /home/joel/piserver/ && cd /home/joel/piserver
+        run: cp -r * /home/joel/piserver/ && cd /home/joel/piserver
       - name: Install dependencies
         run: npm ci --production
       - name: Test node .
