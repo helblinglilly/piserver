@@ -9,7 +9,9 @@ const app = express();
 app.set("view engine", "pug");
 app.use("/static", express.static("public"));
 app.set("views", "./views");
+
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.use("/timesheet", timesheetRouter);
 app.use("/ac", acRouter);
@@ -20,5 +22,11 @@ app.get("/", (_, res, req) => {
 });
 
 app.all("/", error.methodNotAllowed);
+
+app.use((err, _, res, next) => {
+  if (err) {
+    error.handleErrors(res, err);
+  } else next(err);
+});
 
 module.exports = app;
