@@ -10,7 +10,7 @@ exports.getTimesheets = (_, res, next) => {
   res.render("timesheets/index", { ...options });
 };
 
-exports.action = (req, res, next) => {
+exports.enter = (req, res, next) => {
   if (req.body.action) {
     switch (req.query.action) {
       case "Clock In":
@@ -30,4 +30,14 @@ exports.action = (req, res, next) => {
   } else {
     next({ statusCode: 400, msg: "Page not found" });
   }
+};
+
+exports.view = (req, res, next) => {
+  // res.render("timesheets/view", { ...options });
+  res.render("timesheets/view");
+};
+
+exports.edit = (req, res, next) => {
+  // res.render("timesheets/view", { ...options });
+  res.render("timesheets/edit");
 };
