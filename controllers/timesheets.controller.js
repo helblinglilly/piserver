@@ -4,8 +4,9 @@ const utils = require("../utils");
 exports.getTimesheets = (_, res, next) => {
   const options = {};
   options.day = utils.today();
-  options.nextAction = "Clock In";
-  options.endTime = "17:15";
+  options.nextAction = timesheetsModel.selectNextAction();
+  options.endTime = timesheetsModel.selectEndTime();
+
   res.render("timesheets/index", { ...options });
 };
 
