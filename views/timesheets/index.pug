@@ -1,1 +1,14 @@
 include  ../components/header.pug
+
+.container.is-max-desktop.p-6
+    .title.is-1 #{day}
+    .title.is-2 17:00 #{endTime}
+    .card
+        .card-content(onclick="location.href='/timesheet/enter';")
+            a.card-text Enter Time #{nextAction}
+    .card.mt-6
+        .card-content(onclick="location.href='/timesheet/view';")
+            a.card-text View Time
+    .card.mt-6
+        .card-content(onclick="location.href='/timesheet/edit';")
+            a.card-text Edit Time

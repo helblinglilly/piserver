@@ -10,7 +10,6 @@ if (process.env.NODE_ENV === "production") {
 
 app.listen(port, () => {
   console.log(`Listening on ${host}:${port}`);
-  console.log(process.env.NODE_ENV);
 });
 
 exports.port;
