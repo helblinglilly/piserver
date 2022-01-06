@@ -2,20 +2,20 @@ include components/header.pug
 
 .container.is-max-desktop.p-6
   .card(onclick='pihole()')
-    .card-content
+    .card-content(onclick="location.href='/admin';")
       img.icon(src='/static/assets/pihole.svg', alt='Pi Hole Icon')
-      a.card-text(href='/admin') Pi Hole
+      a.card-text Pi Hole
     footer.card-footer
       p.card-footer-item Password: O4LQXFll
-  .card.mt-6(onclick='timesheet()')
+  .card.mt-6(onclick="location.href='/timesheet';")
     .card-content
       img.icon(src='/static/assets/clock.png', alt='Clock Icon')
-      a.card-text(href='/timesheet') Timesheet
-  .card.mt-6(onclick='animalcrossing()')
+      a.card-text Timesheet
+  .card.mt-6(onclick="location.href='/ac';")
     .card-content
       img.icon(src='/static/assets/ac.png', alt='Animal Crossing Leaf')
       a.card-text(href='/ac') Animal Crossing
-  .card.mt-6(onclick='pokemon()')
+  .card.mt-6(onclick="location.href='/pokemon';")
     .card-content
       img.icon(src='/static/assets/pokemon.png', alt='Pokeball Icon')
       a.card-text(href='/pokemon') Pokemon
