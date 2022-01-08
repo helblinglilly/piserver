@@ -12,18 +12,18 @@ exports.getTimesheets = (_, res, next) => {
 
 exports.enter = (req, res, next) => {
   if (req.body.action) {
-    switch (req.query.action) {
+    switch (req.body.action) {
       case "Clock In":
-        console.log("Action to Clock In");
+        timesheetsModel.insertClockIn();
         break;
       case "Start Break":
-        console.log("Action to Start Break");
+        timesheetsModel.insertBreakStart();
         break;
       case "End Break":
-        console.log("Action to End Break");
+        timesheetsModel.insertBreakEnd();
         break;
       case "Clock Out":
-        console.log("Action to Clock Out");
+        timesheetsModel.insertClockOut();
         break;
     }
     res.redirect("/timesheet");

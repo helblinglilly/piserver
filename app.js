@@ -1,5 +1,4 @@
 const express = require("express");
-const setup = require("./setup");
 const error = require("./controllers/error.controller");
 const timesheetRouter = require("./routers/timesheets.router.js");
 const acRouter = require("./routers/ac.router.js");
