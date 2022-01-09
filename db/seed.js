@@ -1,42 +1,41 @@
 const db = require("./index");
 
 exports.seed = async () => {
-  const dropTimesheet = `DROP TABLE timesheet;`;
-  const createTimesheets = `CREATE TABLE "timesheet" (
-    "username" varchar(15) NOT NULL,
+  const createUsertable = `CREATE TABLE "usertable" (
+        "ip" varchar(255) NOT NULL PRIMARY KEY,
+        "username" varchar(255) NOT NULL
+        );`;
+
+  const createTimesheet = `CREATE TABLE "timesheet" (
+    "username" VARCHAR NOT NULL,
     "day_date" DATE NOT NULL,
     "clock_in" TIME NOT NULL,
     "break_in" TIME,
     "break_out" TIME,
     "clock_out" TIME,
     PRIMARY KEY(username, day_date)
-  );`;
-  const insertData = [
-    `INSERT INTO timesheet(username, day_date, clock_in, break_in, break_out, clock_out) VALUES ('joel', '2022-01-08', '09:00', '13:00', '14:00', '17:30') RETURNING *;`,
-    `INSERT INTO timesheet(username, day_date, clock_in, break_in, break_out, clock_out) VALUES ('joel', '2022-01-09', '09:00', '13:00', '14:00', '17:30') RETURNING *;`,
-    `INSERT INTO timesheet(username, day_date, clock_in, break_in, break_out, clock_out) VALUES ('joel', '2022-01-10', '09:00', '13:00', '14:00', '17:30') RETURNING *;`,
-    `INSERT INTO timesheet(username, day_date, clock_in, break_in, break_out, clock_out) VALUES ('joel', '2022-01-11', '09:00', '13:00', '14:00', '17:30') RETURNING *;`,
-    `INSERT INTO timesheet(username, day_date, clock_in, clock_out) VALUES ('harry', '2022-01-09', '11:00', '19:00') RETURNING *;`,
-    `INSERT INTO timesheet(username, day_date, clock_in, clock_out) VALUES ('harry', '2022-01-10', '11:00', '19:00') RETURNING *;`,
-    `INSERT INTO timesheet(username, day_date, clock_in, clock_out) VALUES ('harry', '2022-01-11', '11:00', '19:00') RETURNING *;`,
+    );`;
+
+  const insertUsertable = [
+    `INSERT INTO usertable (ip, username) VALUES ('::ffff:127.0.0.1', 'joel');`,
   ];
 
-  try {
-    await db.query(dropTimesheet);
-  } catch (err) {
-    console.log(err);
+  const insertTimsheet = [
+    `INSERT INTO timesheet (username, day_date, clock_in, break_in, break_out, clock_out) VALUES ('joel', '2022-01-01', '09:00', '13:00', '14:00', '17:30');`,
+    `INSERT INTO timesheet (username, day_date, clock_in, break_in, break_out, clock_out) VALUES ('joel', '2022-01-02', '09:00', '13:15', '14:15', '17:45');`,
+    `INSERT INTO timesheet (username, day_date, clock_in, break_in, break_out, clock_out) VALUES ('joel', '2022-01-03', '08:30', '13:00', '14:00', '17:00');`,
+  ];
+
+  await db.query("DROP TABLE IF EXISTS timesheet");
+  await db.query("DROP TABLE IF EXISTS usertable");
+  await db.query(createUsertable);
+  await db.query(createTimesheet);
+  for (query of insertUsertable) {
+    await db.query(query);
   }
-  await db.query(createTimesheets);
-  for (query of insertData) {
-    try {
-      await db.query(query);
-    } catch (err) {
-      console.log(err);
-    }
-    console.log(`Completed: ${query}`);
+  for (query of insertTimsheet) {
+    await db.query(query);
   }
+  console.log("here");
+  console.log("Seeded");
 };
-/*
-INSERT INTO timesheet(username, day_date, clock_in) VALUES ('joel', '2022-01-08', '11:45') RETURNING *;
-UPDATE timesheet SET break_in = '14:00' WHERE username='joel' AND day_date = '2022-01-08' RETURNING *;
-*/

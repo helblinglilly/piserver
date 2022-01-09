@@ -1,34 +1,74 @@
 const db = require("../db");
-const seeding = require("../db/seed");
+const format = require("pg-format");
 
-exports.selectTimesheets = () => {};
-
-exports.selectNextAction = async () => {
-  db.connect();
-  seeding.seed();
-
-  const output = await db.query(`SELECT * FROM timesheet`);
-  console.log(output);
-
-  return "Clock In";
+exports.selectDay = (day, username) => {
+  return db
+    .query(
+      format(
+        `SELECT * FROM timesheet WHERE day_date=%L AND username=%L`,
+        day,
+        username
+      )
+    )
+    .then(({ rows }) => rows);
 };
 
-exports.selectEndTime = () => {
-  return "17:15";
+exports.getUsername = (ip) => {
+  return db
+    .query(format(`SELECT username FROM usertable WHERE ip LIKE %L`, ip))
+    .then(({ rows }) => rows[0].username);
 };
 
-exports.insertClockIn = () => {
-  console.log("Action to Clock In");
+/*
+exports.insertClockIn = (day, username, time) => {
+  db.query(
+    format(
+      `INSERT INTO timesheet (day_date, username, clock_in) VALUES (%L, %L, %L)`,
+      day,
+      username,
+      time
+    )
+  )
+    .then(() => console.log(`Inserted clock in: ${username} ${day} ${time}`))
+    .catch((err) => console.log(err));
 };
 
-exports.insertBreakStart = () => {
-  console.log("Action to Break Start");
+exports.insertBreakStart = (day, username, time) => {
+  db.query(
+    format(
+      `INSERT INTO timesheet (day_date, username, break_in) VALUES (%L, %L, %L)`,
+      day,
+      username,
+      time
+    )
+  )
+    .then(() => console.log(`Inserted break in: ${username} ${day} ${time}`))
+    .catch((err) => console.log(err));
 };
 
-exports.insertBreakEnd = () => {
-  console.log("Action to Break End");
+exports.insertBreakEnd = (day, username, time) => {
+  db.query(
+    format(
+      `INSERT INTO timesheet (day_date, username, break_end) VALUES (%L, %L, %L)`,
+      day,
+      username,
+      time
+    )
+  )
+    .then(() => console.log(`Inserted break end: ${username} ${day} ${time}`))
+    .catch((err) => console.log(err));
 };
 
-exports.insertClockOut = () => {
-  console.log("Action to Clock Out");
+exports.insertClockOut = (day, username, time) => {
+  db.query(
+    format(
+      `INSERT INTO timesheet (day_date, username, clock_out) VALUES (%L, %L, %L)`,
+      day,
+      username,
+      time
+    )
+  )
+    .then(() => console.log(`Inserted clock out: ${username} ${day} ${time}`))
+    .catch((err) => console.log(err));
 };
+*/

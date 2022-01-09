@@ -1,4 +1,5 @@
 const app = require("./app");
+const seed = require("./db/seed");
 
 const environment = process.env.NODE_ENV || "development";
 
@@ -10,6 +11,12 @@ if (environment == "production") {
   global.host = "127.0.0.1";
 }
 
-app.listen(port, () => {
-  console.log(`Listening on http://${host}:${port}`);
-});
+seedAndRun();
+
+function seedAndRun() {
+  seed.seed().then(() => {
+    app.listen(port, () => {
+      console.log(`Listening on http://${host}:${port}`);
+    });
+  });
+}
