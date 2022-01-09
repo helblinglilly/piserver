@@ -9,14 +9,9 @@ if (environment == "production") {
 } else {
   global.port = 9090;
   global.host = "127.0.0.1";
+  seed.seed();
 }
 
-seedAndRun();
-
-function seedAndRun() {
-  seed.seed().then(() => {
-    app.listen(port, () => {
-      console.log(`Listening on http://${host}:${port}`);
-    });
-  });
-}
+app.listen(port, () => {
+  console.log(`Listening on http://${host}:${port}`);
+});

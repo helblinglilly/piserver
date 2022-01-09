@@ -16,7 +16,7 @@ app.use("/timesheet", timesheetRouter);
 app.use("/ac", acRouter);
 app.use("/pokemon", pokemonRouter);
 
-app.get("/", (_, res, req) => {
+app.get("/", (_, res, next) => {
   res.render("index.pug", { host: `` });
 });
 

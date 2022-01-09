@@ -20,7 +20,7 @@ exports.today = () => {
 
 exports.todayIso = () => {
   const date = new Date();
-  return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+  return date.toISOString().substr(0, 10);
 };
 
 exports.addTime = (startTime, addTime) => {
