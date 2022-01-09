@@ -1,7 +1,7 @@
 const db = require("../db");
 const format = require("pg-format");
 
-exports.selectDay = (day, username) => {
+exports.selectDay = async (day, username) => {
   return db
     .query(
       format(
@@ -10,10 +10,10 @@ exports.selectDay = (day, username) => {
         username
       )
     )
-    .then(({ rows }) => rows);
+    .then(({ rows }) => rows[0]);
 };
 
-exports.getUsername = (ip) => {
+exports.getUsername = async (ip) => {
   return db
     .query(format(`SELECT username FROM usertable WHERE ip LIKE %L`, ip))
     .then(({ rows }) => rows[0].username);
