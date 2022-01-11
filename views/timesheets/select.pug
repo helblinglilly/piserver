@@ -4,16 +4,16 @@ block append content
     .container.is-max-desktop.pl-6.pr-6
         .title.is-2 User selection 
         .columns
-            div.card.column.m-6(onclick="document.forms['userForm'].submit();")
-                form(action="/timesheet/select", method="post", id="userForm") 
-                    input(type="hidden", name="action", value="harry")
+            div.card.column.m-6(onclick="document.forms['harryForm'].submit();")
+                form(action="/timesheet/select", method="post", id="harryForm") 
+                    input(type="hidden", name="username", value="harry")
                     figure.image
                         img(src="/static/assets/harry.png")
                     .card-footer
                         .card-footer-item.title.is-4 Harry
-            div.card.column.m-6(onclick="document.forms['userForm'].submit();")
-                form(action="/timesheet/select", method="post", id="userForm") 
-                    input(type="hidden", name="action", value="joel")
+            div.card.column.m-6(onclick="document.forms['joelForm'].submit();")
+                form(action="/timesheet/select", method="post", id="joelForm") 
+                    input(type="hidden", name="username", value="joel")
                     figure.image
                         img(src="/static/assets/joel.png")
                     .card-footer

@@ -5,6 +5,10 @@ const tc = require("../controllers/timesheets.controller");
 timesheetsRouter.get("/", tc.getTimesheets);
 timesheetsRouter.all("/", error.methodNotAllowed);
 
+timesheetsRouter.get("/select", tc.selectGet);
+timesheetsRouter.post("/select", tc.selectPost);
+timesheetsRouter.all("/select", error.methodNotAllowed);
+
 timesheetsRouter.post("/enter", tc.enter);
 timesheetsRouter.all("/enter", error.methodNotAllowed);
 

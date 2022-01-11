@@ -13,14 +13,27 @@ exports.selectDay = async (day, username) => {
     .then(({ rows }) => rows[0]);
 };
 
-exports.getUsername = async (ip) => {
+exports.selectUsername = async (ip) => {
   return db
     .query(format(`SELECT username FROM usertable WHERE ip LIKE %L`, ip))
     .then(({ rows }) => rows[0].username);
 };
 
-/*
-exports.insertClockIn = (day, username, time) => {
+exports.insertUsertable = async (ip, username) => {
+  try {
+    return db.query(
+      format(
+        `INSERT INTO usertable (ip, username) VALUES (%L, %L)`,
+        ip,
+        username
+      )
+    );
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+exports.insertClockIn = async (day, username, time) => {
   db.query(
     format(
       `INSERT INTO timesheet (day_date, username, clock_in) VALUES (%L, %L, %L)`,
@@ -33,42 +46,40 @@ exports.insertClockIn = (day, username, time) => {
     .catch((err) => console.log(err));
 };
 
-exports.insertBreakStart = (day, username, time) => {
+exports.insertBreakStart = async (day, username, time) => {
   db.query(
     format(
-      `INSERT INTO timesheet (day_date, username, break_in) VALUES (%L, %L, %L)`,
+      `UPDATE timesheet SET break_in=%L WHERE day_date=%L AND username=%L`,
+      time,
       day,
-      username,
-      time
+      username
     )
   )
     .then(() => console.log(`Inserted break in: ${username} ${day} ${time}`))
     .catch((err) => console.log(err));
 };
 
-exports.insertBreakEnd = (day, username, time) => {
+exports.insertBreakEnd = async (day, username, time) => {
   db.query(
     format(
-      `INSERT INTO timesheet (day_date, username, break_end) VALUES (%L, %L, %L)`,
+      `UPDATE timesheet SET break_out=%L WHERE day_date=%L AND username=%L`,
+      time,
       day,
-      username,
-      time
+      username
     )
   )
     .then(() => console.log(`Inserted break end: ${username} ${day} ${time}`))
     .catch((err) => console.log(err));
 };
 
-exports.insertClockOut = (day, username, time) => {
+exports.insertClockOut = async (day, username, time) => {
   db.query(
     format(
-      `INSERT INTO timesheet (day_date, username, clock_out) VALUES (%L, %L, %L)`,
+      `UPDATE timesheet SET clock_out=%L WHERE day_date=%L AND username=%L`,
+      time,
       day,
-      username,
-      time
+      username
     )
   )
-    .then(() => console.log(`Inserted clock out: ${username} ${day} ${time}`))
     .catch((err) => console.log(err));
 };
-*/

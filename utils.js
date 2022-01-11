@@ -28,3 +28,20 @@ exports.addTime = (startTime, addTime) => {
   startTime.setMinutes(startTime.getMinutes() + addTime.minutes);
   return startTime;
 };
+
+exports.DateTimeToTime = (date) => {
+  let hours = date.getHours();
+  let minutes = date.getMinutes();
+
+  if (hours < 10) hours = "0" + hours;
+  if (minutes < 10) minutes = "0" + minutes;
+
+  return `${hours}:${minutes}`;
+};
+
+exports.constructDateTime = (day, time) => {
+  const dateTime = new Date(day);
+  dateTime.setHours(time.substr(0, 2));
+  dateTime.setMinutes(time.substr(3, 2));
+  return dateTime;
+};
