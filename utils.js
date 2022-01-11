@@ -36,7 +36,11 @@ exports.addTime = (startTime, addTime = {hours: 0, minutes: 0}) => {
   return startTime;
 };
 
-exports.DateTimeToTime = (date) => {
+exports.dateTimeToTime = (date) => {
+  if (date === undefined)
+    throw "Invalid Argument - empty"
+  else if (typeof date !== 'object')
+    throw "Invalid Argument - Not an object"
   let hours = date.getHours();
   let minutes = date.getMinutes();
 
@@ -47,6 +51,13 @@ exports.DateTimeToTime = (date) => {
 };
 
 exports.constructDateTime = (day, time) => {
+  if (day === undefined || time === undefined)
+    throw "Invalid Argument - empty"
+  else if (typeof day !== 'object')
+    throw "Invalid Argument - Not an object"
+  else if (typeof time !== 'string')
+    throw "Invalid Argument - Not a string"
+    
   const dateTime = new Date(day);
   dateTime.setHours(time.substr(0, 2));
   dateTime.setMinutes(time.substr(3, 2));
