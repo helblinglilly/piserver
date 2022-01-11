@@ -17,7 +17,7 @@ app.use("/ac", acRouter);
 app.use("/pokemon", pokemonRouter);
 
 app.get("/", (_, res, next) => {
-  res.render("index.pug", { host: `` });
+  res.render("index.pug");
 });
 
 app.all("/", error.methodNotAllowed);

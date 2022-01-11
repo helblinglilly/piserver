@@ -5,7 +5,7 @@ const environment = process.env.NODE_ENV || "development";
 
 if (environment == "production") {
   global.port = 8080;
-  global.host = "raspberry.pi";
+  global.host = "127.0.0.1";
 } else {
   global.port = 9090;
   global.host = "127.0.0.1";
