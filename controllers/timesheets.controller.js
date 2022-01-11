@@ -17,7 +17,7 @@ exports.getTimesheets = async (req, res, next) => {
       hours: 8,
       minutes: 30,
     });
-    options.endTime = `${utils.DateTimeToTime(endTime)}`;
+    options.endTime = `${utils.dateTimeToTime(endTime)}`;
   } else {
     if (rows.clock_in && !rows.break_in && !rows.break_out && !rows.clock_out) {
       options.nextAction = "Break In";
@@ -31,7 +31,7 @@ exports.getTimesheets = async (req, res, next) => {
         }
         options.endTime = `Overtime: ${overtimeWorked.hours}h ${overtimeWorked.minutes}min`;
       } else
-          options.endTime = `${utils.DateTimeToTime(endTime)}`;
+          options.endTime = `${utils.dateTimeToTime(endTime)}`;
       
     } else if (rows.clock_in && rows.break_in && !rows.break_out && !rows.clock_out) {
       options.nextAction = "Break End";
@@ -40,7 +40,7 @@ exports.getTimesheets = async (req, res, next) => {
 
       const plusOneHour = utils.addTime(break_in, { hours: 1, minutes: 0 });
       const difference = now > plusOneHour ? now : plusOneHour;
-      const backFromBreakTime = utils.DateTimeToTime(difference);
+      const backFromBreakTime = utils.dateTimeToTime(difference);
 
       const millisecondsLeft = 7.5 * 60 * 60 * 1000 - (break_in - clock_in);
       const timeLeftAtWork = {
@@ -48,7 +48,7 @@ exports.getTimesheets = async (req, res, next) => {
         minutes: ((millisecondsLeft / 60 / 60 / 1000) % 1) * 60,
       };
 
-      const doneWithWork = utils.DateTimeToTime(utils.addTime(difference, timeLeftAtWork));
+      const doneWithWork = utils.dateTimeToTime(utils.addTime(difference, timeLeftAtWork));
       options.endTime = `Back: ${backFromBreakTime}\nDone by: ${doneWithWork}`;
 
     } else if (rows.clock_in && rows.break_in && rows.break_out && !rows.clock_out) {
@@ -68,7 +68,7 @@ exports.getTimesheets = async (req, res, next) => {
           minutes: ((millisecondsLeft / 60 / 60 / 1000) % 1) * 60,
         };
 
-        displayText = utils.DateTimeToTime(utils.addTime(now, timeLeftAtWork));
+        displayText = utils.dateTimeToTime(utils.addTime(now, timeLeftAtWork));
       } else {
         const overtimeMilliseconds = Math.abs(millisecondsLeft);
         const overtimeWorked = {
@@ -123,19 +123,19 @@ exports.enter = async (req, res, next) => {
     const username = await timesheetsModel.selectUsername(ip);
     switch (req.body.action) {
       case "Clock In":
-        timesheetsModel.insertClockIn(now, username, utils.DateTimeToTime(now));
+        timesheetsModel.insertClockIn(now, username, utils.dateTimeToTime(now));
         res.redirect("/timesheet");
         break;
       case "Break In":
-        timesheetsModel.insertBreakStart(now, username, utils.DateTimeToTime(now));
+        timesheetsModel.insertBreakStart(now, username, utils.dateTimeToTime(now));
         res.redirect("/timesheet");
         break;
       case "Break End":
-        timesheetsModel.insertBreakEnd(now, username, utils.DateTimeToTime(now));
+        timesheetsModel.insertBreakEnd(now, username, utils.dateTimeToTime(now));
         res.redirect("/timesheet");
         break;
       case "Clock Out":
-        timesheetsModel.insertClockOut(now, username, utils.DateTimeToTime(now));
+        timesheetsModel.insertClockOut(now, username, utils.dateTimeToTime(now));
         res.redirect("/timesheet");
         break;
       case "Done for the day :)":
