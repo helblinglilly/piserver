@@ -52,6 +52,54 @@ exports.getTimesheets = async (req, res, next) => {
       );
 
       options.endTime = `Back: ${backFromBreakTime}\nDone by: ${doneWithWork}`;
+    } else if (
+      rows.clock_in &&
+      rows.break_in &&
+      rows.break_out &&
+      !rows.clock_out
+    ) {
+      options.nextAction = "Clock Out";
+
+      const clock_in = new Date(rows.day_date);
+      clock_in.setHours(rows.clock_in.substr(0, 2));
+      clock_in.setMinutes(rows.clock_in.substr(3, 2));
+
+      const break_in = new Date(rows.day_date);
+      break_in.setHours(rows.break_in.substr(0, 2));
+      break_in.setMinutes(rows.break_in.substr(3, 2));
+
+      const break_out = new Date(rows.day_date);
+      break_out.setHours(rows.break_out.substr(0, 2));
+      break_out.setMinutes(rows.break_out.substr(3, 2));
+
+      // 7.5hours/day work contract
+      const timeWorked = new Date() - break_out + (break_in - clock_in);
+      const millisecondsLeft = 7.5 * 60 * 60 * 1000 - timeWorked;
+
+      if (millisecondsLeft > 0) {
+        const timeLeftAtWork = {
+          hours: Math.trunc(millisecondsLeft / 60 / 60 / 1000),
+          minutes: ((millisecondsLeft / 60 / 60 / 1000) % 1) * 60,
+        };
+
+        const doneWithWork = utils.DateTimeToTime(
+          utils.addTime(new Date(), timeLeftAtWork)
+        );
+        options.endTime = `${doneWithWork}`;
+      } else {
+        const overtimeMilliseconds = Math.abs(millisecondsLeft);
+        const overtimeWorked = {
+          hours: Math.trunc(overtimeMilliseconds / 60 / 60 / 1000),
+          minutes: Math.trunc(
+            ((overtimeMilliseconds / 60 / 60 / 1000) % 1) * 60
+          ),
+        };
+        if (overtimeWorked.hours >= 1) {
+          options.endTime = `Overtime: ${overtimeWorked.hours}h ${overtimeWorked.minutes}min`;
+        } else {
+          options.endTime = `Overtime: ${overtimeWorked.minutes}min`;
+        }
+      }
     }
   }
 
