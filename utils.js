@@ -23,7 +23,14 @@ exports.todayIso = () => {
   return date.toISOString().substr(0, 10);
 };
 
-exports.addTime = (startTime, addTime) => {
+exports.addTime = (startTime, addTime = {hours: 0, minutes: 0}) => {
+  if (!startTime || !addTime)
+    throw "Invalid Argument - empty";
+  else if (typeof startTime !== 'object')
+    throw "Invalid Argument - startTime is not DateTime"
+  else if (typeof addTime !== 'object')
+    throw "Invalid Argument - addTime is not an object"
+
   startTime.setHours(startTime.getHours() + addTime.hours);
   startTime.setMinutes(startTime.getMinutes() + addTime.minutes);
   return startTime;

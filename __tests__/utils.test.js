@@ -2,7 +2,7 @@ const utils = require("../utils");
 
 describe("Utils Tests", () => {
   describe("todayIso()", () => {
-    it("Separated by '/'", () => {
+    it("1.0 Separated by '/'", () => {
       const input = utils.todayIso();
 
       const year = input.substr(0, 4);
@@ -22,14 +22,23 @@ describe("Utils Tests", () => {
     });
   });
   describe("addTime(startTime, { hours: number, minutes: number})", () => {
-    it("Adds time correctly", () => {
+    it("1.0 Invalid Argumet - Empty Args", () => {
+      expect(() => utils.addTime()).toThrow("Invalid Argument - empty");
+    });
+    it("1.1 Invalid Argument - Not of DateTime", () => {
+      expect(() => utils.addTime('something', 123) ).toThrow("Invalid Argument - startTime is not DateTime");
+    });
+    it("1.2 Invalid Argument - Not an object", () => {
+      expect(() => utils.addTime(new Date(), 123) ).toThrow("Invalid Argument - addTime is not an object");
+    });
+    it("2.0 Adds time correctly", () => {
       const startTime = new Date("01 Jan 1970 00:00:00 GMT");
       const addTime = { hours: 8, minutes: 30 };
       const output = utils.addTime(startTime, addTime);
 
       expect(output.toISOString()).toBe("1970-01-01T08:30:00.000Z");
     });
-    it("Subtracts time correctly", () => {
+    it("2.1 Subtracts time correctly", () => {
       const startTime = new Date("01 Jan 1970 08:30:00 GMT");
       const addTime = { hours: -8, minutes: -30 };
       const output = utils.addTime(startTime, addTime);
