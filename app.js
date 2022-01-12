@@ -16,8 +16,8 @@ app.use("/timesheet", timesheetRouter);
 app.use("/ac", acRouter);
 app.use("/pokemon", pokemonRouter);
 
-app.get("/", (_, res, next) => {
-  res.render("/views/index.pug");
+app.get("/", (_, res, req) => {
+  res.render("home/index", { host: `` });
 });
 
 app.all("/", error.methodNotAllowed);
