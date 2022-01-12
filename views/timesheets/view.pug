@@ -1,11 +1,13 @@
 extend  ../components/header.pug
-
+  
 block append content
     .container.is-max-desktop.pl-6.pr-6
         nav.breadcrumb(aria-label="breadcrumbs")
             ul
                 li
                     a(href="/") Home
+                li
+                    a(href="/timesheet") Timesheet
                 li.is-active
-                    a(href="", aria-current="page") Pokemon
-        p Pokemon
+                    a(href="", aria-current="page") View Time
+        p View Time

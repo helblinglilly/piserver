@@ -1,17 +1,17 @@
 const app = require("./app");
+const seed = require("./db/seed");
 
-let port = 9090;
-let host = "http://127.0.0.1";
+const environment = process.env.NODE_ENV || "development";
 
-if (process.env.NODE_ENV === "production") {
-  port = 8080;
-  host = "http://raspberry.pi";
+if (environment == "production") {
+  global.port = 8080;
+  global.host = "127.0.0.1";
+} else {
+  global.port = 9090;
+  global.host = "127.0.0.1";
+  seed.seed();
 }
 
 app.listen(port, () => {
-  console.log(`Listening on ${host}:${port}`);
-  console.log(process.env.NODE_ENV);
+  console.log(`Listening on http://${host}:${port}`);
 });
-
-exports.port;
-exports.host;
