@@ -162,12 +162,27 @@ exports.selectPost = (req, res, next) => {
   res.send(`Hello ${req.body.username}`);
 };
 
-exports.view = (req, res, next) => {
-  // res.render("timesheets/view", { ...options });
-  res.render("timesheets/view");
+exports.view = async (req, res, next) => {
+  const options = { }
+  options.date = Object.keys(req.query).length === 0 ? utils.todayIso() : req.query.date;
+
+  if (Object.keys(req.query).length === 0)
+    options.date = utils.todayIso();
+  else 
+    options.date = req.query.date;
+  
+  const ip = req.socket.remoteAddress;
+  const username = await timesheetsModel.selectUsername(ip);
+  const entry = await timesheetsModel.selectDay(options.date, username);
+  
+  if (entry){
+
+  }
+
+
+  res.render("timesheets/view", { ...options});
 };
 
 exports.edit = (req, res, next) => {
-  // res.render("timesheets/view", { ...options });
   res.render("timesheets/edit");
 };
