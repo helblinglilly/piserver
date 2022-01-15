@@ -4,12 +4,12 @@ const format = require("pg-format");
 
 const env = process.env.NODE_ENV || "dev";
 exports.seed = async () => {
-	const createUsertable = `CREATE TABLE usertable_${env} (
+	const createUsertable = `CREATE TABLE IF NOT EXISTS usertable_${env} (
         "ip" varchar(255) NOT NULL PRIMARY KEY,
         "username" varchar(255) NOT NULL
         );`;
 
-	const createTimesheet = `CREATE TABLE timesheet_${env} (
+	const createTimesheet = `CREATE TABLE IF NOT EXISTS timesheet_${env} (
     id SERIAL PRIMARY KEY,
     username VARCHAR NOT NULL,
     day_date DATE NOT NULL,
