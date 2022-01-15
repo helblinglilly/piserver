@@ -21,10 +21,12 @@ block append content
         form(action="/timesheet/view", method="get", id="view") 
             input(type='date', name='date', onchange="document.forms['view'].submit();", value=date).input
 
-        //- .container.pt-6 
-        //-     p.title.is-4 Weekly Progress
-        //-     progress.progress.is-primary(value='15', max='37.5')
         .container.pt-6
+        if locals.alert
+            .notification.is-warning #{alert}
+        if !locals.clock_in
+            .notification No data for this day
+        else
             table.table.is-fullwidth
                 thead
                     tr
@@ -35,10 +37,11 @@ block append content
                     th +/-
                 tbody
                     tr
-                    td 09:00
-                    td 13:00
-                    td 14:00
-                    td 17:00
-                    td.has-text-success +2.5h
-
+                    td #{clock_in}
+                    td #{break_in}
+                    td #{break_out}
+                    td #{clock_out}
+                    if locals.difference
+                        td #{difference}
+    
             
