@@ -7,6 +7,9 @@ exports.getTimesheets = async (req, res, next) => {
 
 	const ip = req.socket.remoteAddress;
 	const username = await timesheetsModel.selectUsername(ip);
+	if (!username) {
+		res.redirect("/timesheet/select");
+	}
 
 	const rows = await timesheetsModel.selectDay(utils.todayIso(), username);
 	const now = new Date();
@@ -144,8 +147,7 @@ exports.selectPost = (req, res, next) => {
 	const ip = req.socket.remoteAddress;
 	const username = req.body.username;
 	timesheetsModel.insertUsertable(ip, username);
-	console.log("done");
-	res.send(`Hello ${req.body.username}`);
+	res.redirect("/timesheet");
 };
 
 exports.view = async (req, res, next) => {

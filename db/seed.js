@@ -5,8 +5,8 @@ const format = require("pg-format");
 const env = process.env.NODE_ENV || "dev";
 exports.seed = async () => {
 	const createUsertable = `CREATE TABLE IF NOT EXISTS usertable_${env} (
-        "ip" varchar(255) NOT NULL PRIMARY KEY,
-        "username" varchar(255) NOT NULL
+        ip varchar(255) NOT NULL PRIMARY KEY,
+        username varchar(255) NOT NULL
         );`;
 
 	const createTimesheet = `CREATE TABLE IF NOT EXISTS timesheet_${env} (
@@ -18,10 +18,6 @@ exports.seed = async () => {
     break_out TIME,
     clock_out TIME
     );`;
-
-	const insertUsertable = [
-		`INSERT INTO usertable_${env} (ip, username) VALUES ('::ffff:127.0.0.1', 'joel');`,
-	];
 
 	const insertTimsheet = [
 		`INSERT INTO timesheet_${env} (username, day_date, clock_in, break_in, break_out, clock_out) VALUES ('joel', '2022-01-01', '09:00:00', '13:00:00', '14:00:00', '17:30:00');`,
@@ -58,9 +54,6 @@ exports.seed = async () => {
 	await db.query(createTimesheet);
 
 	if (env === "dev") {
-		for (query of insertUsertable) {
-			await db.query(query);
-		}
 		for (query of insertTimsheet) {
 			await db.query(query);
 		}
