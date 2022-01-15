@@ -7,7 +7,7 @@ exports.selectDay = async (day, username) => {
 	return db
 		.query(
 			format(
-				`SELECT * FROM "timesheet-${env}" WHERE day_date=%L AND username=%L`,
+				`SELECT * FROM timesheet_${env} WHERE day_date=%L AND username=%L`,
 				day,
 				username
 			)
@@ -17,7 +17,7 @@ exports.selectDay = async (day, username) => {
 
 exports.selectUsername = async (ip) => {
 	return db
-		.query(format(`SELECT username FROM "usertable-${env}" WHERE ip LIKE %L`, ip))
+		.query(format(`SELECT username FROM usertable_${env} WHERE ip LIKE %L`, ip))
 		.then(({ rows }) => rows[0].username);
 };
 
@@ -25,7 +25,7 @@ exports.insertUsertable = async (ip, username) => {
 	try {
 		return db.query(
 			format(
-				`INSERT INTO "usertable-${env}" (ip, username) VALUES (%L, %L)`,
+				`INSERT INTO usertable_${env} (ip, username) VALUES (%L, %L)`,
 				ip,
 				username
 			)
@@ -38,7 +38,7 @@ exports.insertUsertable = async (ip, username) => {
 exports.insertClockIn = async (day, username, time) => {
 	db.query(
 		format(
-			`INSERT INTO "timesheet-${env}" (day_date, username, clock_in) VALUES (%L, %L, %L)`,
+			`INSERT INTO timesheet_${env} (day_date, username, clock_in) VALUES (%L, %L, %L)`,
 			day,
 			username,
 			time
@@ -51,7 +51,7 @@ exports.insertClockIn = async (day, username, time) => {
 exports.insertBreakStart = async (day, username, time) => {
 	db.query(
 		format(
-			`UPDATE "timesheet-${env}" SET break_in=%L WHERE day_date=%L AND username=%L`,
+			`UPDATE timesheet_${env} SET break_in=%L WHERE day_date=%L AND username=%L`,
 			time,
 			day,
 			username
@@ -64,7 +64,7 @@ exports.insertBreakStart = async (day, username, time) => {
 exports.insertBreakEnd = async (day, username, time) => {
 	db.query(
 		format(
-			`UPDATE "timesheet-${env}" SET break_out=%L WHERE day_date=%L AND username=%L`,
+			`UPDATE timesheet_${env} SET break_out=%L WHERE day_date=%L AND username=%L`,
 			time,
 			day,
 			username
@@ -77,7 +77,7 @@ exports.insertBreakEnd = async (day, username, time) => {
 exports.insertClockOut = async (day, username, time) => {
 	db.query(
 		format(
-			`UPDATE "timesheet-${env}" SET clock_out=%L WHERE day_date=%L AND username=%L`,
+			`UPDATE timesheet_${env} SET clock_out=%L WHERE day_date=%L AND username=%L`,
 			time,
 			day,
 			username
