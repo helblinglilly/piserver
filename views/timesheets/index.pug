@@ -1,6 +1,9 @@
 extend  ../components/header.pug
-  
-block append content
+
+block append head
+   script(src='/static/scripts/modal.js')
+
+block append body
     .container.is-max-desktop.pl-6.pr-6
         nav.breadcrumb(aria-label="breadcrumbs")
             ul
@@ -12,10 +15,24 @@ block append content
         .title.is-1 #{day}
         .title.is-2 #{endTime}
         .card
-            form(action="/timesheet/enter", method="post", id="enterForm") 
-                input(type="hidden", name="action", value=nextAction)
-                .card-content(onclick="document.forms['enterForm'].submit();")
-                    a.card-text #{nextAction}
+            .card-content.js-modal-trigger(data-target='modal-js-example')
+                a.card-text #{nextAction}
+
+
+            #modal-js-example.modal
+                .modal-background
+                .modal-card
+                    .modal-card-head
+                        p.modal-card-title #{nextAction}
+                    .modal-card-body
+                        p Are you sure you want to do this?
+                    footer.modal-card-foot
+                        form(action="/timesheet/enter", method="post", id="enterForm") 
+                            input(type="hidden", name="action", value=nextAction)
+                        button.button.is-info.is-fullwidth(onclick="document.forms['enterForm'].submit();") #{nextAction}
+                        button.button.is-danger.is-fullwidth Cancel
+                        
+
         .card.mt-6
             .card-content(onclick="location.href='/timesheet/view';")
                 a.card-text View Time
