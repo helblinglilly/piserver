@@ -1,5 +1,12 @@
 extend  ../components/header.pug
   
+block append scripts
+   script.
+    function handler(e){
+    alert(e.target.value)
+    }
+
+    
 block append content
     .container.is-max-desktop.pl-6.pr-6
         nav.breadcrumb(aria-label="breadcrumbs")
@@ -10,4 +17,31 @@ block append content
                     a(href="/timesheet") Timesheet
                 li.is-active
                     a(href="", aria-current="page") View Time
-        p View Time
+        p.title.is-3 View Time
+        form(action="/timesheet/view", method="get", id="view") 
+            input(type='date', name='date', onchange="document.forms['view'].submit();", value=date).input
+
+        .container.pt-6
+        if locals.alert
+            .notification.is-warning #{alert}
+        if !locals.clock_in
+            .notification No data for this day
+        else
+            table.table.is-fullwidth
+                thead
+                    tr
+                    th Clock In
+                    th Break Start
+                    th Break End
+                    th Clock Out
+                    th +/-
+                tbody
+                    tr
+                    td #{clock_in}
+                    td #{break_in}
+                    td #{break_out}
+                    td #{clock_out}
+                    if locals.difference
+                        td #{difference}
+    
+            
