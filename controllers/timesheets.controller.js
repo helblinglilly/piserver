@@ -144,7 +144,8 @@ exports.selectGet = (_, res, next) => {
 };
 
 exports.selectPost = (req, res, next) => {
-	const ip = req.socket.remoteAddress;
+	// x-forwarded-for if this application sits behind a proxy
+	const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
 	const username = req.body.username;
 	timesheetsModel.insertUsertable(ip, username);
 	res.redirect("/timesheet");
