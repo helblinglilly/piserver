@@ -5,7 +5,7 @@ exports.getTimesheets = async (req, res, next) => {
 	const options = {};
 	options.day = utils.today();
 
-	const ip = req.socket.remoteAddress;
+	const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
 	const username = await timesheetsModel.selectUsername(ip);
 	if (!username) {
 		res.redirect("/timesheet/select");
@@ -104,7 +104,7 @@ exports.getTimesheets = async (req, res, next) => {
 exports.enter = async (req, res, next) => {
 	if (req.body.action) {
 		const now = new Date();
-		const ip = req.socket.remoteAddress;
+		const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
 		const username = await timesheetsModel.selectUsername(ip);
 		switch (req.body.action) {
 			case "Clock In":
@@ -144,7 +144,6 @@ exports.selectGet = (_, res, next) => {
 };
 
 exports.selectPost = (req, res, next) => {
-	// x-forwarded-for if this application sits behind a proxy
 	const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
 	const username = req.body.username;
 	timesheetsModel.insertUsertable(ip, username);
@@ -155,7 +154,7 @@ exports.view = async (req, res, next) => {
 	const options = {};
 	options.date = req.query.date ? req.query.date : utils.todayIso();
 
-	const ip = req.socket.remoteAddress;
+	const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
 	const username = await timesheetsModel.selectUsername(ip);
 	const entry = await timesheetsModel.selectDay(options.date, username);
 
