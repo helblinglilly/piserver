@@ -9,7 +9,7 @@ exports.getTimesheets = async (req, res, next) => {
   const username = await timesheetsModel.selectUsername(ip);
   if (!username) {
     res.redirect("/timesheet/select");
-  } // some change
+  }
 
   const rows = await timesheetsModel.selectDay(utils.todayIso(), username);
   const now = new Date();

@@ -26,10 +26,14 @@ describe("Utils Tests", () => {
       expect(() => utils.addTime()).toThrow("Invalid Argument - empty");
     });
     it("1.1 Invalid Argument - Not of DateTime", () => {
-      expect(() => utils.addTime('something', 123) ).toThrow("Invalid Argument - startTime is not DateTime");
+      expect(() => utils.addTime("something", 123)).toThrow(
+        "Invalid Argument - startTime is not DateTime",
+      );
     });
     it("1.2 Invalid Argument - Not an object", () => {
-      expect(() => utils.addTime(new Date(), 123) ).toThrow("Invalid Argument - addTime is not an object");
+      expect(() => utils.addTime(new Date(), 123)).toThrow(
+        "Invalid Argument - addTime is not an object",
+      );
     });
     it("2.0 Adds time correctly", () => {
       const startTime = new Date("01 Jan 1970 00:00:00 GMT");
@@ -54,7 +58,7 @@ describe("Utils Tests", () => {
       expect(() => utils.dateTimeToTime(123)).toThrow("Invalid Argument - Not an object");
     });
     it("2.0 Converts correctly", () => {
-      const time = new Date('December 17, 1995 03:24:00');
+      const time = new Date("December 17, 1995 03:24:00");
       expect(utils.dateTimeToTime(time)).toBe("03:24");
     });
   });
@@ -63,15 +67,19 @@ describe("Utils Tests", () => {
       expect(() => utils.constructDateTime()).toThrow("Invalid Argument - empty");
     });
     it("1.1 Invalid Argument - Not an object", () => {
-      expect(() => utils.constructDateTime('', '')).toThrow("Invalid Argument - Not an object");
+      expect(() => utils.constructDateTime("", "")).toThrow(
+        "Invalid Argument - Not an object",
+      );
     });
     it("1.2 Invalid Argument - Not a string", () => {
-      expect(() => utils.constructDateTime(new Date(), 123)).toThrow("Invalid Argument - Not a string");
-    })
+      expect(() => utils.constructDateTime(new Date(), 123)).toThrow(
+        "Invalid Argument - Not a string",
+      );
+    });
     it("2.0 Converts correctly", () => {
-      const date = new Date('December 17, 1995');
-      const output = utils.constructDateTime(date, "14:33")
+      const date = new Date("December 17, 1995");
+      const output = utils.constructDateTime(date, "14:33");
       expect(utils.dateTimeToTime(output)).toBe("14:33");
     });
-  })
+  });
 });

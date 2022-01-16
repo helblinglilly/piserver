@@ -1,5 +1,6 @@
 const { Pool } = require("pg");
-const dotenvPath = process.env.NODE_ENV == "production" ? "~/.env" : `${__dirname}/../.env`;
+const dotenvPath =
+  process.env.NODE_ENV == "production" ? "~/.env" : `${__dirname}/../.env`;
 
 require("dotenv").config({
   path: `${dotenvPath}`,

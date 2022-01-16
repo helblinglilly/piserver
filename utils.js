@@ -13,9 +13,7 @@ weekday = () => {
 
 exports.today = () => {
   const date = new Date();
-  return `${weekday()}, ${date.getDate()}/${
-    date.getMonth() + 1
-  }/${date.getFullYear()}`;
+  return `${weekday()}, ${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
 };
 
 exports.todayIso = () => {
@@ -23,13 +21,12 @@ exports.todayIso = () => {
   return date.toISOString().substr(0, 10);
 };
 
-exports.addTime = (startTime, addTime = {hours: 0, minutes: 0}) => {
-  if (!startTime || !addTime)
-    throw "Invalid Argument - empty";
-  else if (typeof startTime !== 'object')
-    throw "Invalid Argument - startTime is not DateTime"
-  else if (typeof addTime !== 'object')
-    throw "Invalid Argument - addTime is not an object"
+exports.addTime = (startTime, addTime = { hours: 0, minutes: 0 }) => {
+  if (!startTime || !addTime) throw "Invalid Argument - empty";
+  else if (typeof startTime !== "object")
+    throw "Invalid Argument - startTime is not DateTime";
+  else if (typeof addTime !== "object")
+    throw "Invalid Argument - addTime is not an object";
 
   startTime.setHours(startTime.getHours() + addTime.hours);
   startTime.setMinutes(startTime.getMinutes() + addTime.minutes);
@@ -37,10 +34,8 @@ exports.addTime = (startTime, addTime = {hours: 0, minutes: 0}) => {
 };
 
 exports.dateTimeToTime = (date) => {
-  if (date === undefined)
-    throw "Invalid Argument - empty"
-  else if (typeof date !== 'object')
-    throw "Invalid Argument - Not an object"
+  if (date === undefined) throw "Invalid Argument - empty";
+  else if (typeof date !== "object") throw "Invalid Argument - Not an object";
   let hours = date.getHours();
   let minutes = date.getMinutes();
 
@@ -51,13 +46,10 @@ exports.dateTimeToTime = (date) => {
 };
 
 exports.constructDateTime = (day, time) => {
-  if (day === undefined || time === undefined)
-    throw "Invalid Argument - empty"
-  else if (typeof day !== 'object')
-    throw "Invalid Argument - Not an object"
-  else if (typeof time !== 'string')
-    throw "Invalid Argument - Not a string"
-    
+  if (day === undefined || time === undefined) throw "Invalid Argument - empty";
+  else if (typeof day !== "object") throw "Invalid Argument - Not an object";
+  else if (typeof time !== "string") throw "Invalid Argument - Not a string";
+
   const dateTime = new Date(day);
   dateTime.setHours(time.substr(0, 2));
   dateTime.setMinutes(time.substr(3, 2));
