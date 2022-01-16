@@ -1,13 +1,13 @@
 extend  ../components/header.pug
   
-block append scripts
+block append head
    script.
     function handler(e){
     alert(e.target.value)
     }
 
     
-block append content
+block append body
     .container.is-max-desktop.pl-6.pr-6
         nav.breadcrumb(aria-label="breadcrumbs")
             ul
