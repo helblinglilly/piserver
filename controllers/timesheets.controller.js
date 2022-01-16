@@ -148,7 +148,7 @@ exports.selectPost = (req, res, next) => {
 	const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
 	const username = req.body.username;
 	timesheetsModel.insertUsertable(ip, username);
-	res.status(200).redirect("/timesheet");
+	res.redirect(302, "/timesheet");
 };
 
 exports.view = async (req, res, next) => {
