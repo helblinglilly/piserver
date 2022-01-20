@@ -1,10 +1,11 @@
 extend  ../components/header.pug
   
 block append head
-   script.
-    function handler(e){
-    alert(e.target.value)
-    }
+    link(rel='stylesheet', href='/static/styles/table-abbreviation.css')
+    script.
+        function handler(e){
+            alert(e.target.value)
+        }
 
     
 block append body
@@ -30,11 +31,16 @@ block append body
             table.table.is-fullwidth
                 thead
                     tr
-                    th Clock In
-                    th Break Start
-                    th Break End
-                    th Clock Out
-                    th +/-
+                    th.full Clock In
+                    th.abbr In
+                    th.full Break Start
+                    th.abbr Out
+                    th.full Break End
+                    th.abbr In
+                    th.full Clock End
+                    th.abbr Out
+                    th.full +/-
+                    th.abbr +/-
                 tbody
                     tr
                     td #{clock_in}

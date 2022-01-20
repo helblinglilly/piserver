@@ -105,6 +105,5 @@ dist
 
 # Environment files
 .env.*
-public/styles
 
 *.DS_Store
