@@ -1,4 +1,7 @@
 extend  ../components/header.pug
+
+block append head
+    script(src='/static/scripts/timesheet_edit.js')
   
 block append body
     .container.is-max-desktop.pl-6.pr-6
@@ -10,6 +13,7 @@ block append body
                     a(href="/timesheet") Timesheet
                 li.is-active
                     a(href="", aria-current="page") Edit Time
+
         p.title.is-3 Edit Time
         form(action="/timesheet/edit", method="get", id="edit") 
             input(type='date', name='date', onchange="document.forms['edit'].submit();", value=date).input
@@ -20,21 +24,48 @@ block append body
         if !locals.clock_in
             .notification No data for this day
         else
-            table.table.is-fullwidth
-                thead
-                    tr
-                    th Clock In
-                    th Break Start
-                    th Break End
-                    th Clock Out
-                    th +/-
-                tbody
-                    tr
-                    td #{clock_in}
-                    td #{break_in}
-                    td #{break_out}
-                    td #{clock_out}
-                    if locals.difference
-                        td #{difference}
-    
-            
+            .columns
+                .column
+                    .card
+                        .card-header-title Clock In
+                        .card-content 
+                            form(action="/timesheet/edit", method="post", id="save-clock_in")
+                                input.input(id="input-clock_in", name="clock_in" placeholder="Clock In", value=clock_in, readonly, style="color: #c2c2c2").is-danger
+                        .card-footer
+                            .card-footer-item(onclick="edit('clock_in')")
+                                a(href="#" id="a-edit-clock_in") Edit
+                            .card-footer-item(onclick="save('clock_in')")
+                                a(href="#" style="color:#c2c2c2;" enabled="false" id="a-save-clock_in") Save
+                .column
+                    .card
+                        .card-header-title Break In
+                        .card-content 
+                            form(action="/timesheet/edit", method="post", id="save-break_in")
+                                input.input(id="input-break_in", name="break_in" placeholder="Break In", value=break_in, readonly, style="color: #c2c2c2").is-danger
+                        .card-footer
+                            .card-footer-item(onclick="edit('break_in')")
+                                a(href="#" id="a-edit-break_in") Edit
+                            .card-footer-item(onclick="save('break_in')")
+                                a(href="#" style="color:#c2c2c2;" enabled="false" id="a-save-break_in") Save
+                .column
+                    .card
+                        .card-header-title Break Out
+                        .card-content 
+                            form(action="/timesheet/edit", method="post", id="save-break_out")
+                                input.input(id="input-break_out", name="break_out" placeholder="Break Out", value=break_out, readonly, style="color: #c2c2c2").is-danger
+                        .card-footer
+                            .card-footer-item(onclick="edit('break_out')")
+                                a(href="#" id="a-edit-break_out") Edit
+                            .card-footer-item(onclick="save('break_out')")
+                                a(href="#" style="color:#c2c2c2;" enabled="false" id="a-save-break_out") Save
+                .column
+                    .card
+                        .card-header-title Clock Out
+                        .card-content 
+                            form(action="/timesheet/edit", method="post", id="save-clock_out")
+                                input.input(id="input-clock_out", name="clock_out" placeholder="Clock Out", value=clock_out, readonly, style="color: #c2c2c2").is-danger
+                        .card-footer
+                            .card-footer-item(onclick="edit('clock_out')")
+                                a(href="#" id="a-edit-clock_out") Edit
+                            .card-footer-item(onclick="save('clock_out')")
+                                a(href="#" style="color:#c2c2c2;" enabled="false" id="a-save-clock_out") Save
