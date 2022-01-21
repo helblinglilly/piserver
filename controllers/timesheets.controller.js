@@ -1,7 +1,7 @@
 const timesheetsModel = require("../models/timsheets.model");
 const utils = require("../utils");
 
-exports.getTimesheets = async (req, res, next) => {
+exports.getIndex = async (req, res, next) => {
   const options = {};
   options.day = utils.today();
 
@@ -101,7 +101,7 @@ exports.getTimesheets = async (req, res, next) => {
   res.render("timesheets/index", { ...options });
 };
 
-exports.enter = async (req, res, next) => {
+exports.postEnter = async (req, res, next) => {
   if (req.body.action) {
     const now = new Date();
     const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
@@ -112,15 +112,15 @@ exports.enter = async (req, res, next) => {
         res.redirect("/timesheet");
         break;
       case "Break In":
-        timesheetsModel.insertBreakStart(now, username, utils.dateTimeToTime(now));
+        timesheetsModel.updateBreakStart(now, username, utils.dateTimeToTime(now));
         res.redirect("/timesheet");
         break;
       case "Break End":
-        timesheetsModel.insertBreakEnd(now, username, utils.dateTimeToTime(now));
+        timesheetsModel.updateBreakEnd(now, username, utils.dateTimeToTime(now));
         res.redirect("/timesheet");
         break;
       case "Clock Out":
-        timesheetsModel.insertClockOut(now, username, utils.dateTimeToTime(now));
+        timesheetsModel.updateClockOut(now, username, utils.dateTimeToTime(now));
         res.redirect("/timesheet");
         break;
       case "Done for the day :)":
@@ -135,18 +135,18 @@ exports.enter = async (req, res, next) => {
   }
 };
 
-exports.selectGet = (_, res, next) => {
+exports.getSelect = (_, res, next) => {
   res.render("timesheets/select");
 };
 
-exports.selectPost = (req, res, next) => {
+exports.postSelect = (req, res, next) => {
   const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
   const username = req.body.username;
   timesheetsModel.insertUsertable(ip, username);
   res.redirect(302, "/timesheet");
 };
 
-exports.view = async (req, res, next) => {
+exports.getView = async (req, res, next) => {
   const options = {};
   options.date = req.query.date ? req.query.date : utils.todayIso();
 
@@ -173,7 +173,7 @@ exports.view = async (req, res, next) => {
   res.render("timesheets/view", { ...options });
 };
 
-exports.edit = async (req, res, next) => {
+exports.getEdit = async (req, res, next) => {
   const options = {};
   options.date = req.query.date ? req.query.date : utils.todayIso();
 
@@ -197,8 +197,36 @@ exports.edit = async (req, res, next) => {
     if (!options.clock_out) options.alert = "Day not completed yet";
   }
 
-  res.render("timesheets/view", { ...options });
-  res.render("timesheets/edit");
+  res.render("timesheets/edit", { ...options });
+};
+
+exports.postEdit = async (req, res, next) => {
+  const args = req.body;
+  const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
+  const username = await timesheetsModel.selectUsername(ip);
+
+  if (!args.date) res.sendStatus(400);
+
+  if (args.clock_in)
+    utils.isShortTime(args.clock_in)
+      ? timesheetsModel.updateClockIn(args.date, username, args.clock_in)
+      : res.sendStatus(400);
+  else if (args.break_in)
+    utils.isShortTime(args.break_in)
+      ? timesheetsModel.updateBreakStart(args.date, username, args.break_in)
+      : res.sendStatus(400);
+  else if (args.break_out)
+    utils.isShortTime(args.break_in)
+      ? timesheetsModel.updateBreakEnd(args.date, username, args.break_out)
+      : res.sendStatus(400);
+  else if (args.clock_out)
+    utils.isShortTime(args.clock_out)
+      ? timesheetsModel.updateClockOut(args.date, username, args.clock_out)
+      : res.sendStatus(400);
+  else res.sendStatus(400);
+
+  console.log(req.query);
+  res.redirect(`/timesheet/edit?date=${args.date}`);
 };
 
 overtime = (clock_in, break_in, break_out, clock_out) => {

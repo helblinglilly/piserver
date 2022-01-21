@@ -47,7 +47,20 @@ exports.insertClockIn = async (day, username, time) => {
     .catch((err) => console.log(err));
 };
 
-exports.insertBreakStart = async (day, username, time) => {
+exports.updateClockIn = async (day, username, time) => {
+  db.query(
+    format(
+      `UPDATE timesheet_${env} SET clock_in=%L WHERE day_date=%L AND username=%L`,
+      time,
+      day,
+      username,
+    ),
+  )
+    .then(() => console.log(`Updated clock in: ${username} ${day} ${time}`))
+    .catch((err) => console.log(err));
+};
+
+exports.updateBreakStart = async (day, username, time) => {
   db.query(
     format(
       `UPDATE timesheet_${env} SET break_in=%L WHERE day_date=%L AND username=%L`,
@@ -60,7 +73,7 @@ exports.insertBreakStart = async (day, username, time) => {
     .catch((err) => console.log(err));
 };
 
-exports.insertBreakEnd = async (day, username, time) => {
+exports.updateBreakEnd = async (day, username, time) => {
   db.query(
     format(
       `UPDATE timesheet_${env} SET break_out=%L WHERE day_date=%L AND username=%L`,
@@ -73,7 +86,7 @@ exports.insertBreakEnd = async (day, username, time) => {
     .catch((err) => console.log(err));
 };
 
-exports.insertClockOut = async (day, username, time) => {
+exports.updateClockOut = async (day, username, time) => {
   db.query(
     format(
       `UPDATE timesheet_${env} SET clock_out=%L WHERE day_date=%L AND username=%L`,
