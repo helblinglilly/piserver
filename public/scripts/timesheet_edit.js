@@ -57,10 +57,23 @@ function toggleInput(input) {
     input.setAttribute("style", "color:#c2c2c2");
   }
 }
+
 function save(action) {
   if (action === "clock_in") {
     let state = document.getElementById("a-save-clock_in");
     state = state.getAttribute("enabled");
     if (state === "true") document.forms["save-clock_in"].submit();
+  } else if (action === "break_in") {
+    let state = document.getElementById("a-save-break_in");
+    state = state.getAttribute("enabled");
+    if (state === "true") document.forms["save-break_in"].submit();
+  } else if (action === "break_out") {
+    let state = document.getElementById("a-save-break_out");
+    state = state.getAttribute("enabled");
+    if (state === "true") document.forms["save-break_out"].submit();
+  } else if (action === "clock_out") {
+    let state = document.getElementById("a-save-clock_out");
+    state = state.getAttribute("enabled");
+    if (state === "true") document.forms["save-clock_out"].submit();
   }
 }
