@@ -222,13 +222,13 @@ exports.postEdit = async (req, res, next) => {
 
   // Trying to insert anything before clock in
   if (!hasEntryYet && !args.clock_in) {
-    this.getEdit(req, res, next, "Can't insert times without Clock In present first");
+    this.getEdit(req, res, next, "Can't insert times when no 'Clock In' is set");
     return;
   }
 
   // Trying to insert break end with no break in
   if (!hasEntryYet.break_in && args.break_out) {
-    this.getEdit(req, res, next, "Can't insert Break End when no Break Start is set");
+    this.getEdit(req, res, next, "Can't insert 'Break End' when no 'Break Start' is set");
     return;
   }
 
