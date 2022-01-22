@@ -173,7 +173,7 @@ exports.getView = async (req, res, next) => {
   res.render("timesheets/view", { ...options });
 };
 
-exports.getEdit = async (req, res, next) => {
+exports.getEdit = async (req, res, next, message = null) => {
   const options = {};
   options.date = req.query.date ? req.query.date : utils.todayIso();
 
@@ -196,7 +196,7 @@ exports.getEdit = async (req, res, next) => {
 
     if (!options.clock_out) options.alert = "Day not completed yet";
   }
-
+  if (message) options.alert = message;
   res.render("timesheets/edit", { ...options });
 };
 
@@ -204,28 +204,67 @@ exports.postEdit = async (req, res, next) => {
   const args = req.body;
   const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
   const username = await timesheetsModel.selectUsername(ip);
-
   if (!args.date) res.sendStatus(400);
 
-  if (args.clock_in)
-    utils.isShortTime(args.clock_in)
-      ? timesheetsModel.updateClockIn(args.date, username, args.clock_in)
-      : res.sendStatus(400);
-  else if (args.break_in)
-    utils.isShortTime(args.break_in)
-      ? timesheetsModel.updateBreakStart(args.date, username, args.break_in)
-      : res.sendStatus(400);
-  else if (args.break_out)
-    utils.isShortTime(args.break_in)
-      ? timesheetsModel.updateBreakEnd(args.date, username, args.break_out)
-      : res.sendStatus(400);
-  else if (args.clock_out)
-    utils.isShortTime(args.clock_out)
-      ? timesheetsModel.updateClockOut(args.date, username, args.clock_out)
-      : res.sendStatus(400);
-  else res.sendStatus(400);
+  const hasEntryYet = await timesheetsModel.selectDay(args.date, username);
 
-  console.log(req.query);
+  // Using update when no entry exists yet will just not write - use insert instead
+  if (!hasEntryYet && args.clock_in) {
+    if (utils.isShortTime(args.clock_in)) {
+      await timesheetsModel.insertClockIn(args.date, username, args.clock_in);
+      res.redirect(`/timesheet/edit?date=${args.date}`);
+      return;
+    } else {
+      res.sendStatus(400);
+      return;
+    }
+  }
+
+  // Trying to insert anything before clock in
+  if (!hasEntryYet && !args.clock_in) {
+    this.getEdit(req, res, next, "Can't insert times without Clock In present first");
+    return;
+  }
+
+  // Trying to insert break end with no break in
+  if (!hasEntryYet.break_in && args.break_out) {
+    this.getEdit(req, res, next, "Can't insert Break End when no Break Start is set");
+    return;
+  }
+
+  console.log(args);
+
+  // Validation complete - just update values
+  if (args.clock_in) {
+    if (utils.isShortTime(args.clock_in)) {
+      await timesheetsModel.updateClockIn(args.date, username, args.clock_in);
+    } else {
+      res.sendStatus(400);
+      return;
+    }
+  } else if (args.break_in)
+    if (utils.isShortTime(args.break_in)) {
+      await timesheetsModel.updateBreakStart(args.date, username, args.break_in);
+    } else {
+      res.sendStatus(400);
+      return;
+    }
+  else if (args.break_out)
+    if (utils.isShortTime(args.break_out)) {
+      await timesheetsModel.updateBreakEnd(args.date, username, args.break_out);
+    } else {
+      res.sendStatus(400);
+      return;
+    }
+  else if (args.clock_out) {
+    if (utils.isShortTime(args.clock_out)) {
+      await timesheetsModel.updateClockOut(args.date, username, args.clock_out);
+    } else {
+      res.sendStatus(400);
+      return;
+    }
+  } else res.sendStatus(400);
+
   res.redirect(`/timesheet/edit?date=${args.date}`);
 };
 
