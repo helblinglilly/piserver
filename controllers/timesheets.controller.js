@@ -9,6 +9,7 @@ exports.getIndex = async (req, res, next) => {
   const username = await timesheetsModel.selectUsername(ip);
   if (!username) {
     res.redirect("/timesheet/select");
+    return;
   }
 
   const rows = await timesheetsModel.selectDay(utils.todayIso(), username);
