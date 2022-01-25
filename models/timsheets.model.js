@@ -42,9 +42,7 @@ exports.insertClockIn = async (day, username, time) => {
       username,
       time,
     ),
-  )
-    .then(() => console.log(`Inserted clock in: ${username} ${day} ${time}`))
-    .catch((err) => console.log(err));
+  ).catch((err) => console.log(err));
 };
 
 exports.updateClockIn = async (day, username, time) => {
@@ -55,9 +53,7 @@ exports.updateClockIn = async (day, username, time) => {
       day,
       username,
     ),
-  )
-    .then(() => console.log(`Updated clock in: ${username} ${day} ${time}`))
-    .catch((err) => console.log(err));
+  ).catch((err) => console.log(err));
 };
 
 exports.updateBreakStart = async (day, username, time) => {
@@ -68,9 +64,7 @@ exports.updateBreakStart = async (day, username, time) => {
       day,
       username,
     ),
-  )
-    .then(() => console.log(`Inserted break in: ${username} ${day} ${time}`))
-    .catch((err) => console.log(err));
+  ).catch((err) => console.log(err));
 };
 
 exports.updateBreakEnd = async (day, username, time) => {
@@ -81,9 +75,7 @@ exports.updateBreakEnd = async (day, username, time) => {
       day,
       username,
     ),
-  )
-    .then(() => console.log(`Inserted break end: ${username} ${day} ${time}`))
-    .catch((err) => console.log(err));
+  ).catch((err) => console.log(err));
 };
 
 exports.updateClockOut = async (day, username, time) => {
