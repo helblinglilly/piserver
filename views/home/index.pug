@@ -1,5 +1,8 @@
 extend  ../components/header.pug
-  
+
+block append head
+  title Raspberry Pi
+
 block append body
     .container.is-max-desktop.p-6
       .card(onclick="location.href='/admin';")
