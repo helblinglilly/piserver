@@ -5,14 +5,7 @@ exports.getIndex = async (req, res, next) => {
   const options = {};
   options.day = utils.today();
 
-  const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
-  const username = await timesheetsModel.selectUsername(ip);
-  if (!username) {
-    res.redirect("/timesheet/select");
-    return;
-  }
-
-  const rows = await timesheetsModel.selectDay(utils.todayIso(), username);
+  const rows = await timesheetsModel.selectDay(utils.todayIso(), req.username);
   const now = new Date();
 
   if (!rows) {
@@ -105,8 +98,7 @@ exports.getIndex = async (req, res, next) => {
 exports.postEnter = async (req, res, next) => {
   if (req.body.action) {
     const now = new Date();
-    const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
-    const username = await timesheetsModel.selectUsername(ip);
+    const username = req.username;
     switch (req.body.action) {
       case "Clock In":
         timesheetsModel.insertClockIn(now, username, utils.dateTimeToTime(now));
@@ -136,24 +128,11 @@ exports.postEnter = async (req, res, next) => {
   }
 };
 
-exports.getSelect = (_, res, next) => {
-  res.render("timesheets/select");
-};
-
-exports.postSelect = (req, res, next) => {
-  const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
-  const username = req.body.username;
-  timesheetsModel.insertUsertable(ip, username);
-  res.redirect(302, "/timesheet");
-};
-
 exports.getView = async (req, res, next) => {
   const options = {};
   options.date = req.query.date ? req.query.date : utils.todayIso();
 
-  const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
-  const username = await timesheetsModel.selectUsername(ip);
-  const entry = await timesheetsModel.selectDay(options.date, username);
+  const entry = await timesheetsModel.selectDay(options.date, req.username);
 
   if (entry) {
     options.clock_in = entry.clock_in.substr(0, 5);
@@ -178,9 +157,7 @@ exports.getEdit = async (req, res, next, message = null) => {
   const options = {};
   options.date = req.query.date ? req.query.date : utils.todayIso();
 
-  const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
-  const username = await timesheetsModel.selectUsername(ip);
-  const entry = await timesheetsModel.selectDay(options.date, username);
+  const entry = await timesheetsModel.selectDay(options.date, req.username);
 
   if (entry) {
     options.clock_in = entry.clock_in.substr(0, 5);
@@ -203,8 +180,7 @@ exports.getEdit = async (req, res, next, message = null) => {
 
 exports.postEdit = async (req, res, next) => {
   const args = req.body;
-  const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
-  const username = await timesheetsModel.selectUsername(ip);
+  const username = req.username;
   if (!args.date) res.sendStatus(400);
 
   const hasEntryYet = await timesheetsModel.selectDay(args.date, username);
@@ -232,8 +208,6 @@ exports.postEdit = async (req, res, next) => {
     this.getEdit(req, res, next, "Can't insert 'Break End' when no 'Break Start' is set");
     return;
   }
-
-  console.log(args);
 
   // Validation complete - just update values
   if (args.clock_in) {
