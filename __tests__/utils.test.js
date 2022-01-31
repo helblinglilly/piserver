@@ -50,6 +50,29 @@ describe("Utils Tests", () => {
       expect(output.toISOString()).toBe("1970-01-01T00:00:00.000Z");
     });
   });
+  describe("isShortTime(time)", () => {
+    it("1.0 No Argument", () => {
+      expect(utils.isShortTime()).toBe(false);
+    });
+    it("1.1 Wrong type (object)", () => {
+      expect(utils.isShortTime({})).toBe(false);
+    });
+    it("1.2 Wrong type (int)", () => {
+      expect(utils.isShortTime(1234)).toBe(false);
+    });
+    it("2.0 Is valid - No Optionals", () => {
+      expect(utils.isShortTime("13:15")).toBe(true);
+    });
+    it("2.1 Is valid - Optional 0 in hour", () => {
+      expect(utils.isShortTime("09:15")).toBe(true);
+    });
+    it("2.2 Is valid - Optional 0 in minute", () => {
+      expect(utils.isShortTime("13:05")).toBe(true);
+    });
+    it("2.3 Is valid - Optional 0 in both", () => {
+      expect(utils.isShortTime("09:05")).toBe(true);
+    });
+  });
   describe("dateTimeToTime", () => {
     it("1.0 No Argument", () => {
       expect(() => utils.dateTimeToTime()).toThrow("Invalid Argument - empty");

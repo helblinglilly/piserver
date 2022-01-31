@@ -33,6 +33,14 @@ exports.addTime = (startTime, addTime = { hours: 0, minutes: 0 }) => {
   return startTime;
 };
 
+exports.isShortTime = (allegedTime) => {
+  if (typeof allegedTime !== "string") return false;
+
+  const result = allegedTime.match("/^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/");
+  if (result === null) return true;
+  return result;
+};
+
 exports.dateTimeToTime = (date) => {
   if (date === undefined) throw "Invalid Argument - empty";
   else if (typeof date !== "object") throw "Invalid Argument - Not an object";

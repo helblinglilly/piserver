@@ -1,22 +1,39 @@
 extend  ../components/header.pug
-  
+
+block append head
+  title Raspberry Pi
+
 block append body
     .container.is-max-desktop.p-6
-      .card(onclick='pihole()')
-        .card-content(onclick="location.href='/admin';")
-          img.icon(src='/static/assets/pihole.svg', alt='Pi Hole Icon')
-          a.card-text Pi Hole
+      .card(onclick="location.href='/admin';")
+        .card-content
+          figure.container(style="display: flex; align-items: center;")
+            img.icon(src='/static/assets/pihole.svg', alt='Pi Hole Icon').mr-1
+            a.card-text Pi Hole
         footer.card-footer
           p.card-footer-item Password: O4LQXFll
-      .card.mt-6(onclick="location.href='/timesheet';")
+      .card.mt-6(onclick="location.href='http://raspberry.pi:32400/web/'")
         .card-content
-          img.icon(src='/static/assets/clock.png', alt='Clock Icon')
-          a.card-text Timesheet
-      .card.mt-6(onclick="location.href='/ac';")
+          figure.container(style="display: flex; align-items: center;")
+            img.icon(src='/static/assets/plex.png', alt='Plex Logo').mr-1
+            a.card-text(href='http://raspberry.pi:32400/web') Plex
+      .card.mt-6(onclick="location.href='http://raspberry.pi:5000/files/'")
         .card-content
-          img.icon(src='/static/assets/ac.png', alt='Animal Crossing Leaf')
-          a.card-text(href='/ac') Animal Crossing
-      .card.mt-6(onclick="location.href='/pokemon';")
+          figure.container(style="display: flex; align-items: center;")
+            img.icon(src='/static/assets/files.png', alt='Files Icon').mr-1
+            a.card-text(href='http://raspberry.pi:5000/files/') Files
+      .card.mt-6(onclick="location.href='/timesheet'")
         .card-content
-          img.icon(src='/static/assets/pokemon.png', alt='Pokeball Icon')
-          a.card-text(href='/pokemon') Pokemon
+          figure.container(style="display: flex; align-items: center;")
+            img.icon(src='/static/assets/clock.png', alt='Clock Icon').mr-1
+            a.card-text Timesheet
+      .card.mt-6(onclick="location.href='/ac'")
+        .card-content
+          figure.container(style="display: flex; align-items: center;")
+            img.icon(src='/static/assets/ac.png', alt='Animal Crossing Leaf').mr-1
+            a.card-text(href='/ac') Animal Crossing
+      .card.mt-6(onclick="location.href='/pokemon'")
+        .card-content
+          figure.container(style="display: flex; align-items: center;")
+            img.icon(src='/static/assets/pokemon.png', alt='Pokeball Icon').mr-1
+            a.card-text(href='/pokemon') Pokemon

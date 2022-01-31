@@ -1,0 +1,11 @@
+.abbr {
+  display: none;
+}
+@media only screen and (max-width: 600px) {
+  .full {
+    display: none;
+  }
+  .abbr {
+    display: table-cell;
+  }
+}
