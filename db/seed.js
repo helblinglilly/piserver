@@ -45,7 +45,7 @@ exports.seed = async () => {
 		*/
   ];
 
-  if (env === "dev") {
+  if (env === "dev" || env === "test") {
     await db.query(`DROP TABLE IF EXISTS timesheet_${env}`);
     await db.query(`DROP TABLE IF EXISTS usertable_${env}`);
   }
@@ -58,5 +58,4 @@ exports.seed = async () => {
       await db.query(query);
     }
   }
-  console.log("Seeded Database");
 };
