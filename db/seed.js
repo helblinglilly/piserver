@@ -53,9 +53,16 @@ exports.seed = async () => {
   await db.query(createUsertable);
   await db.query(createTimesheet);
 
-  if (env === "dev") {
+  if (env === "dev" || env === "test") {
     for (query of insertTimsheet) {
       await db.query(query);
     }
   }
+
+  if (env === "test") {
+    db.query(
+      "INSERT INTO usertable_test (ip, username) VALUES ('::ffff:127.0.0.1', 'test');",
+    );
+  }
+  console.log("Seeded DB");
 };

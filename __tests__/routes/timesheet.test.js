@@ -5,7 +5,9 @@ const seed = require("../../db/seed");
 const userModel = require("../../models/user.model");
 
 describe("Timesheet Tests", () => {
-  beforeAll(async () => await seed.seed());
+  // beforeAll(async () => {
+  //     await seed.seed();
+  // });
 
   describe("/timesheet", () => {
     test("GET - 200", async () => {
@@ -14,16 +16,17 @@ describe("Timesheet Tests", () => {
     test("GET - No IP Provided - User selection", async () => {
       return request(app)
         .get("/timesheet")
+        .set("X-Forwarded-For", "192.168.2.1")
+        .send()
         .expect(200)
         .then(({ text }) => {
           expect(text.includes(`action="/user/select"`)).toBe(true);
         });
     });
     test("GET - IP Provided - Main page", async () => {
-      await userModel.insertUser("::ffff:127.0.0.1", "test");
       return request(app)
         .get("/timesheet")
-        .send({ "x-forwarded-for": "::ffff:127.0.0.1" })
+        .send()
         .expect(200)
         .then(({ text }) => {
           expect(text.includes(`action="/user/select"`)).toBe(false);
