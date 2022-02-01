@@ -99,20 +99,37 @@ exports.postEnter = async (req, res, next) => {
   if (req.body.action) {
     const now = new Date();
     const username = req.username;
+    const existing = await timesheetsModel.selectDay(utils.todayIso(), username);
+
     switch (req.body.action) {
       case "Clock In":
         timesheetsModel.insertClockIn(now, username, utils.dateTimeToTime(now));
         res.redirect("/timesheet");
         break;
       case "Break In":
+        if (!existing) {
+          next({ statusCode: 400, msg: `Can't '${req.body.action}' yet` });
+          break;
+        }
         timesheetsModel.updateBreakStart(now, username, utils.dateTimeToTime(now));
         res.redirect("/timesheet");
         break;
       case "Break End":
+        if (!existing) {
+          next({ statusCode: 400, msg: `Can't '${req.body.action}' yet` });
+          break;
+        } else if (!existing.break_in) {
+          next({ statusCode: 400, msg: `Can't '${req.body.action}' before 'Break In'` });
+          break;
+        }
         timesheetsModel.updateBreakEnd(now, username, utils.dateTimeToTime(now));
         res.redirect("/timesheet");
         break;
       case "Clock Out":
+        if (!existing) {
+          next({ statusCode: 400, msg: `Can't '${req.body.action}' yet` });
+          break;
+        }
         timesheetsModel.updateClockOut(now, username, utils.dateTimeToTime(now));
         res.redirect("/timesheet");
         break;
@@ -120,11 +137,11 @@ exports.postEnter = async (req, res, next) => {
         res.redirect("https://youtu.be/kxSOhBdwmc4?t=1");
         break;
       default:
-        next({ statusCode: 500, msg: "Invalid action" });
+        next({ statusCode: 400, msg: "Invalid action" });
         break;
     }
   } else {
-    next({ statusCode: 400, msg: "Page not found" });
+    next({ statusCode: 400, msg: "Empty payload" });
   }
 };
 
