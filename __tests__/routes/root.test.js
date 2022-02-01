@@ -1,9 +1,28 @@
 const express = require("express");
 const request = require("supertest");
 const app = require("../../app");
-const seed = require("../../db/seed");
+const db = require("../../db");
 
 describe("App Router Tests", () => {
+  let server, agent;
+
+  beforeEach((done) => {
+    server = app.listen(4000, (err) => {
+      if (err) return done(err);
+
+      agent = request.agent(server);
+      done();
+    });
+  });
+
+  afterEach((done) => {
+    server.close(done);
+  });
+
+  afterAll(() => {
+    if (db.end) db.end();
+  });
+
   describe("/", () => {
     test("GET - 200", () => {
       return request(app).get("/").expect(200);
@@ -23,12 +42,11 @@ describe("App Router Tests", () => {
   });
 
   describe("/timesheet", () => {
-    test("GET - 200", async () => {
-      await seed.seed();
-      return request(app)
+    test("GET - 200", () => {
+      return request(server)
         .get("/timesheet")
-        .send({ "x-forwarded-for": "192.168.0.10" })
-        .expect(200);
+        .expect(200)
+        .then((something) => expect(something).toBe(something));
     });
     test("PATCH - 405", () => {
       return request(app).patch("/timesheet").expect(405);
