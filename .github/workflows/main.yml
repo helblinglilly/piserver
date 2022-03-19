@@ -18,7 +18,7 @@ jobs:
       - name: Install dependencies
         run: npm ci --development
       - name: Move env file
-        run: cp /home/joel/env ./env
+        run: cp /home/joel/env ./.env
       - name: Run tests
         run: npm run test
   deploy:
@@ -34,7 +34,7 @@ jobs:
         with:
           node-version: 12
       - name: Move files
-        run: cp -r * /home/joel/piserver/ && cd /home/joel/piserver
+        run: cp -r * /home/joel/piserver/ && cd /home/joel/piserver && cp /home/joel/env /home/joel/piserver/.env
       - name: Install dependencies
         run: npm ci
       - name: Restarting pm2 service
