@@ -1,10 +1,6 @@
 const { Pool } = require("pg");
-const dotenvPath =
-  process.env.NODE_ENV == "production" ? "~/.env" : `${__dirname}/../.env`;
 
-require("dotenv").config({
-  path: `${dotenvPath}`,
-});
+require("dotenv").config();
 
 module.exports = new Pool({
   user: process.env.POSTGRES_USER,

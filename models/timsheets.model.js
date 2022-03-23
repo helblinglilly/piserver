@@ -15,25 +15,6 @@ exports.selectDay = async (day, username) => {
     .then(({ rows }) => rows[0]);
 };
 
-exports.selectUsername = async (ip) => {
-  return db
-    .query(format(`SELECT username FROM usertable_${env} WHERE ip LIKE %L`, ip))
-    .then((result) => {
-      if (result.rows.length === 0) return null;
-      else return result.rows[0].username;
-    });
-};
-
-exports.insertUsertable = async (ip, username) => {
-  try {
-    return db.query(
-      format(`INSERT INTO usertable_${env} (ip, username) VALUES (%L, %L)`, ip, username),
-    );
-  } catch (err) {
-    console.log(err);
-  }
-};
-
 exports.insertClockIn = async (day, username, time) => {
   db.query(
     format(

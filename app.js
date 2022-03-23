@@ -3,6 +3,7 @@ const error = require("./controllers/error.controller");
 const timesheetRouter = require("./routers/timesheets.router.js");
 const acRouter = require("./routers/ac.router.js");
 const pokemonRouter = require("./routers/pokemon.router.js");
+const userRouter = require("./routers/user.router");
 
 const app = express();
 app.set("view engine", "pug");
@@ -15,6 +16,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/timesheet", timesheetRouter);
 app.use("/ac", acRouter);
 app.use("/pokemon", pokemonRouter);
+app.use("/user", userRouter);
 
 app.get("/", (_, res, req) => {
   res.render("home/index", { host: `` });

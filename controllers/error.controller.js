@@ -1,10 +1,6 @@
 exports.handleErrors = (res, err) => {
-  console.log(err);
-  res.status(500);
-  res.render("errors/generic", {
-    errorCode: "500",
-    errorMessage: "Unkown server error - check logs",
-  });
+  res.status(err.statusCode);
+  res.render("errors/generic", { errorCode: err.statusCode, errorMessage: err.msg });
 };
 
 exports.methodNotAllowed = (_, res) => {

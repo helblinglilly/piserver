@@ -45,7 +45,7 @@ exports.seed = async () => {
 		*/
   ];
 
-  if (env === "dev") {
+  if (env === "dev" || env === "test") {
     await db.query(`DROP TABLE IF EXISTS timesheet_${env}`);
     await db.query(`DROP TABLE IF EXISTS usertable_${env}`);
   }
@@ -53,10 +53,15 @@ exports.seed = async () => {
   await db.query(createUsertable);
   await db.query(createTimesheet);
 
-  if (env === "dev") {
+  if (env === "dev" || env === "test") {
     for (query of insertTimsheet) {
       await db.query(query);
     }
   }
-  console.log("Seeded Database");
+
+  if (env === "test") {
+    await db.query(
+      "INSERT INTO usertable_test (ip, username) VALUES ('::ffff:127.0.0.1', 'test');",
+    );
+  }
 };
