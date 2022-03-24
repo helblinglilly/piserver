@@ -9,12 +9,22 @@ block append body
             ul
                 li
                     a(href="/") Home
+                li
+                    a(href="/pokemon") Pokemon
                 li.is-active
-                    a(href="", aria-current="page") Pokemon
+                    a(href="", aria-current="page") Black and White
 
-        input.input(type="text", placeholder="Search for something!")
-        .card.mt-6(onclick="location.href='/pokemon/blackwhite'")
+
+        form(action="/pokemon/search", method="get", id="search") 
+            input.input(type="text" name="search" placeholder="Search for something!" onsubmit="document.forms['search'].submit()")
+            input(type="submit" hidden)
+            
+        figure.container(style="display: flex; align-items: center;").mt-6
+            img.icon(src='/static/assets/pokemon/bw-icon.png', alt='Portainer Icon').mr-1
+            p.title.is-3 Pokemon Black and White
+
+        .card.mt-6(onclick="location.href='/pokemon/blackwhite/pokedex'")
             .card-content
-                figure.container(style="display: flex; align-items: center;")
-                    img.icon(src='/static/assets/pokemon/bw-icon.png', alt='Portainer Icon').mr-1
-                    a.card-text(href='/pokemon/blackwhite') Pokemon Black and White
+                figure.container(style="display: flex; align-items: center;").pb-3
+                    img.icon(src='/static/assets/pokemon/pokedex.png', alt='Portainer Icon').mr-1
+                    a.card-text(href='/pokemon/blackwhite') Pokedex

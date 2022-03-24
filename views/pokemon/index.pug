@@ -12,6 +12,10 @@ block append body
                 li.is-active
                     a(href="", aria-current="page") Pokemon
 
+        form(action="/pokemon/search", method="get", id="search") 
+            input.input(type="text" name="search" placeholder="Search for something!" onsubmit="document.forms['search'].submit()")
+            input(type="submit" hidden)
+            
         .card.mt-6(onclick="location.href='/pokemon/blackwhite'")
             .card-content
                 figure.container(style="display: flex; align-items: center;")
