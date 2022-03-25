@@ -11,12 +11,63 @@ block append body
                     a(href="/") Home
                 li
                     a(href="/pokemon", aria-current="page") Pokemon
-                if locals.sourcePage
+                if locals.sourcePage && !locals.sourcePage.includes("search?search")
                     li
                         if locals.sourcePage == "Black and White"
                         a(href=`/pokemon/blackwhite`, aria-current="page") #{sourcePage}
                 li.is-active
                     a(href="", aria-current="page") Search
 
-        
-        p #{searchTerm}
+        p.title.is-3 Results for: #{searchTerm}
+
+        form(action="/pokemon/search", method="get", id="search").mb-6
+            input.input(type="text" name="search" placeholder="Search for something!" onsubmit="document.forms['search'].submit()")
+            input(type="submit" hidden)
+            
+
+        each val in finds
+            if Object.keys(val) == "pokemon"
+                p.title.is-4 Pokemons
+                each pokemon in val.pokemon
+                    .card(onclick=`location.href='/pokemon/pkmn/${pokemon.id}'`).mb-3
+                            .card-content
+                                figure.container(style="display: flex; align-items: center;").pb-3
+                                    img.is-48x48(src=`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`, alt='Pokemon Sprite Icon').mr-1
+                                    a.card-text(href=`/pokemon/pkmn/${pokemon.id}`) #{pokemon.german} - #{pokemon.english}
+            if Object.keys(val) == "item"
+                p.title.is-4 Items
+                each item in val.item
+                    .card(onclick=`location.href='/pokemon/item/${item.id}'`).mb-3
+                            .card-content
+                                figure.container(style="display: flex; align-items: center;").pb-3
+                                    if item.german.includes("TM")
+                                        img.is-48x48(src=`https://archives.bulbagarden.net/media/upload/9/9a/Bag_TM_Normal_Sprite.png`, alt='Item Icon').mr-1
+                                        a.card-text(href=`/pokemon/item/${item.id}`) #{item.german}
+                                    else 
+                                        img.is-48x48(src=`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/${item.english_id}.png`, alt='Item Icon').mr-1
+                                        a.card-text(href=`/pokemon/item/${item.id}`) #{item.german} - #{item.english}
+
+            if Object.keys(val) == "type"
+                p.title.is-4 Types
+                each typeEntry in val.type
+                    p #{typeEntry.id}  - #{typeEntry.german} - #{typeEntry.english}
+
+
+            if Object.keys(val) == "move"
+                p.title.is-4 Moves
+                each move in val.move
+                    .card(onclick=`location.href='/pokemon/move/${move.id}'`).mb-3
+                        .card-content
+                            figure.container(style="display: flex; align-items: center;").pb-3
+                                if move.attack_type.includes("physical")
+                                    img.is-48x48(src=`https://i.stack.imgur.com/UATOp.png`, alt='Item Icon').mr-1
+                                if move.attack_type.includes("special")
+                                    img.is-48x48(src=`https://i.stack.imgur.com/dS0qQ.png`, alt='Item Icon').mr-1
+                                if move.attack_type.includes("status")
+                                    img.is-48x48(src=`https://i.stack.imgur.com/LWKMo.png`, alt='Attack Icon').mr-1
+                                a.card-text(href=`/pokemon/move/${move.id}`) #{move.german} - #{move.english}
+
+            if Object.keys(val) == "ability"
+                p.title.is-4 Abilities
+                each ability in val.ability
+                    p #{ability.id}  - #{ability.german} - #{ability.english}

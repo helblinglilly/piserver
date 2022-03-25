@@ -14,7 +14,7 @@ exports.getBlackWhite = (req, res, next) => {
   res.render("pokemon/blackwhite");
 };
 
-exports.getSearch = (req, res, next) => {
+exports.getSearch = async (req, res, next) => {
   const options = {};
 
   // Referer
@@ -33,20 +33,43 @@ exports.getSearch = (req, res, next) => {
   options.searchTerm = searchTerm;
 
   // Load files
+  let data = await fs.readFile("./pokedata/data.json", "utf-8");
+  data = JSON.parse(data);
+
   const promises = [];
-  promises.push(fs.readFile("./pokedata/abilities.json", "utf-8"));
-  // promises.push(fs.readFile("./pokedata/items.json", "utf-8"));
-  // promises.push(fs.readFile("./pokedata/moves.json", "utf-8"));
-  // promises.push(fs.readFile("./pokedata/names.json", "utf-8"));
-  promises.push(fs.readFile("./pokedata/types.json", "utf-8"));
+  promises.push(findSearch(searchTerm, data.names, "pokemon"));
+  promises.push(findSearch(searchTerm, data.items, "item"));
+  promises.push(findSearch(searchTerm, data.types, "type"));
+  promises.push(findSearch(searchTerm, data.moves, "move"));
+  promises.push(findSearch(searchTerm, data.abilities, "ability"));
 
   Promise.all(promises)
-    .then((values) => {
-      values = JSON.parse(values);
-      console.log(values);
+    .then((finds) => {
+      finds = finds.filter((item) => item !== null);
+
+      options.finds = finds;
       res.render("pokemon/search", { ...options });
     })
-    .catch((err) => {
-      console.log(err);
+    .catch(() => {
+      res.render("pokemon/search", { ...options });
     });
+};
+
+const findSearch = async (word, input, key) => {
+  return new Promise((resolve, reject) => {
+    if (!word || !input) reject();
+
+    let finds = input.filter(
+      (item) =>
+        item.german.toLowerCase().includes(word.toLowerCase()) ||
+        item.english.toLowerCase().includes(word.toLowerCase()),
+    );
+    if (finds.length === 0) resolve(null);
+
+    finds = finds.slice(0, 10);
+
+    const obj = {};
+    obj[key] = finds;
+    resolve(obj);
+  });
 };
