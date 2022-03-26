@@ -1,0 +1,82 @@
+extend  ../components/header.pug
+
+block append head
+    title Pokemon
+    script(src='/static/scripts/cardtoggle.js')
+
+block append body
+    .container.is-max-desktop.pl-6.pr-6
+        nav.breadcrumb(aria-label="breadcrumbs")
+            ul
+                li
+                    a(href="/") Home
+                li
+                    a(href="/pokemon") Pokemon
+                li.is-active
+                    a(href="/pokemon/search", aria-current="page") Search
+        
+        form(action="/pokemon/search", method="get", id="search").mb-6
+            input.input(type="text" name="search" placeholder="Search for something!" onsubmit="document.forms['search'].submit()")
+            input(type="submit" hidden)
+
+
+
+        .columns
+            .column
+                .card 
+                    .card-header
+                        .card-header-icon
+                            img(src=`${item.sprites.default}`)
+                        .card-header-title
+                            p #{germanName}
+                        .card-header-icon
+                            p ₽#{item.cost}
+                    .card-content
+                        each flavourtext in germanFlavourTexts
+                            .container.m-3
+                                p.has-text-weight-bold #{flavourtext.generationName}
+                                p #{flavourtext.text}
+                            
+
+                .card.mt-1
+                    .card-header
+                        .card-header-icon
+                            img(src=`${item.sprites.default}`)
+                        .card-header-title
+                            p #{englishName}
+                        .card-header-icon
+                            p ₽#{item.cost}
+                    
+                    .card-content
+                        each flavourtext in englishFlavourTexts
+                            .card.m-2
+                                .card-content.card-toggle
+                                    p.has-text-weight-bold #{flavourtext.generationName}
+                                    .container.mt-1.is-hidden
+                                        p #{flavourtext.text}
+
+                   
+                    
+            .column
+                .card
+                    .card-header
+                        .card-header-title
+                            p Effect
+                    .card-content
+                        p #{item.effect_entries[0].effect}
+
+
+                .card.mt-3.mb-1
+                    .card-header
+                        .card-header-title
+                            p Gehalten von / Held by
+                
+                each pkmn in held_by_summaries
+                    .card.mb-1(onclick=`location.href='/pkmn/${pkmn.id}'`)
+                        .card-header
+                            .card-header-icon
+                                img(src=`${pkmn.sprite}`, style="height: 48px; width: 48px")
+                            .card-header-title
+                                p #{pkmn.german}
+                            .card-header-icon
+                                p.has-text-weight-bold #{pkmn.english}
