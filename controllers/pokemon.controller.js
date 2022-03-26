@@ -29,6 +29,7 @@ exports.getItem = async (req, res, next) => {
     item.held_by_pokemon.forEach((details) => {
       const id = details.pokemon.url.split("/")[6];
       promises.push(cache.receivePokemonSpeciesData(id));
+      console.log(`Pokemon ${id}`);
     });
   }
 
