@@ -63,3 +63,154 @@ exports.constructDateTime = (day, time) => {
   dateTime.setMinutes(time.substr(3, 2));
   return dateTime;
 };
+
+exports.pokemonNameLanguage = (species, languageCode) => {
+  let name = "";
+  species.names.forEach((entry) => {
+    if (entry.language.name === languageCode) {
+      name = entry.name;
+    }
+  });
+  return name;
+};
+
+exports.itemNameLanguage = (item, languageCode) => {
+  let name = "";
+  item.names.forEach((entry) => {
+    if (entry.language.name === languageCode) {
+      name = entry.name;
+    }
+  });
+  return name;
+};
+
+exports.itemFlavourTextLanguage = (item, languageCode) => {
+  let texts = [];
+  let previousText = "";
+
+  item.flavor_text_entries.forEach((entry) => {
+    if (entry.language.name === languageCode) {
+      if (previousText != entry.text) {
+        const gen = this.generationLanguage(entry.version_group.name);
+
+        const i = {
+          generation: gen.generation,
+          generationName: gen[languageCode],
+          text: entry.text,
+        };
+        texts.push(i);
+
+        previousText = entry.text;
+      }
+    }
+  });
+
+  return texts;
+};
+
+exports.generationLanguage = (version_group_name) => {
+  const lookup = {
+    "red-blue": {
+      de: "Rot / Blau",
+      en: "Red / Blue",
+      generation: 1,
+    },
+    yellow: {
+      de: "Gelb",
+      en: "Yellow",
+      generation: 1,
+    },
+    "gold-silver": {
+      de: "Gold / Silber",
+      en: "Gold / Silver",
+      generation: 2,
+    },
+    crystal: {
+      de: "Kristall",
+      en: "Crystal",
+      generation: 3,
+    },
+    "ruby-sapphire": {
+      de: "Rubin / Saphir",
+      en: "Ruby / Sapphire",
+      generation: 3,
+    },
+    emerald: {
+      de: "Smaragd",
+      en: "Emerald",
+      generation: 3,
+    },
+    "firered-leafgreen": {
+      de: "Feuer Rot / Blatt Grün",
+      en: "Fire Red / Leaf Green",
+      generation: 3,
+    },
+    colosseum: {
+      de: "Kolosseum",
+      en: "Colosseum",
+      generation: 3,
+    },
+    xd: {
+      de: "XD",
+      en: "XD",
+      generation: 3,
+    },
+    "diamond-pearl": {
+      de: "Diamant / Perle",
+      en: "Diamond / Perl",
+      generation: 4,
+    },
+    platinum: {
+      de: "Platin",
+      en: "Platinum",
+      generation: 4,
+    },
+    "heartgold-soulsilver": {
+      de: "Heartgold / Soulsilver",
+      en: "Heartgold / Soulsilver",
+      generation: 4,
+    },
+    "black-white": {
+      de: "Schwarz / Weiss",
+      en: "Black / White",
+      generation: 5,
+    },
+    "black-2-white-2": {
+      de: "Schwarz 2 / Weiss 2",
+      en: "Black 2 / White 2",
+      generation: 5,
+    },
+    "x-y": {
+      de: "X / Y",
+      en: "X / Y",
+      generation: 6,
+    },
+    "omega-ruby-alpha-sapphire": {
+      de: "Omega Rubin / Alpha Saphir",
+      en: "Omega Ruby / Alpha Sapphire",
+      generation: 6,
+    },
+    "sun-moon": {
+      de: "Sonne / Mond",
+      en: "Sun / Moon",
+      generation: 7,
+    },
+    "ultra-sun-ultra-moon": {
+      de: "Ultra Sonne / Ultra Mond",
+      en: "Ultra Sun / Ultra Moon",
+      generation: 7,
+    },
+    "lets-go-pikachu-lets-go-eevee": {
+      de: "Let's Go Pikachu / Evoli",
+      en: "Let's Go Pikachu / Eevee",
+      generation: 7,
+    },
+    "sword-shield": {
+      de: "Schwert / Schild",
+      en: "Sword / Shield",
+      generation: 8,
+    },
+  };
+
+  return lookup[version_group_name];
+};
