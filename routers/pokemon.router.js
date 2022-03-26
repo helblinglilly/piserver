@@ -11,6 +11,9 @@ pokemonRouter.all("/blackwhite", error.methodNotAllowed);
 pokemonRouter.get("/search", pc.getSearch);
 pokemonRouter.all("/search", error.methodNotAllowed);
 
+pokemonRouter.get("/item/:id", pc.getItem);
+pokemonRouter.all("/item/:id", error.methodNotAllowed);
+
 pokemonRouter.post("/");
 pokemonRouter.all("/*", error.pageNotFound);
 

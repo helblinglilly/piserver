@@ -1,11 +1,32 @@
 const pkmnModel = require("../models/pokemon.model");
 const fs = require("fs").promises;
+const axios = require("axios");
+const wrapper = require("axios-cache-plugin");
 
 const pokemonData = {};
 
+let http = wrapper(axios, {
+  maxCacheSize: 15,
+});
 exports.getPokemon = (_, res, next) => {
-  res.render("pokemon/index");
+  res.render("pokemon");
   // some test
+};
+
+exports.getItem = async (req, res, next) => {
+  const options = {};
+  const id = req.params.id;
+
+  const itemResponse = await http({
+    url: `https://pokeapi.co/api/v2/item/${id}`,
+    method: "get",
+  });
+  // const itemResponse = await axios.get(`https://pokeapi.co/api/v2/item/${id}`);
+  const item = itemResponse.data;
+
+  options.item = item;
+  console.log(item);
+  res.render("pokemon/detail-item", { ...options });
 };
 
 exports.getBlackWhite = (req, res, next) => {
@@ -49,9 +70,11 @@ exports.getSearch = async (req, res, next) => {
 
       options.finds = finds;
       res.render("pokemon/search", { ...options });
+      data = null;
     })
     .catch(() => {
       res.render("pokemon/search", { ...options });
+      data = null;
     });
 };
 

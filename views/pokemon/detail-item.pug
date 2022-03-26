@@ -1,0 +1,51 @@
+extend  ../components/header.pug
+
+block append head
+    title Pokemon
+
+block append body
+    .container.is-max-desktop.pl-6.pr-6
+        nav.breadcrumb(aria-label="breadcrumbs")
+            ul
+                li
+                    a(href="/") Home
+                li
+                    a(href="/pokemon") Pokemon
+                li.is-active
+                    a(href="/pokemon/search", aria-current="page") Search
+        
+        form(action="/pokemon/search", method="get", id="search").mb-6
+            input.input(type="text" name="search" placeholder="Search for something!" onsubmit="document.forms['search'].submit()")
+            input(type="submit" hidden)
+
+        .columns
+            .column
+                .card 
+                    .card-header
+                        .card-header-icon
+                            img(src=`${item.sprites.default}`)
+                        .card-header-title
+                            p #{item.names[4].name}
+                        .card-header-icon
+                            p ₽#{item.cost}
+                    .card-content
+                        p #{item.flavor_text_entries[51].text}
+                    
+            .column
+                .card 
+                    .card-header
+                        .card-header-icon
+                            img(src=`${item.sprites.default}`)
+                        .card-header-title
+                            p #{item.names[7].name}
+                        .card-header-icon
+                            p ₽#{item.cost}
+                    .card-content
+                        p #{item.flavor_text_entries[54].text}
+
+                .card.mt-1
+                    .card-header
+                        .card-header-title
+                            p Effect
+                    .card-content
+                        p #{item.effect_entries[0].effect}
