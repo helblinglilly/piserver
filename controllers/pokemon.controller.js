@@ -1,64 +1,6 @@
 const fs = require("fs");
-const axios = require("axios");
 const utils = require("../utils");
-
-const cachePath = `${__dirname}/../cache/`;
-if (!fs.existsSync(cachePath)) fs.mkdirSync(cachePath);
-
-const receiveItem = async (id) => {
-  if (!fs.existsSync(`${cachePath}/item`)) fs.mkdirSync(`${cachePath}/item`);
-
-  let item;
-  if (fs.existsSync(cachePath + `item/${id}.json`)) {
-    item = fs.readFileSync(cachePath + `item/${id}.json`, "utf-8");
-    item = JSON.parse(item);
-    // console.log(`Read item ${id} from cache`);
-  } else {
-    const itemResponse = await axios.get(`https://pokeapi.co/api/v2/item/${id}`);
-    item = itemResponse.data;
-    fs.writeFileSync(cachePath + `item/${id}.json`, JSON.stringify(item));
-    console.log(`item/${id}`);
-  }
-  return item;
-};
-
-const receivePokemon = async (id) => {
-  if (!fs.existsSync(`${cachePath}/pokemon`)) fs.mkdirSync(`${cachePath}/pokemon`);
-
-  let item;
-  if (fs.existsSync(cachePath + `pokemon/${id}.json`)) {
-    item = fs.readFileSync(cachePath + `pokemon/${id}.json`, "utf-8");
-    item = JSON.parse(item);
-    // console.log(`Read Pokemon ${id} from cache`);
-  } else {
-    const itemResponse = await axios.get(`https://pokeapi.co/api/v2/pokemon/${id}`);
-    item = itemResponse.data;
-    fs.writeFileSync(cachePath + `pokemon/${id}.json`, JSON.stringify(item));
-    console.log(`pokemon/${id}`);
-  }
-  return item;
-};
-
-const receivePokemonSpecies = async (id) => {
-  if (id > 0 && id < 899) {
-    if (!fs.existsSync(`${cachePath}/species`)) fs.mkdirSync(`${cachePath}/species`);
-
-    let item;
-    if (fs.existsSync(cachePath + `species/${id}.json`)) {
-      item = fs.readFileSync(cachePath + `species/${id}.json`, "utf-8");
-      item = JSON.parse(item);
-      // console.log(`Read Species ${id} from cache`);
-    } else {
-      const itemResponse = await axios.get(
-        `https://pokeapi.co/api/v2/pokemon-species/${id}`,
-      );
-      item = itemResponse.data;
-      fs.writeFileSync(cachePath + `species/${id}.json`, JSON.stringify(item));
-      console.log(`pokemon-species/${id}`);
-    }
-    return item;
-  }
-};
+const cache = require("../cache/cachemanager");
 
 exports.getPokemon = (_, res, next) => {
   res.render("pokemon");
@@ -68,10 +10,13 @@ exports.getItem = async (req, res, next) => {
   const options = {};
   const id = req.params.id;
 
-  const item = await receiveItem(id);
+  const item = await cache.receivePokemonItemData(id);
   options.item = item;
   options.germanName = utils.itemNameLanguage(item, "de");
   options.englishName = utils.itemNameLanguage(item, "en");
+
+  const imagePath = await cache.receivePokemonItemSprite(item.name);
+  options.spritePath = imagePath;
 
   options.germanFlavourTexts = utils.itemFlavourTextLanguage(item, "de");
   options.englishFlavourTexts = utils.itemFlavourTextLanguage(item, "en");
@@ -83,7 +28,7 @@ exports.getItem = async (req, res, next) => {
   if (item.held_by_pokemon.length > 0) {
     item.held_by_pokemon.forEach((details) => {
       const id = details.pokemon.url.split("/")[6];
-      promises.push(receivePokemonSpecies(id));
+      promises.push(cache.receivePokemonSpeciesData(id));
     });
   }
 
@@ -94,19 +39,26 @@ exports.getItem = async (req, res, next) => {
 
   Promise.all(promises)
     .then((entry) => {
+      entry = entry.filter((x) => x !== undefined);
+
       entry.forEach((pkmn, index) => {
         const details = {};
         if (pkmn) {
-          details.sprite = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pkmn.id}.png`;
-          details.german = utils.pokemonNameLanguage(pkmn, "de");
+          cache.receivePokemonSprite(pkmn.id).then((sprite) => {
+            details.sprite = sprite;
 
-          const english = utils.pokemonNameLanguage(pkmn, "en");
-          details.english = english !== details.german ? english : "";
-          options.held_by_summaries.push(details);
-          details.id = id;
+            details.german = utils.pokemonNameLanguage(pkmn, "de");
+            const english = utils.pokemonNameLanguage(pkmn, "en");
+            details.english = english !== details.german ? english : "";
+
+            options.held_by_summaries.push(details);
+            details.id = id;
+
+            if (index === entry.length - 1) {
+              res.render("pokemon/item", { ...options });
+            }
+          });
         }
-
-        if (index === entry.length - 1) res.render("pokemon/item", { ...options });
       });
     })
     .catch((err) => {

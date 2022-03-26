@@ -111,3 +111,5 @@ dist
 
 cache/*
 !cache/*.js
+
+public/assets/pokemon/cache/*

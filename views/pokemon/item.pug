@@ -26,7 +26,7 @@ block append body
                 .card 
                     .card-header
                         .card-header-icon
-                            img(src=`${item.sprites.default}`)
+                            img(src=`${spritePath}`)
                         .card-header-title
                             p #{germanName}
                         .card-header-icon
@@ -41,7 +41,7 @@ block append body
                 .card.mt-1
                     .card-header
                         .card-header-icon
-                            img(src=`${item.sprites.default}`)
+                            img(src=`${spritePath}`)
                         .card-header-title
                             p #{englishName}
                         .card-header-icon
@@ -72,7 +72,7 @@ block append body
                             p Gehalten von / Held by
                 
                 each pkmn in held_by_summaries
-                    .card.mb-1(onclick=`location.href='/pkmn/${pkmn.id}'`)
+                    .card.mb-1(onclick=`location.href='/pokemon/pkmn/${pkmn.id}'`)
                         .card-header
                             .card-header-icon
                                 img(src=`${pkmn.sprite}`, style="height: 48px; width: 48px")
