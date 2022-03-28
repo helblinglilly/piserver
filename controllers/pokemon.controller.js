@@ -11,25 +11,26 @@ exports.getItem = async (req, res, next) => {
   const id = req.params.id;
 
   const item = await cache.receivePokemonItemData(id);
+
   options.item = item;
+  options.held_by_summaries = [];
+
   options.germanName = utils.itemNameLanguage(item, "de");
   options.englishName = utils.itemNameLanguage(item, "en");
-
-  const imagePath = await cache.receivePokemonItemSprite(item.name);
-  options.spritePath = imagePath;
-
   options.germanFlavourTexts = utils.itemFlavourTextLanguage(item, "de");
   options.englishFlavourTexts = utils.itemFlavourTextLanguage(item, "en");
 
-  options.held_by_summaries = [];
+  const imagePath = await cache.receivePokemonItemSprite(item.name);
+  options.spritePath = imagePath;
 
   const promises = [];
 
   if (item.held_by_pokemon.length > 0) {
     item.held_by_pokemon.forEach((details) => {
       const id = details.pokemon.url.split("/")[6];
-      promises.push(cache.receivePokemonSpeciesData(id));
-      console.log(`Pokemon ${id}`);
+      if (id > 0 && id <= utils.highestPokedexEntry) {
+        promises.push(cache.receivePokemonSpeciesData(id));
+      }
     });
   }
 
@@ -64,6 +65,7 @@ exports.getItem = async (req, res, next) => {
     })
     .catch((err) => {
       console.log(err);
+      console.log("Catch block");
       res.render("pokemon/item", { ...options });
     });
 };

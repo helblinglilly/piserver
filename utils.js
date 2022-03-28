@@ -67,6 +67,8 @@ exports.constructDateTime = (day, time) => {
   return dateTime;
 };
 
+exports.highestPokedexEntry = 898;
+
 exports.pokemonNameLanguage = (species, languageCode) => {
   let name = "";
   species.names.forEach((entry) => {
@@ -221,24 +223,16 @@ exports.generationLanguage = (version_group_name) => {
 exports.downloadFile = async (fileUrl, outputLocationPath) => {
   const writer = fs.createWriteStream(outputLocationPath);
 
-  return axios({
+  const response = await axios({
     method: "get",
     url: fileUrl,
     responseType: "stream",
-  }).then((response) => {
-    return new Promise((resolve, reject) => {
-      response.data.pipe(writer);
-      let error = null;
-      writer.on("error", (err) => {
-        error = err;
-        writer.close();
-        reject(err);
-      });
-      writer.on("close", () => {
-        if (!error) {
-          resolve(true);
-        }
-      });
-    });
+  });
+
+  response.data.pipe(writer);
+
+  return new Promise((resolve, reject) => {
+    writer.on("finish", resolve);
+    writer.on("error", reject);
   });
 };
