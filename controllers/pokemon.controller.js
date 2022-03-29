@@ -32,8 +32,15 @@ exports.getItem = async (req, res, next) => {
     });
   }
 
+  // For unused items
+  if (options.item.effect_entries.length === 0)
+    options.item.effect_entries.push({ effect: "Unused" });
+
   // Skip the steps below if there aren't any
-  if (pkmnSpeciesPromises.length === 0) res.render("pokemon/item", { ...options });
+  if (pkmnSpeciesPromises.length === 0) {
+    res.render("pokemon/item", { ...options });
+    return;
+  }
 
   // Get data about each pokemon that holds this item
   Promise.all(pkmnSpeciesPromises)
@@ -90,14 +97,18 @@ exports.getSearch = async (req, res, next) => {
 
   let dictionaryData = model.dictionaryData();
 
-  const promises = [];
-  promises.push(findSearch(searchTerm, dictionaryData.names, "pokemon"));
-  promises.push(findSearch(searchTerm, dictionaryData.items, "item"));
-  promises.push(findSearch(searchTerm, dictionaryData.types, "type"));
-  promises.push(findSearch(searchTerm, dictionaryData.moves, "move"));
-  promises.push(findSearch(searchTerm, dictionaryData.abilities, "ability"));
+  const searchPromises = [];
+  searchPromises.push(
+    findSearch(searchTerm, dictionaryData.names, "pokemon", model.receivePokemonSprite),
+  );
+  searchPromises.push(
+    findSearch(searchTerm, dictionaryData.items, "item", model.receivePokemonItemSprite),
+  );
+  searchPromises.push(findSearch(searchTerm, dictionaryData.types, "type"));
+  searchPromises.push(findSearch(searchTerm, dictionaryData.moves, "move"));
+  searchPromises.push(findSearch(searchTerm, dictionaryData.abilities, "ability"));
 
-  Promise.all(promises)
+  Promise.all(searchPromises)
     .then((finds) => {
       finds = finds.filter((entry) => entry !== null);
 
@@ -109,21 +120,35 @@ exports.getSearch = async (req, res, next) => {
     });
 };
 
-const findSearch = async (word, input, key) => {
+const findSearch = (word, input, key, spriteMethod) => {
   return new Promise((resolve, reject) => {
     if (!word || !input) reject();
 
+    // Find items
     let finds = input.filter(
-      (item) =>
-        item.german.toLowerCase().includes(word.toLowerCase()) ||
-        item.english.toLowerCase().includes(word.toLowerCase()),
+      (entry) =>
+        entry.german.toLowerCase().includes(word.toLowerCase()) ||
+        entry.english.toLowerCase().includes(word.toLowerCase()),
     );
-    if (finds.length === 0) resolve(null);
 
+    // Size adjustment
+    if (finds.length === 0) resolve(null);
     finds = finds.slice(0, 10);
 
-    const obj = {};
-    obj[key] = finds;
-    resolve(obj);
+    const finish = () => {
+      const obj = {};
+      obj[key] = finds;
+      resolve(obj);
+    };
+
+    // Get sprites from cache if there is a sprite needed
+    if (spriteMethod) {
+      finds.forEach(async (entry, index) => {
+        if (key === "pokemon") entry.sprite = await spriteMethod(entry.id);
+        if (key === "item") entry.sprite = await spriteMethod(entry.english_id);
+
+        if (index === finds.length - 1) finish();
+      });
+    } else finish();
   });
 };

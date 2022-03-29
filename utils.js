@@ -98,12 +98,26 @@ exports.itemFlavourTextLanguage = (item, languageCode) => {
       if (previousText != entry.text) {
         const gen = this.generationLanguage(entry.version_group.name);
 
-        const i = {
-          generation: gen.generation,
-          generationName: gen[languageCode],
-          text: entry.text,
-        };
-        texts.push(i);
+        const i = {};
+        entry.text = entry.text.replace(/\n/g, " ");
+        if (entry.text == "- - -") {
+          i.generation = gen.generation;
+          i.generationName = gen[languageCode];
+          i.text = "n/a";
+          i.text = "n/a";
+        } else {
+          i.generation = gen.generation;
+          i.generationName = gen[languageCode];
+          i.text = entry.text;
+        }
+
+        // German entries tend to be duplicates of each other
+        let found = false;
+        texts.forEach((text) => {
+          if (text.text == i.text) found = true;
+        });
+
+        if (!found) texts.push(i);
 
         previousText = entry.text;
       }
@@ -220,19 +234,22 @@ exports.generationLanguage = (version_group_name) => {
   return lookup[version_group_name];
 };
 
-exports.downloadFile = async (fileUrl, outputLocationPath) => {
-  const writer = fs.createWriteStream(outputLocationPath);
-
-  const response = await axios({
-    method: "get",
-    url: fileUrl,
-    responseType: "stream",
-  });
-
-  response.data.pipe(writer);
-
-  return new Promise((resolve, reject) => {
-    writer.on("finish", resolve);
-    writer.on("error", reject);
+exports.downloadFile = (fileUrl, outputLocationPath) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const response = await axios({
+        method: "get",
+        url: fileUrl,
+        responseType: "stream",
+      });
+      const writer = fs.createWriteStream(outputLocationPath);
+      response.data.pipe(writer);
+      writer.on("finish", resolve);
+      writer.on("error", reject);
+    } catch (err) {
+      if (err.response.status === 404) {
+        reject({ status: 404, content: "/static/assets/pokemon/not-found.png" });
+      } else reject(err);
+    }
   });
 };

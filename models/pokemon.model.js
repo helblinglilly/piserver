@@ -118,8 +118,12 @@ exports.receivePokemonItemSprite = (item_name) => {
           resolve(`/static/assets/pokemon/cache/item/${item_name}.png`);
         })
         .catch((err) => {
-          console.log(err);
-          reject(err);
+          if (err.status === 404) {
+            resolve(err.content);
+          } else {
+            console.log(err);
+            reject(err);
+          }
         });
     }
   });

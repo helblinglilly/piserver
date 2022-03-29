@@ -32,7 +32,7 @@ block append body
                     .card(onclick=`location.href='/pokemon/pkmn/${pokemon.id}'`).mb-3
                         .card-content
                             figure.container(style="display: flex; align-items: center;")
-                                img.is-48x48(src=`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`, alt='Pokemon Sprite Icon').mr-1
+                                img.is-48x48(src=`${pokemon.sprite}`, alt='Pokemon Sprite Icon').mr-1
                                 p.mr-3 ##{pokemon.id}
                                 a.card-text(href=`/pokemon/pkmn/${pokemon.id}`) #{pokemon.german} - #{pokemon.english}
             if Object.keys(val) == "item"
@@ -45,7 +45,7 @@ block append body
                                     img.is-48x48(src=`https://archives.bulbagarden.net/media/upload/9/9a/Bag_TM_Normal_Sprite.png`, alt='Item Icon').mr-1
                                     a.card-text(href=`/pokemon/item/${item.id}`) #{item.german}
                                 else 
-                                    img.is-48x48(src=`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/${item.english_id}.png`, alt='Item Icon').mr-1
+                                    img.is-48x48(src=`${item.sprite}`, style="height: 30px; width: 30px;" alt='Item Icon').mr-1
                                     a.card-text(href=`/pokemon/item/${item.id}`) #{item.german} - #{item.english}
 
             if Object.keys(val) == "type"

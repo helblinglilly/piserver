@@ -26,34 +26,45 @@ block append body
                 .card 
                     .card-header
                         .card-header-icon
-                            img(src=`${spritePath}`)
+                            img(src=`${spritePath}` style="height: 30px; width: 30px")
                         .card-header-title
                             p #{germanName}
                         .card-header-icon
                             p ₽#{item.cost}
                     .card-content
-                        each flavourtext in germanFlavourTexts
+                        if germanFlavourTexts.length === 1
                             .container.m-3
-                                p.has-text-weight-bold #{flavourtext.generationName}
-                                p #{flavourtext.text}
+                                if germanFlavourTexts[0].generationName !== "X / Y"
+                                    p.has-text-weight-bold #{germanFlavourTexts[0].generationName}
+                                p #{germanFlavourTexts[0].text}
+                        else 
+                            each flavourtext in germanFlavourTexts
+                                .container.m-3
+                                    p.has-text-weight-bold #{flavourtext.generationName}
+                                    p #{flavourtext.text}
                             
 
                 .card.mt-1
                     .card-header
                         .card-header-icon
-                            img(src=`${spritePath}`)
+                            img(src=`${spritePath}` style="height: 30px; width: 30px")
                         .card-header-title
                             p #{englishName}
                         .card-header-icon
                             p ₽#{item.cost}
                     
                     .card-content
-                        each flavourtext in englishFlavourTexts
-                            .card.m-2
-                                .card-content.card-toggle
-                                    p.has-text-weight-bold #{flavourtext.generationName}
-                                    .container.mt-1.is-hidden
-                                        p #{flavourtext.text}
+                        if englishFlavourTexts.length === 1
+                            .container.m-3
+                                p.has-text-weight-bold #{englishFlavourTexts[0].generationName}
+                                p #{englishFlavourTexts[0].text}
+                        else 
+                            each flavourtext in englishFlavourTexts
+                                .card.m-2
+                                    .card-content.card-toggle
+                                        p.has-text-weight-bold #{flavourtext.generationName}
+                                        .container.mt-1.is-hidden
+                                            p #{flavourtext.text}
 
                    
                     
