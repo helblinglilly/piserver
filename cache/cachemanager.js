@@ -8,11 +8,10 @@ const spriteCachePath = `${__dirname}/../public/assets/pokemon/cache/`;
 if (!fs.existsSync(cachePath)) fs.mkdirSync(cachePath);
 if (!fs.existsSync(spriteCachePath)) fs.mkdirSync(spriteCachePath);
 
-exports.receivePokemonItemData = (id) => {
+exports.receivePokemonItemData = async (id) => {
   if (!fs.existsSync(`${cachePath}/item`)) fs.mkdirSync(`${cachePath}/item`);
 
   return new Promise((resolve, reject) => {
-    let item;
     if (fs.existsSync(cachePath + `item/${id}.json`)) {
       item = fs.readFileSync(cachePath + `item/${id}.json`, "utf-8");
       resolve(JSON.parse(item));
@@ -20,17 +19,13 @@ exports.receivePokemonItemData = (id) => {
       axios
         .get(`https://pokeapi.co/api/v2/item/${id}`)
         .then((response) => {
-          fs.writeFile(
+          console.log(`item/${id}`);
+          fs.writeFileSync(
             cachePath + `item/${id}.json`,
             JSON.stringify(response.data),
-            (err) => {
-              if (err) {
-                console.log(err);
-                reject(err);
-              }
-              resolve(response.data);
-            },
+            "utf-8",
           );
+          resolve(response.data);
         })
         .catch((err) => {
           console.log(err);
@@ -39,7 +34,6 @@ exports.receivePokemonItemData = (id) => {
     }
   });
 };
-
 exports.receivePokemonData = async (id) => {
   if (!fs.existsSync(`${cachePath}/pokemon`)) fs.mkdirSync(`${cachePath}/pokemon`);
 
