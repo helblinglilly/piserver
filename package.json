@@ -5,7 +5,7 @@
   "main": "setup.js",
   "scripts": {
     "test": "jest test --detectOpenHandles",
-    "dev": "nodemon setup.js --ignore cache/item/ --ignore cache/species/",
+    "dev": "nodemon setup.js --ignore cache/ --ignore public/assets/pokemon/cache/",
     "prepare": "husky install",
     "lint": "prettier --write '**/*.js'"
   },

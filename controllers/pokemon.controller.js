@@ -1,6 +1,6 @@
 const fs = require("fs");
 const utils = require("../utils");
-const cache = require("../cache/cachemanager");
+const model = require("../models/pokemon.model");
 
 exports.getPokemon = (_, res, next) => {
   res.render("pokemon");
@@ -10,7 +10,8 @@ exports.getItem = async (req, res, next) => {
   const options = {};
   const id = req.params.id;
 
-  const item = await cache.receivePokemonItemData(id);
+  const item = await model.receivePokemonItemData(id);
+  options.spritePath = await model.receivePokemonItemSprite(item.name);
 
   options.item = item;
   options.held_by_summaries = [];
@@ -20,52 +21,45 @@ exports.getItem = async (req, res, next) => {
   options.germanFlavourTexts = utils.itemFlavourTextLanguage(item, "de");
   options.englishFlavourTexts = utils.itemFlavourTextLanguage(item, "en");
 
-  const imagePath = await cache.receivePokemonItemSprite(item.name);
-  options.spritePath = imagePath;
-
-  const promises = [];
-
+  // Set up for pokemon that hold this item
+  const pkmnSpeciesPromises = [];
   if (item.held_by_pokemon.length > 0) {
-    item.held_by_pokemon.forEach((details) => {
-      const id = details.pokemon.url.split("/")[6];
+    item.held_by_pokemon.forEach((pkmn) => {
+      const id = pkmn.pokemon.url.split("/")[6];
       if (id > 0 && id <= utils.highestPokedexEntry) {
-        promises.push(cache.receivePokemonSpeciesData(id));
+        pkmnSpeciesPromises.push(model.receivePokemonSpeciesData(id));
       }
     });
   }
 
-  if (promises.length === 0) {
-    res.render("pokemon/item", { ...options });
-    return;
-  }
+  // Skip the steps below if there aren't any
+  if (pkmnSpeciesPromises.length === 0) res.render("pokemon/item", { ...options });
 
-  Promise.all(promises)
+  // Get data about each pokemon that holds this item
+  Promise.all(pkmnSpeciesPromises)
     .then((entry) => {
       entry = entry.filter((x) => x !== undefined);
 
       entry.forEach((pkmn, index) => {
-        const details = {};
-        if (pkmn) {
-          cache.receivePokemonSprite(pkmn.id).then((sprite) => {
-            details.sprite = sprite;
+        model.receivePokemonSprite(pkmn.id).then((sprite) => {
+          const details = {};
+          details.id = id;
+          details.sprite = sprite;
 
-            details.german = utils.pokemonNameLanguage(pkmn, "de");
-            const english = utils.pokemonNameLanguage(pkmn, "en");
-            details.english = english !== details.german ? english : "";
+          details.german = utils.pokemonNameLanguage(pkmn, "de");
+          const english = utils.pokemonNameLanguage(pkmn, "en");
+          details.english = english !== details.german ? english : "";
 
-            options.held_by_summaries.push(details);
-            details.id = id;
+          options.held_by_summaries.push(details);
 
-            if (index === entry.length - 1) {
-              res.render("pokemon/item", { ...options });
-            }
-          });
-        }
+          if (index === entry.length - 1) {
+            res.render("pokemon/item", { ...options });
+          }
+        });
       });
     })
     .catch((err) => {
       console.log(err);
-      console.log("Catch block");
       res.render("pokemon/item", { ...options });
     });
 };
@@ -94,28 +88,24 @@ exports.getSearch = async (req, res, next) => {
   }
   options.searchTerm = searchTerm;
 
-  // Load files
-  let data = fs.readFileSync("./pokedata/data.json", "utf-8");
-  data = JSON.parse(data);
+  let dictionaryData = model.dictionaryData();
 
   const promises = [];
-  promises.push(findSearch(searchTerm, data.names, "pokemon"));
-  promises.push(findSearch(searchTerm, data.items, "item"));
-  promises.push(findSearch(searchTerm, data.types, "type"));
-  promises.push(findSearch(searchTerm, data.moves, "move"));
-  promises.push(findSearch(searchTerm, data.abilities, "ability"));
+  promises.push(findSearch(searchTerm, dictionaryData.names, "pokemon"));
+  promises.push(findSearch(searchTerm, dictionaryData.items, "item"));
+  promises.push(findSearch(searchTerm, dictionaryData.types, "type"));
+  promises.push(findSearch(searchTerm, dictionaryData.moves, "move"));
+  promises.push(findSearch(searchTerm, dictionaryData.abilities, "ability"));
 
   Promise.all(promises)
     .then((finds) => {
-      finds = finds.filter((item) => item !== null);
+      finds = finds.filter((entry) => entry !== null);
 
       options.finds = finds;
       res.render("pokemon/search", { ...options });
-      data = null;
     })
     .catch(() => {
       res.render("pokemon/search", { ...options });
-      data = null;
     });
 };
 
