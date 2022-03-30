@@ -254,6 +254,6 @@ exports.downloadFile = (fileUrl, outputLocationPath) => {
   });
 };
 
-exports.getUniqueListBy = (arr, key) => {
-  return [...new Map(arr.map((item) => [item[key], item])).values()];
+exports.getUniqueListBy = (arr, key1) => {
+  return [...new Map(arr.map((item) => [item[key1], item])).values()];
 };

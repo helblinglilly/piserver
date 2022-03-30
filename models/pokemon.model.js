@@ -368,22 +368,21 @@ const buildEvolutions = (chain) => {
       });
 
       if (evolves.evolves_to.length > 0) {
+        const level2Result = {};
+        level2Result.evolutions = [];
+
         evolves.evolves_to.forEach(async (evol, index) => {
-          const level2Result = {};
           level2Result.species = targetId;
           level2Result.speciesSprite = targetSprite;
 
-          const level2Evolution = [];
-
           const level2TargetId =
             evol.species.url.split("/")[evol.species.url.split("/").length - 2];
-          level2Evolution.push({
+
+          level2Result.evolutions.push({
             target: level2TargetId,
             targetSprite: await this.receivePokemonSpriteFront(level2TargetId),
             conditions: await getEvolutionConditions(evol.evolution_details[0]),
           });
-
-          level2Result.evolutions = level2Evolution;
 
           if (index === evolves.evolves_to.length - 1) {
             results.push(level2Result);
@@ -409,7 +408,10 @@ exports.receiveEvolutionChain = (url) => {
 
     const chainSource = await getChain(url);
     const results = await buildEvolutions(chainSource);
-    const unique = utils.getUniqueListBy(results, "species");
+    const unique = utils.getUniqueListBy(results, "species", "target");
+    // unique.forEach((entry) => {
+    //   console.log(entry);
+    // });
 
     resolve(unique);
   });

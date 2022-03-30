@@ -64,20 +64,50 @@ block append body
                                             each condition in siblingEvolution.conditions
                                                 if Object.keys(condition).includes("level")
                                                     p Level: #{condition.level}
+                                                    
+                                                if Object.keys(condition).includes("gender")
+                                                    if condition.gender === 2
+                                                        p Male
+                                                    else if condition.gender === 1
+                                                        p Female
 
                                                 if Object.keys(condition).includes("item")
                                                     img(src=`${condition.itemSprite}` style="width: 40%; height: auto" onclick=`location=href='/pokemon/item/${condition.item}'`)
 
                                                 if Object.keys(condition).includes("happiness")
-                                                    p Freundschaft / Happiness
-                                                    p Level up
+                                                    p Freundschaft + Level hoch
+                                                    hr.m-2
+                                                    p Happiness + Level up
 
                                                 if condition.trigger === "shed"
                                                     p 5 Pkmn in team + 1 Pokeball
                                                     p Level: 20
 
-                                                p #{condition.trigger}
-                                                    
+                                                if condition.trigger === "spin"
+                                                    p Gib eine Süssigkeit und drehe im Kreis
+                                                    hr.m-2
+                                                    p Give a sweet and spin your character
+
+                                                if condition.trigger === "tower-of-darkness"
+                                                    p Turm des Unlichts
+                                                    hr.m-2
+                                                    p Tower of Darkness
+
+                                                if condition.trigger === "tower-of-waters"
+                                                    p Turm des Wassers
+                                                    hr.m-2
+                                                    p Tower of Waters
+
+                                                if condition.trigger === "three-critical-hits"
+                                                    p 3 Volltreffer
+                                                    hr.m-2
+                                                    p 3 Critical hits
+                                                
+                                                if condition.trigger === "take-damage"
+                                                    p Nimm schaden
+                                                    hr.m-2
+                                                    p Take damage
+
                                     .column.has-text-centered(onclick=`location.href='/pokemon/pkmn/${siblingEvolution.target}'`)
                                         img(src=`${siblingEvolution.targetSprite}`)
                         

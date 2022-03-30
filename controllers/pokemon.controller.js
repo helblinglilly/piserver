@@ -36,7 +36,7 @@ exports.getPokemon = async (req, res, next) => {
   options.evolutionChain.forEach((evolution) => {
     // console.log(evolution);
     evolution.evolutions.forEach((sibling) => {
-      console.log(sibling);
+      // console.log(sibling);
     });
   });
   res.render("pokemon/pkmn", { ...options });
