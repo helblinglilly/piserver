@@ -12,14 +12,14 @@ block append body
                     a(href="/") Home
                 li
                     a(href="/pokemon") Pokemon
+                li
+                    a(href="/pokemon/search") Search
                 li.is-active
-                    a(href="/pokemon/search", aria-current="page") Search
+                    a(aria-current="page") Item ##{item.id}
         
         form(action="/pokemon/search", method="get", id="search").mb-6
             input.input(type="text" name="search" placeholder="Search for something!" onsubmit="document.forms['search'].submit()")
             input(type="submit" hidden)
-
-
 
         .columns
             .column

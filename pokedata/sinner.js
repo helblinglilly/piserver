@@ -1,38 +1,31 @@
 const axios = require("axios");
 const fs = require("fs");
 
-const biggestId = 267;
+const biggestId = 898;
 
 const pokenames = [];
 
 const grab = async () => {
-  for (let i = 1; i <= biggestId; i++) {
-    const response = await axios.get(`https://pokeapi.co/api/v2/ability/${i}`);
+  for (let i = 650; i <= biggestId; i++) {
+    const response = await axios.get(`https://pokeapi.co/api/v2/pokemon-species/${i}`);
 
-    if (response.data.length < 4) {
-      pokenames.push({
-        german: "unused",
-        english: "unused",
-        english_id: "unused",
-        id: i,
-      });
-      console.log(i, "unused");
-    } else {
-      const germanName = response.data.names[4].name;
-      const englishName = response.data.names[7].name;
-      const englishId = response.data.name;
+    let german, english;
+    response.data.names.forEach((entry) => {
+      if (entry.language.name === "de") {
+        german = entry.name;
+      }
+      if (entry.language.name === "en") {
+        english = entry.name;
+      }
+    });
 
-      pokenames.push({
-        german: germanName,
-        english: englishName,
-        english_id: englishId,
-        id: i,
-      });
-    }
+    pokenames.push({ german: german, english: english, id: i });
+    // console.log(german);
 
     console.log(i);
-    await new Promise((r) => setTimeout(r, 200));
   }
+  await new Promise((r) => setTimeout(r, 200));
+
   fs.writeFileSync("ability.json", JSON.stringify(pokenames), "utf8");
 };
 

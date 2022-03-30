@@ -1,11 +1,47 @@
 const fs = require("fs");
 const utils = require("../utils");
 const model = require("../models/pokemon.model");
+const error = require("./error.controller");
 
-exports.getPokemon = (_, res, next) => {
+exports.getRoot = (_, res, next) => {
   res.render("pokemon");
 };
 
+exports.getPokemon = async (req, res, next) => {
+  const options = {};
+  options.id = req.params.id;
+
+  // 404
+  if (
+    req.params.id <= 0 ||
+    req.params.id > utils.highestPokedexEntry ||
+    options.id == "undefined"
+  ) {
+    error.pageNotFound(req, res);
+    return;
+  }
+
+  const species = await model.receivePokemonSpeciesData(options.id);
+
+  options.germanName = utils.pokemonNameLanguage(species, "de");
+  options.englishName = utils.pokemonNameLanguage(species, "en");
+
+  options.spriteFront = await model.receivePokemonSpriteFront(options.id);
+  options.spriteBack = await model.receivePokemonSpriteBack(options.id);
+  await model.receivePokemonSpriteShinyFront(options.id);
+  await model.receivePokemonSpriteShinyBack(options.id);
+
+  options.evolutionChain = await model.receiveEvolutionChain(species.evolution_chain.url);
+
+  options.evolutionChain.forEach((evolution) => {
+    // console.log(evolution);
+    evolution.evolutions.forEach((sibling) => {
+      console.log(sibling);
+    });
+  });
+  res.render("pokemon/pkmn", { ...options });
+  return;
+};
 exports.getItem = async (req, res, next) => {
   const options = {};
   const id = req.params.id;
@@ -48,9 +84,9 @@ exports.getItem = async (req, res, next) => {
       entry = entry.filter((x) => x !== undefined);
 
       entry.forEach((pkmn, index) => {
-        model.receivePokemonSprite(pkmn.id).then((sprite) => {
+        model.receivePokemonSpriteFront(pkmn.id).then((sprite) => {
           const details = {};
-          details.id = id;
+          details.id = pkmn.id;
           details.sprite = sprite;
 
           details.german = utils.pokemonNameLanguage(pkmn, "de");
@@ -81,13 +117,20 @@ exports.getSearch = async (req, res, next) => {
   const options = {};
 
   // Referer
-  let sourcePage = req.headers.referer.split("pokemon/")[1];
-  if (sourcePage) {
-    if (sourcePage.includes("blackwhite")) sourcePage = "Black and White";
-    options.sourcePage = sourcePage;
+  if (req.headers.referer) {
+    let sourcePage = req.headers.referer.split("pokemon/")[1];
+    if (sourcePage) {
+      if (sourcePage.includes("blackwhite")) sourcePage = "Black and White";
+    }
+  } else {
+    options.sourcePage = "Pokemon";
   }
 
   // Search term
+  if (!req.query.search) {
+    res.render("pokemon", { ...options });
+    return;
+  }
   const searchTerm = req.query.search;
   if (!searchTerm) {
     res.render("pokemon/search", { ...options });
@@ -99,7 +142,12 @@ exports.getSearch = async (req, res, next) => {
 
   const searchPromises = [];
   searchPromises.push(
-    findSearch(searchTerm, dictionaryData.names, "pokemon", model.receivePokemonSprite),
+    findSearch(
+      searchTerm,
+      dictionaryData.names,
+      "pokemon",
+      model.receivePokemonSpriteFront,
+    ),
   );
   searchPromises.push(
     findSearch(searchTerm, dictionaryData.items, "item", model.receivePokemonItemSprite),
