@@ -257,3 +257,11 @@ exports.downloadFile = (fileUrl, outputLocationPath) => {
 exports.getUniqueListBy = (arr, key1) => {
   return [...new Map(arr.map((item) => [item[key1], item])).values()];
 };
+
+exports.sortMoves = (arr) => {
+  console.log("Hey");
+  for (const entry of arr) {
+    console.log(entry);
+  }
+  // console.log(arr);
+};

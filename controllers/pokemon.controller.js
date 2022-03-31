@@ -22,6 +22,8 @@ exports.getPokemon = async (req, res, next) => {
   }
 
   const species = await model.receivePokemonSpeciesData(options.id);
+  const pokemon = await model.receivePokemonData(options.id);
+  // const dictionaryData = model.dictionaryData();
 
   options.germanName = utils.pokemonNameLanguage(species, "de");
   options.englishName = utils.pokemonNameLanguage(species, "en");
@@ -33,12 +35,79 @@ exports.getPokemon = async (req, res, next) => {
 
   options.evolutionChain = await model.receiveEvolutionChain(species.evolution_chain.url);
 
-  options.evolutionChain.forEach((evolution) => {
-    // console.log(evolution);
-    evolution.evolutions.forEach((sibling) => {
-      // console.log(sibling);
-    });
-  });
+  options.type1 = {};
+  options.type1.sprite = model.receiveTypeSprite(pokemon.types[0].type.name);
+  if (pokemon.types[1]) {
+    options.type2 = {};
+    options.type2.sprite = model.receiveTypeSprite(pokemon.types[1].type.name);
+  }
+
+  options.growth = species.growth_rate.name;
+
+  if (utils.generationLanguage(req.query.game)) {
+    options.game = {
+      name: req.query.game,
+      german: utils.generationLanguage(req.query.game).de,
+      english: utils.generationLanguage(req.query.game).en,
+    };
+  }
+
+  options.moves = [];
+  let i = 0;
+  for (const pokemonMove of pokemon.moves) {
+    for (const versionGroupDetail of pokemonMove.version_group_details) {
+      const version = options.moves.find(
+        (version) => version.game.name === versionGroupDetail.version_group.name,
+      );
+
+      const moveData = await model.receiveAttackData(pokemonMove.move.url);
+      const move = {};
+      move.id =
+        pokemonMove.move.url.split("/")[pokemonMove.move.url.split("/").length - 2];
+      move.type = moveData.type.name;
+      move.typeSprite = model.receiveTypeSprite(move.type);
+      move.attackType = moveData.damage_class.name;
+      move.attackTypeSirte = move.moveNameGerman = utils.itemNameLanguage(moveData, "de");
+      move.moveNameEnglish = utils.itemNameLanguage(moveData, "en");
+
+      let versionGroup;
+      pokemonMove.version_group_details.forEach((detail) => {
+        if (detail.version_group.name === options.game.name) {
+          versionGroup = detail;
+        }
+      });
+
+      if (versionGroup) {
+        if (versionGroup.move_learn_method.name === "machine") {
+          move.method = "Machine";
+        } else if (versionGroup.move_learn_method.name === "level-up") {
+          move.method = `Lv ${versionGroup.level_learned_at}`;
+        } else if (versionGroup.move_learn_method.name === "tutor") {
+          move.method = `Erlernt - Tutor`;
+        }
+      }
+
+      if (!version) {
+        options.moves.push({
+          game: {
+            name: versionGroupDetail.version_group.name,
+            details: utils.generationLanguage(versionGroupDetail.version_group.name),
+          },
+          moves: [move],
+        });
+      } else {
+        version.moves.push(move);
+      }
+    }
+  }
+
+  for (const [key, value] of Object.entries(options.moves)) {
+    console.log(key, value.moves);
+    if (key === 0) {
+      utils.sortMoves(value.moves);
+    }
+  }
+
   res.render("pokemon/pkmn", { ...options });
   return;
 };
@@ -176,7 +245,8 @@ const findSearch = (word, input, key, spriteMethod) => {
     let finds = input.filter(
       (entry) =>
         entry.german.toLowerCase().includes(word.toLowerCase()) ||
-        entry.english.toLowerCase().includes(word.toLowerCase()),
+        entry.english.toLowerCase().includes(word.toLowerCase()) ||
+        entry.id == word,
     );
 
     // Size adjustment

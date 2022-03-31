@@ -1,6 +1,7 @@
 const fs = require("fs");
 const axios = require("axios");
 const utils = require("../utils");
+const { cache } = require("pug/lib");
 
 const cachePath = `${__dirname}/../cache/`;
 const spriteCachePath = `${__dirname}/../public/assets/pokemon/cache/`;
@@ -51,18 +52,12 @@ exports.receivePokemonData = (id) => {
         axios.get(`https://pokeapi.co/api/v2/pokemon/${id}`).then((response) => {
           console.log(`pokemon/${id}`);
 
-          fs.writeFile(
+          fs.writeFileSync(
             cachePath + `pokemon/${id}.json`,
             JSON.stringify(response.data),
             "utf-8",
-          )
-            .Promise()
-            .then(() => {
-              resolve(response.data);
-            })
-            .catch((err) => {
-              reject(err);
-            });
+          );
+          resolve(response.data);
         });
       }
     }
@@ -345,7 +340,6 @@ const buildEvolutions = (chain) => {
     const evolutions = [];
 
     if (chain.evolves_to.length === 0) {
-      console.log("Has no evolutions");
       resolve([{ species: species, speciesSprite: speciesSprite, evolutions: [] }]);
       return;
     }
@@ -421,4 +415,39 @@ exports.dictionaryData = () => {
     dictionaryData = JSON.parse(fs.readFileSync("./pokedata/data.json", "utf-8"));
   }
   return dictionaryData;
+};
+
+exports.receiveTypeSprite = (name) => {
+  const data = this.dictionaryData();
+
+  for (const type of data.types) {
+    if (type.english_id === name) return type.sprite;
+  }
+};
+
+exports.receiveAttackData = (url) => {
+  if (!fs.existsSync(cachePath)) fs.mkdirSync(cachePath);
+  if (!fs.existsSync(`${cachePath}/attack`)) fs.mkdirSync(`${cachePath}/attack`);
+
+  const id = url.split("/")[url.split("/").length - 2];
+
+  return new Promise((resolve, reject) => {
+    let attack;
+
+    if (fs.existsSync(cachePath + `attack/${id}.json`)) {
+      attack = fs.readFileSync(cachePath + `attack/${id}.json`, "utf-8");
+      resolve(JSON.parse(attack));
+    } else {
+      axios.get(url).then((response) => {
+        console.log(`attack/${id}`);
+
+        fs.writeFileSync(
+          cachePath + `attack/${id}.json`,
+          JSON.stringify(response.data),
+          "utf-8",
+        );
+        resolve(response.data);
+      });
+    }
+  });
 };
