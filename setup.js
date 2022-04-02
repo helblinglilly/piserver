@@ -10,7 +10,6 @@ if (environment == "production") {
   global.port = 9090;
   global.host = "127.0.0.1";
 }
-seed.seed();
 app.listen(port, "0.0.0.0", () => {
   console.log(`Listening on http://${host}:${port}`);
 });

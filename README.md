@@ -37,3 +37,25 @@ In its current design, it is designed for my partner and myself.
   - POSTGRES_HOST
   - POSTGRES_DATABASE
   - POSTGRES_PASSWORD
+
+```json
+{
+  "items": [
+    {
+      "german": "name",
+      "english": "name",
+      "english_id": "name",
+      "id": id
+      }
+  ],
+  attack: [
+    {
+      "german": "name",
+      "english": "name",
+      "english_id": "name",
+      "id": id
+      "type": [physical/special/other]
+    }
+  ]
+}
+```

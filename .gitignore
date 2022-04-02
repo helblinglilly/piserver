@@ -106,5 +106,10 @@ dist
 # Environment files
 .env.*
 
+# MacOS and VS Code
 *.DS_Store
 .vscode
+
+# Cache locations
+cache/
+public/assets/pokemon/cache/*

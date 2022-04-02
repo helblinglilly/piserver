@@ -1,0 +1,240 @@
+extend  ../components/header.pug
+
+block append head
+    title Pokemon
+    script(src='/static/scripts/shinytoggle.js')
+    script(src='/static/scripts/dropdowntoggle.js')
+    script(src='/static/scripts/cardheadtoggle.js')
+    style.
+        div.dropdown-item.is-active {
+        background-color: #AAA291;
+        }
+        div.dropdownItem:hover {
+        background-color: #e8e8e8;
+        }
+        img.tableImage {
+            display: block
+        }
+
+
+block append body
+    .container.is-max-desktop.pl-6.pr-6
+        nav.breadcrumb(aria-label="breadcrumbs")
+            ul
+                li
+                    a(href="/") Home
+                li
+                    a(href="/pokemon") Pokemon
+                li
+                    a(href="/pokemon/search") Search
+                li.is-active
+                    a(aria-current="page") Pokemon ##{id}
+        
+        form(action="/pokemon/search", method="get", id="search").mb-6
+            input.input(type="text" name="search" placeholder="Search for something!" onsubmit="document.forms['search'].submit()")
+            input(type="submit" hidden)
+
+
+        .columns
+            .column
+                //-- Pokemon name and sprite
+                .card.mb-1 
+                    .card-header
+                        if germanName !== englishName
+                            .card-header-title
+                                p 🇩🇪 #{germanName}
+                            .card-header-title
+                                p 🇬🇧 #{englishName}
+                            .card-header-icon
+                                p ##{id}
+                        else
+                            .card-header-title
+                                p #{germanName}
+                    .card-content
+                        .columns.mb-0.is-mobile
+                            .column
+                                img(src=`${spriteFront}` style="height: auto; width: 100%")#sprite-front
+                            .column
+                                img(src=`${spriteBack}` style="height: auto; width: 100%")#sprite-back
+                        .columns
+                            .column.is-half.has-text-centered.mt-2
+                                img(src=`${type1.sprite}` style="width: 50px; height: 20px;").mr-1
+                                if type2
+                                    img(src=`${type2.sprite}` style="width: 50px; height: 20px;")
+                            .column.is-half.has-text-centered
+                                button.button.is-centered#shiny-toggle Shiny
+                //-- Evolution
+                .card.mt-3
+                    .card-header
+                        .card-header-title
+                            p Evolution
+                    .card-content
+                        each evolution, index in evolutionChain
+                            if evolution.evolutions.length === 0
+                                .columns.is-mobile
+                                    .column.has-text-centered
+                                        img(src=`${evolution.speciesSprite}`)
+
+                            each siblingEvolution in evolution.evolutions
+                                .columns.is-vcentered.is-mobile
+                                    .column.has-text-centered(onclick=`location.href='/pokemon/pkmn/${evolution.species}'`)
+                                        img(src=`${evolution.speciesSprite}`)
+                                    .column.has-text-centered
+                                            each condition in siblingEvolution.conditions
+                                                if Object.keys(condition).includes("level")
+                                                    p Level: #{condition.level}
+                                                    
+                                                if Object.keys(condition).includes("gender")
+                                                    if condition.gender === 2
+                                                        p Male
+                                                    else if condition.gender === 1
+                                                        p Female
+
+                                                if Object.keys(condition).includes("item")
+                                                    img(src=`${condition.itemSprite}` style="width: 40%; height: auto" onclick=`location=href='/pokemon/item/${condition.item}'`)
+
+                                                if Object.keys(condition).includes("happiness")
+                                                    p Freundschaft + Level hoch
+                                                    hr.m-2
+                                                    p Happiness + Level up
+
+                                                if condition.time
+                                                    p #{condition.time}
+                                                
+                                                if condition.held_item
+                                                    p #{condition.held_item_id.url}
+                                                    img(src=`${condition.held_item}` onclick=`location=href='/pokemon/item/${condition.held_item_id}'`)
+
+                                                if condition.trigger === "shed"
+                                                    p 5 Pkmn in team + 1 Pokeball
+                                                    p Level: 20
+
+                                                if condition.trigger === "spin"
+                                                    p Gib eine Süssigkeit und drehe im Kreis
+                                                    hr.m-2
+                                                    p Give a sweet and spin your character
+
+                                                if condition.trigger === "tower-of-darkness"
+                                                    p Turm des Unlichts
+                                                    hr.m-2
+                                                    p Tower of Darkness
+
+                                                if condition.trigger === "tower-of-waters"
+                                                    p Turm des Wassers
+                                                    hr.m-2
+                                                    p Tower of Waters
+
+                                                if condition.trigger === "three-critical-hits"
+                                                    p 3 Volltreffer
+                                                    hr.m-2
+                                                    p 3 Critical hits
+                                                
+                                                if condition.trigger === "take-damage"
+                                                    p Nimm schaden
+                                                    hr.m-2
+                                                    p Take damage
+
+                                    .column.has-text-centered(onclick=`location.href='/pokemon/pkmn/${siblingEvolution.target}'`)
+                                        img(src=`${siblingEvolution.targetSprite}`)
+            
+            .column
+                //-- Attacks
+                .card
+                    .card-header
+                        .card-header-title
+                            p Attacken / Attacks
+
+                    .card-header
+                        .card-header-title
+                            .dropdown
+                                .dropdown-trigger
+                                    button.button.trigger-button
+                                        p Select Game
+                                .dropdown-menu
+                                    .dropdown-content
+                                        each gameName in gamesPresent
+                                            .dropdown-item
+                                                .dropdown-item(onclick=`location.href='?game=${gameName.name}';`)
+                                                    .dropdownItem
+                                                        if gameName.details.de === gameName.details.en
+                                                            p #{gameName.details.de}
+                                                        else 
+                                                            p #{gameName.details.de}
+                                                            p #{gameName.details.en}
+                                            .dropdown-divider
+                        .card-header-icon
+                            div.has-text-right
+                                if game
+                                    if game.german === game.english
+                                        p #{game.german}
+                                    else 
+                                        p #{game.german}
+                                        p #{game.english}
+                    if (game && moves)
+                        .card-content
+                            table.table(style="width: 100%").is-striped.is-hoverable
+                                thead
+                                    tr
+                                        th(style="padding-top: 0px;") Type
+                                        th(style="padding-top: 0px;") Name
+                                        th(style="padding-top: 0px;") Level
+                                tbody(style="width: 100%")
+                                for move in moves
+                                    tr
+                                        td
+                                            img(src=`${move.typeSprite}` style="width: 50px; height: auto;").tableImage
+                                            img(src=`${move.attackTypeSprite}` style="width: 50px; height: auto;").tableImage.mt-1
+                                        if move.moveNameGerman === move.moveNameEnglish
+                                            td #{move.moveNameGerman}
+                                        else 
+                                            td 
+                                                p #{move.moveNameGerman}
+                                                p #{move.moveNameEnglish}
+                                        td #{move.method}  
+                
+                //-- Growth Rate
+                .card.mt-3
+                    .card-header
+                        .card-header-title
+                            p Wachstum / Growth
+                    .card-content
+                        if growth === "slow"
+                            .columns
+                                .column
+                                    p Langsam
+                                .column
+                                    p Slow
+                        else if growth === "medium"
+                           .columns
+                                .column
+                                    p Mittel
+                                .column
+                                    p Medium
+                        else if growth === "fast"
+                            .columns
+                                .column
+                                    p Schnell
+                                .column
+                                    p Fast
+                        else if growth === "medium-slow"
+                            .columns
+                                .column
+                                    p Mittel Langsam
+                                .column
+                                    p Medium Slow
+                        else if growth === "slow-then-very-fast"
+                            .columns
+                                .column
+                                    p Langsam dann sehr schnell
+                                .column
+                                    p Slow then very fast
+                        else if growth === "fast-then-very-slow"
+                            .columns
+                                .column
+                                    p Schnell dann sher langsam
+                                .column
+                                    p Fast then very slow
+                        else 
+                            p #{growth}
+                            
+//-- don't forget about egg groups
