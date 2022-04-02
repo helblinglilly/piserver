@@ -1,5 +1,6 @@
 const fs = require("fs");
 const axios = require("axios");
+const utils = require("pg/lib/utils");
 
 weekday = () => {
   const dayNames = [
@@ -258,10 +259,34 @@ exports.getUniqueListBy = (arr, key1) => {
   return [...new Map(arr.map((item) => [item[key1], item])).values()];
 };
 
-exports.sortMoves = (arr) => {
-  console.log("Hey");
-  for (const entry of arr) {
-    console.log(entry);
+exports.compare = (a, b, key) => {
+  if (a[key] < b[key]) {
+    return -1;
   }
-  // console.log(arr);
+  if (a[key] > b[key]) {
+    return 1;
+  }
+  return 0;
+};
+
+exports.sortmoves = (moves) => {
+  let level = [];
+  let tmvm = [];
+  let tutor = [];
+  let egg = [];
+  let result = [];
+
+  for (const move of moves) {
+    if (move.method === "TM/VM") tmvm.push(move);
+    else if (move.method === "Erlernt - Tutor") tutor.push(move);
+    else if (move.method === "Ei - Egg") egg.push(move);
+    else level.push(move);
+  }
+
+  result.push(level.sort((a, b) => this.compare(a, b, "method")));
+  result.push(egg.sort((a, b) => this.compare(a, b, "type")));
+  result.push(tmvm.sort((a, b) => this.compare(a, b, "type")));
+  result.push(tutor.sort((a, b) => this.compare(a, b), "type"));
+
+  return result.flat();
 };

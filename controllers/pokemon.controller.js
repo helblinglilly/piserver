@@ -23,7 +23,6 @@ exports.getPokemon = async (req, res, next) => {
 
   const species = await model.receivePokemonSpeciesData(options.id);
   const pokemon = await model.receivePokemonData(options.id);
-  // const dictionaryData = model.dictionaryData();
 
   options.germanName = utils.pokemonNameLanguage(species, "de");
   options.englishName = utils.pokemonNameLanguage(species, "en");
@@ -52,62 +51,56 @@ exports.getPokemon = async (req, res, next) => {
     };
   }
 
+  options.gamesPresent = model.receiveGamesPresent(pokemon.moves);
   options.moves = [];
-  let i = 0;
-  for (const pokemonMove of pokemon.moves) {
-    for (const versionGroupDetail of pokemonMove.version_group_details) {
-      const version = options.moves.find(
-        (version) => version.game.name === versionGroupDetail.version_group.name,
-      );
 
-      const moveData = await model.receiveAttackData(pokemonMove.move.url);
-      const move = {};
-      move.id =
-        pokemonMove.move.url.split("/")[pokemonMove.move.url.split("/").length - 2];
-      move.type = moveData.type.name;
-      move.typeSprite = model.receiveTypeSprite(move.type);
-      move.attackType = moveData.damage_class.name;
-      move.attackTypeSirte = move.moveNameGerman = utils.itemNameLanguage(moveData, "de");
-      move.moveNameEnglish = utils.itemNameLanguage(moveData, "en");
-
-      let versionGroup;
-      pokemonMove.version_group_details.forEach((detail) => {
-        if (detail.version_group.name === options.game.name) {
-          versionGroup = detail;
-        }
-      });
-
-      if (versionGroup) {
-        if (versionGroup.move_learn_method.name === "machine") {
-          move.method = "Machine";
-        } else if (versionGroup.move_learn_method.name === "level-up") {
-          move.method = `Lv ${versionGroup.level_learned_at}`;
-        } else if (versionGroup.move_learn_method.name === "tutor") {
-          move.method = `Erlernt - Tutor`;
+  // Processing moves costs a lot - only do this when needed
+  if (options.game) {
+    for (const pokemonMove of pokemon.moves) {
+      const learnDetails = [];
+      // work out what the methods are in the game selected
+      for (const version of pokemonMove.version_group_details) {
+        if (version.version_group.name === options.game.name) {
+          learnDetails.push({
+            level: version.level_learned_at,
+            method: version.move_learn_method.name,
+          });
         }
       }
 
-      if (!version) {
-        options.moves.push({
-          game: {
-            name: versionGroupDetail.version_group.name,
-            details: utils.generationLanguage(versionGroupDetail.version_group.name),
-          },
-          moves: [move],
-        });
-      } else {
-        version.moves.push(move);
+      // If this pokemon has the means to learn this attack in the game selected
+      if (learnDetails.length > 0) {
+        // Add a new move for each method - easier to display
+        for (const learnMethod of learnDetails) {
+          const moveData = await model.receiveAttackData(pokemonMove.move.url);
+          const move = {};
+          move.id =
+            pokemonMove.move.url.split("/")[pokemonMove.move.url.split("/").length - 2];
+          move.type = moveData.type.name;
+          move.typeSprite = model.receiveTypeSprite(move.type);
+          move.attackType = moveData.damage_class.name;
+
+          if (move.attackType === "physical")
+            move.attackTypeSprite = "https://i.stack.imgur.com/UATOp.png";
+          else if (move.attackType === "special")
+            move.attackTypeSprite = "https://i.stack.imgur.com/dS0qQ.png";
+          else if (move.attackType === "status")
+            move.attackTypeSprite = "https://i.stack.imgur.com/LWKMo.png";
+
+          move.moveNameGerman = utils.itemNameLanguage(moveData, "de");
+          move.moveNameEnglish = utils.itemNameLanguage(moveData, "en");
+
+          if (learnMethod.method === "level-up") move.method = learnMethod.level;
+          else if (learnMethod.method === "machine") move.method = "TM/VM";
+          else if (learnMethod.method === "tutor") move.method = "Erlernt - Tutor";
+          else if (learnMethod.method === "egg") move.method = "Ei - Egg";
+          else console.log(move.moveNameGerman, learnMethod.method);
+          options.moves.push(move);
+        }
       }
     }
+    options.moves = utils.sortmoves(options.moves);
   }
-
-  for (const [key, value] of Object.entries(options.moves)) {
-    console.log(key, value.moves);
-    if (key === 0) {
-      utils.sortMoves(value.moves);
-    }
-  }
-
   res.render("pokemon/pkmn", { ...options });
   return;
 };

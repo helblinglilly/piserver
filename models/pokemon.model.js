@@ -280,7 +280,11 @@ const getEvolutionConditions = (detail) => {
       conditions.push({ gender: detail.gender });
     }
     if (detail.held_item) {
-      conditions.push({ held_item: detail.held_item });
+      conditions.push({
+        held_item: await this.receivePokemonItemSprite(detail.held_item.name),
+        held_item_id:
+          detail.held_item.url.split("/")[detail.held_item.url.split("/").length - 2],
+      });
     }
     if (detail.item) {
       const itemId = detail.item.url.split("/")[detail.item.url.split("/").length - 2];
@@ -323,7 +327,9 @@ const getEvolutionConditions = (detail) => {
       conditions.push({ type_in_party: detail.party_type });
     }
     if (detail.time_of_day) {
-      conditions.push({ time: detail.time_of_day });
+      if (detail.time_of_day === "day") conditions.push({ time: "☀️" });
+      else if (detail.time_of_day === "night") conditions.push({ time: "🌙" });
+      else conditions.push({ time: detail.time_of_day });
     }
     if (detail.trade_species) {
       conditions.push({ trading_against: detail.trade_species });
@@ -403,9 +409,6 @@ exports.receiveEvolutionChain = (url) => {
     const chainSource = await getChain(url);
     const results = await buildEvolutions(chainSource);
     const unique = utils.getUniqueListBy(results, "species", "target");
-    // unique.forEach((entry) => {
-    //   console.log(entry);
-    // });
 
     resolve(unique);
   });
@@ -450,4 +453,23 @@ exports.receiveAttackData = (url) => {
       });
     }
   });
+};
+
+exports.receiveGamesPresent = (moves) => {
+  let games = [];
+  for (const pokemonMove of moves) {
+    for (const version of pokemonMove.version_group_details) {
+      const gameName = version.version_group.name;
+
+      if (!games.some((entry) => entry.name === gameName)) {
+        games.push({
+          name: gameName,
+          generation: utils.generationLanguage(gameName).generation,
+          details: utils.generationLanguage(gameName),
+        });
+      }
+    }
+  }
+  games = games.sort((a, b) => utils.compare(a, b, "generation"));
+  return games;
 };

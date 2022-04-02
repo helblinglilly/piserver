@@ -5,6 +5,17 @@ block append head
     script(src='/static/scripts/shinytoggle.js')
     script(src='/static/scripts/dropdowntoggle.js')
     script(src='/static/scripts/cardheadtoggle.js')
+    style.
+        div.dropdown-item.is-active {
+        background-color: #AAA291;
+        }
+        div.dropdownItem:hover {
+        background-color: #e8e8e8;
+        }
+        img.tableImage {
+            display: block
+        }
+
 
 block append body
     .container.is-max-desktop.pl-6.pr-6
@@ -87,6 +98,13 @@ block append body
                                                     hr.m-2
                                                     p Happiness + Level up
 
+                                                if condition.time
+                                                    p #{condition.time}
+                                                
+                                                if condition.held_item
+                                                    p #{condition.held_item_id.url}
+                                                    img(src=`${condition.held_item}` onclick=`location=href='/pokemon/item/${condition.held_item_id}'`)
+
                                                 if condition.trigger === "shed"
                                                     p 5 Pkmn in team + 1 Pokeball
                                                     p Level: 20
@@ -118,73 +136,62 @@ block append body
 
                                     .column.has-text-centered(onclick=`location.href='/pokemon/pkmn/${siblingEvolution.target}'`)
                                         img(src=`${siblingEvolution.targetSprite}`)
+            
             .column
                 //-- Attacks
                 .card
-                    .card-header.card-toggle
+                    .card-header
                         .card-header-title
                             p Attacken / Attacks
-                    .card-content.is-hidden
-                        .columns
-                            .column.is-vcentered
+
+                    .card-header
+                        .card-header-title
+                            .dropdown
+                                .dropdown-trigger
+                                    button.button.trigger-button
+                                        p Select Game
+                                .dropdown-menu
+                                    .dropdown-content
+                                        each gameName in gamesPresent
+                                            .dropdown-item
+                                                .dropdown-item(onclick=`location.href='?game=${gameName.name}';`)
+                                                    .dropdownItem
+                                                        if gameName.details.de === gameName.details.en
+                                                            p #{gameName.details.de}
+                                                        else 
+                                                            p #{gameName.details.de}
+                                                            p #{gameName.details.en}
+                                            .dropdown-divider
+                        .card-header-icon
+                            div.has-text-right
                                 if game
                                     if game.german === game.english
                                         p #{game.german}
                                     else 
                                         p #{game.german}
                                         p #{game.english}
-                            .column
-                                .dropdown
-                                    .dropdown-trigger
-                                        button.button.trigger-button
-                                            p Select Game
-                                    .dropdown-menu
-                                        .dropdown-content
-                                            each generation in moves
-
-                                                if (generation.game.name === game)
-                                                    .dropdown-item.is-active(href=`?game=${generation.game.name}`) 
-                                                        p #{generation.game.details.de}
-                                                        p #{generation.game.details.en}
-                                                else 
-                                                    .dropdown-item(onclick=`location.href='?game=${generation.game.name}';`) 
-                                                        p #{generation.game.details.de}
-                                                        p #{generation.game.details.en}
-                                                .dropdown-divider
-                        for generation in moves
-                            if generation.game.name === game.name
-                                //-- Draw a table with all moves
-                                table.table(style="width: 100%")
-                                    thead
-                                        tr
-                                            th Type
-                                            th Effect
-                                            th Name
-                                            th Level
-                                    tbody(style="width: 100%")
-                                    each move in generation.moves
-                                        tr
-                                            td
-                                                img(src=`${move.typeSprite}` style="width: 50px; height: auto;")
-                                            td
-                                                if move.attackType === "physical"
-                                                    img(src="https://i.stack.imgur.com/UATOp.png" style="width: 45px; height: auto;")
-                                                else if move.attackType === "special"
-                                                    img(src="https://i.stack.imgur.com/dS0qQ.png" style="width: 45px; height: auto;")
-                                                else if move.attackType === "status"
-                                                    img(src="https://i.stack.imgur.com/LWKMo.png" style="width: 45px; height: auto;")
-                                            if move.moveNameGerman === move.moveNameEnglish
-                                                td #{move.moveNameGerman}
-                                            else 
-                                                td 
-                                                    p #{move.moveNameGerman}
-                                                    p #{move.moveNameEnglish}
-                                            td #{move.method}
-                                            
-                                        tr 
-                                        
-                                    
-
+                    if (game && moves)
+                        .card-content
+                            table.table(style="width: 100%").is-striped.is-hoverable
+                                thead
+                                    tr
+                                        th(style="padding-top: 0px;") Type
+                                        th(style="padding-top: 0px;") Name
+                                        th(style="padding-top: 0px;") Level
+                                tbody(style="width: 100%")
+                                for move in moves
+                                    tr
+                                        td
+                                            img(src=`${move.typeSprite}` style="width: 50px; height: auto;").tableImage
+                                            img(src=`${move.attackTypeSprite}` style="width: 50px; height: auto;").tableImage.mt-1
+                                        if move.moveNameGerman === move.moveNameEnglish
+                                            td #{move.moveNameGerman}
+                                        else 
+                                            td 
+                                                p #{move.moveNameGerman}
+                                                p #{move.moveNameEnglish}
+                                        td #{move.method}  
+                
                 //-- Growth Rate
                 .card.mt-3
                     .card-header
