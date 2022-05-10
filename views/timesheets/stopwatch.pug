@@ -1,0 +1,43 @@
+extend  ../components/header.pug
+
+block append head
+   script(src='/static/scripts/modal.js')
+   title Timesheet
+
+block append body
+    .container.is-max-desktop.pl-6.pr-6
+        nav.breadcrumb(aria-label="breadcrumbs")
+            ul
+                li
+                    a(href="/") Home
+                li.is-active
+                    a(href="", aria-current="page") Timesheet
+        
+        
+        div.has-text-centered.mt-6.pt-6
+            .title.is-1.mb-0 8 hours 21 minutes
+            p Last edit: 14:25
+        .card.mt-6
+            .card-content.js-modal-trigger(data-target='modal-js-example')
+                a.card-text Start working
+
+
+            #modal-js-example.modal
+                .modal-background
+                .modal-card
+                    .modal-card-head
+                        p.modal-card-title #{nextAction}
+                    .modal-card-body
+                        p Are you sure you want to do this?
+                    footer.modal-card-foot
+                        form(action="/timesheet/enter", method="post", id="enterForm") 
+                            input(type="hidden", name="action", value=nextAction)
+                        button.button.is-info.is-fullwidth(onclick="document.forms['enterForm'].submit();") #{nextAction}
+                        button.button.is-danger.is-fullwidth Cancel
+
+        .card.mt-6
+            .card-content(onclick="location.href='/timesheet/view';")
+                a.card-text View Time
+        .card.mt-6
+            .card-content(onclick="location.href='/timesheet/edit';")
+                a.card-text Edit Entries

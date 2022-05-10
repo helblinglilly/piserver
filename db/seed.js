@@ -60,8 +60,10 @@ exports.seed = async () => {
   }
 
   if (env === "test") {
+    /*
     await db.query(
       "INSERT INTO usertable_test (ip, username) VALUES ('::ffff:127.0.0.1', 'test');",
     );
+    */
   }
 };

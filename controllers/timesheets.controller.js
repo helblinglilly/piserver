@@ -287,3 +287,7 @@ overtime = (clock_in, break_in, break_out, clock_out) => {
     ? `${plusMinus}${difference.hours}h${difference.minutes}min`
     : `${plusMinus}${difference.minutes}min`;
 };
+
+exports.test = async (req, res, next) => {
+  res.render("timesheets/stopwatch");
+};
