@@ -55,13 +55,6 @@ jobs:
       - name: Push docker image
         run: docker push helblingjoel/piserver:${{ steps.date.outputs.date }}
 
-      # - name: Build and push
-      #   uses: docker/build-push-action@v2
-      #   with:
-      #     push: true
-      #     tags: helblingjoel/piserver:${{ steps.date.outputs.date }}
-      #     cache-from: type=registry,ref=helblingjoel/piserver:buildcache
-      #     cache-to: type=registry,ref=helblingjoel/piserver:buildcache,mode=max
   restart:
     needs: docker
     name: Redeploy
