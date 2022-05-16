@@ -66,6 +66,7 @@ services:
       - /home/joel/filebrowser/files/plex/movies:/movies
       - /home/joel/filebrowser/files/plex/music:/music
       - /home/joel/filebrowser/files/plex/videos:/videos
+      - plexappstate:/var/lib/plexmediaserver/Library/Application Support/Plex Media Server/
     restart: unless-stopped
 
   castblock:
@@ -92,3 +93,4 @@ volumes:
   portainer_data:
   pihole-data:
   pihole-dns:
+  plexappstate:
