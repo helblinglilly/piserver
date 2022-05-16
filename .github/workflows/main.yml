@@ -50,7 +50,7 @@ jobs:
         id: date
 
       - name: Build docker image
-        run: docker build -t helblingjoel/piserver:${{ steps.date.outputs.date }}
+        run: docker build -t helblingjoel/piserver:${{ steps.date.outputs.date }} .
 
       - name: Push docker image
         run: docker push helblingjoel/piserver:${{ steps.date.outputs.date }}
