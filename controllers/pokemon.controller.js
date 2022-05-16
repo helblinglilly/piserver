@@ -1,14 +1,14 @@
-const fs = require("fs");
 const utils = require("../utils");
 const model = require("../models/pokemon.model");
 const error = require("./error.controller");
 
-exports.getRoot = (_, res, next) => {
-  res.render("pokemon");
+exports.getRoot = (req, res, next) => {
+  res.render("pokemon", { username: req.username });
 };
 
 exports.getPokemon = async (req, res, next) => {
   const options = {};
+  options.username = req.username;
   options.id = req.params.id;
 
   // 404
@@ -104,8 +104,10 @@ exports.getPokemon = async (req, res, next) => {
   res.render("pokemon/pkmn", { ...options });
   return;
 };
+
 exports.getItem = async (req, res, next) => {
   const options = {};
+  options.username = req.username;
   const id = req.params.id;
 
   const item = await model.receivePokemonItemData(id);
@@ -172,11 +174,12 @@ exports.getItem = async (req, res, next) => {
 exports.getBlackWhite = (req, res, next) => {
   const lowestPokedexId = 494;
   const highestPokedexId = 649;
-  res.render("pokemon/blackwhite");
+  res.render("pokemon/blackwhite", { username: req.username });
 };
 
 exports.getSearch = async (req, res, next) => {
   const options = {};
+  options.username = req.username;
 
   // Referer
   if (req.headers.referer) {
