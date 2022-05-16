@@ -1,6 +1,7 @@
 FROM node:latest
 ENV NODE_ENV=production
-COPY . ./
+COPY ./dashboard ./
+WORKDIR ./dashboard
 RUN npm install husky --save-dev -g
 ENV POSTGRES_USER=postgres
 ENV POSTGRES_DATABASE=homeserver_production
