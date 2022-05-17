@@ -33,28 +33,17 @@ exports.seed = async () => {
     `INSERT INTO timesheet (username, day_date, clock_in, break_in, break_out, clock_out) VALUES ('harry', '2022-01-03', '08:30:00', NULL, NULL, '17:00:00');`,
     `INSERT INTO timesheet (username, day_date, clock_in, break_in, break_out, clock_out) VALUES ('harry', '2022-01-04', '09:15:00', '13:00:00', '14:00:00', '17:30:00');`,
     `INSERT INTO timesheet (username, day_date, clock_in, break_in, break_out, clock_out) VALUES ('harry', '2022-01-04', '09:45:00', '13:00:00', '14:00:00', '18:15:00');`,
-    /*
-		format(
-			`INSERT INTO "timesheet-${env}" (username, day_date, clock_in, break_in, break_out, clock_out) VALUES ('joel', %L, '09:00', '13:00', '14:00', null);`,
-			utils.todayIso()
-		),
-		format(
-			`INSERT INTO "timesheet-${env}" (username, day_date, clock_in, break_in, break_out, clock_out) VALUES ('harry', %L, '09:45', null, null, null);`,
-			utils.todayIso()
-		),
-		*/
   ];
 
-  if (env === "dev" || env === "test") {
+  if (env !== "production") {
     await db.query(`DROP TABLE IF EXISTS timesheet`);
     await db.query(`DROP TABLE IF EXISTS usertable`);
   }
 
-  console.log("Seeding - Creating usertable and timesheet");
   await db.query(createUsertable);
   await db.query(createTimesheet);
 
-  if (env === "dev" || env === "test") {
+  if (env !== "production") {
     for (query of insertTimsheet) {
       await db.query(query);
     }
