@@ -6,11 +6,7 @@ const env = process.env.NODE_ENV || "dev";
 exports.selectDay = async (day, username) => {
   return db
     .query(
-      format(
-        `SELECT * FROM timesheet_${env} WHERE day_date=%L AND username=%L`,
-        day,
-        username,
-      ),
+      format(`SELECT * FROM timesheet WHERE day_date=%L AND username=%L`, day, username),
     )
     .then(({ rows }) => rows[0]);
 };
@@ -18,7 +14,7 @@ exports.selectDay = async (day, username) => {
 exports.insertClockIn = async (day, username, time) => {
   db.query(
     format(
-      `INSERT INTO timesheet_${env} (day_date, username, clock_in) VALUES (%L, %L, %L)`,
+      `INSERT INTO timesheet (day_date, username, clock_in) VALUES (%L, %L, %L)`,
       day,
       username,
       time,
@@ -29,7 +25,7 @@ exports.insertClockIn = async (day, username, time) => {
 exports.updateClockIn = async (day, username, time) => {
   db.query(
     format(
-      `UPDATE timesheet_${env} SET clock_in=%L WHERE day_date=%L AND username=%L`,
+      `UPDATE timesheet SET clock_in=%L WHERE day_date=%L AND username=%L`,
       time,
       day,
       username,
@@ -40,7 +36,7 @@ exports.updateClockIn = async (day, username, time) => {
 exports.updateBreakStart = async (day, username, time) => {
   db.query(
     format(
-      `UPDATE timesheet_${env} SET break_in=%L WHERE day_date=%L AND username=%L`,
+      `UPDATE timesheet SET break_in=%L WHERE day_date=%L AND username=%L`,
       time,
       day,
       username,
@@ -51,7 +47,7 @@ exports.updateBreakStart = async (day, username, time) => {
 exports.updateBreakEnd = async (day, username, time) => {
   db.query(
     format(
-      `UPDATE timesheet_${env} SET break_out=%L WHERE day_date=%L AND username=%L`,
+      `UPDATE timesheet SET break_out=%L WHERE day_date=%L AND username=%L`,
       time,
       day,
       username,
@@ -62,7 +58,7 @@ exports.updateBreakEnd = async (day, username, time) => {
 exports.updateClockOut = async (day, username, time) => {
   db.query(
     format(
-      `UPDATE timesheet_${env} SET clock_out=%L WHERE day_date=%L AND username=%L`,
+      `UPDATE timesheet SET clock_out=%L WHERE day_date=%L AND username=%L`,
       time,
       day,
       username,

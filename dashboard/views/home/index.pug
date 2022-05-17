@@ -5,28 +5,26 @@ block append head
 
 block append body
     .container.is-max-desktop.p-6
-      .card(onclick="location.href='/admin';")
+      .card(onclick="location.href='http://192.168.0.10:81/admin';")
         .card-content
           figure.container(style="display: flex; align-items: center;")
             img.icon(src='/static/assets/pihole.svg', alt='Pi Hole Icon').mr-1
             a.card-text Pi Hole
-        footer.card-footer
-          p.card-footer-item Password: q4kv4ss1
-      .card.mt-6(onclick="location.href='http://raspberry.pi:32400/web/'")
+      .card.mt-6(onclick="location.href='http://192.168.0.10:32400/web/'")
         .card-content
           figure.container(style="display: flex; align-items: center;")
             img.icon(src='/static/assets/plex.png', alt='Plex Logo').mr-1
-            a.card-text(href='http://raspberry.pi:32400/web') Plex
-      .card.mt-6(onclick="location.href='http://raspberry.pi/portainer/'")
+            a.card-text(href='http://192.168.0.10:32400/web') Plex
+      .card.mt-6(onclick="location.href='https://192.168.0.10:1234'")
         .card-content
           figure.container(style="display: flex; align-items: center;")
             img.icon(src='/static/assets/docker.png', alt='Portainer Icon').mr-1
-            a.card-text(href='http://raspberry.pi/portainer/') Portainer
-      .card.mt-6(onclick="location.href='http://raspberry.pi/files/'")
+            a.card-text(href='https://192.168.0.10:1234') Portainer
+      .card.mt-6(onclick="location.href='http://192.168.0.10:5000/files/'")
         .card-content
           figure.container(style="display: flex; align-items: center;")
             img.icon(src='/static/assets/files.png', alt='Files Icon').mr-1
-            a.card-text(href='http://raspberry.pi/files/') Files
+            a.card-text(href='http://192.168.0.10:5000/files/') Files
       .card.mt-6(onclick="location.href='/timesheet'")
         .card-content
           figure.container(style="display: flex; align-items: center;")
