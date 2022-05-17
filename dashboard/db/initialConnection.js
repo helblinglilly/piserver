@@ -21,6 +21,7 @@ module.exports.initialise = () => {
       if (dbQuery.rows.length === 0) {
         await dbClient.query(`CREATE DATABASE ${process.env.POSTGRES_DATABASE}_${env}`);
       }
+      await dbClient.end();
       resolve();
     } catch (err) {
       reject(err);

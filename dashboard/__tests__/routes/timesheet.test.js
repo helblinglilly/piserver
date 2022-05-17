@@ -1,13 +1,14 @@
-const express = require("express");
 const request = require("supertest");
 const app = require("../../app");
+const dbInit = require("../../db/initialConnection");
 const db = require("../../db");
 const seed = require("../../db/seed");
 
 describe("Timesheet Tests", () => {
-  let server, agent;
+  let server;
 
   beforeEach(async () => {
+    await dbInit.initialise();
     await seed.seed();
   });
 

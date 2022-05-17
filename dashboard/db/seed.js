@@ -88,7 +88,7 @@ exports.seed = async () => {
     */
   ];
 
-  if (env === "dev" || env === "test") {
+  if (env !== "production") {
     await db.query(`DROP TABLE IF EXISTS timesheet`);
     await db.query(`DROP TABLE IF EXISTS stopwatch`);
     await db.query(`DROP TABLE IF EXISTS usertable`);
@@ -98,7 +98,7 @@ exports.seed = async () => {
   await db.query(createTimesheet);
   await db.query(createStopwatch);
 
-  if (env === "dev" || env === "test") {
+  if (env !== "production") {
     for (query of insertTimsheet) {
       await db.query(query);
     }
