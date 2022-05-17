@@ -1,8 +1,20 @@
 # piserver
 
-Raspberry Pi home server web page
+Setup for my home Raspberry Pi
 
-## Features
+Contains the following applications:
+
+- Custom Dashboard application
+- Postgres
+- Castblock
+- Filebrowser
+- Plex
+- Pihole
+- Portainer
+
+---
+
+## Dashboard Features
 
 ### Timesheet
 
@@ -25,37 +37,3 @@ If you forget to clock in an activity, you can also go back retrospectively and 
 
 When you navigate to `/timesheet` for the first time and your IP address is not recognised yet, you will be prompted to select a user, and that entry is written to the database. IP addresses can be spoofed, don't deploy this code in an exposed environment, or where you don't trust your users.
 In its current design, it is designed for my partner and myself.
-
-## Deployment Prerequisites
-
-- PM2 Installed
-  - `npm install pm2 -g`
-  - Job with id=0 being this web server instance
-- Postgres instance with rights to create a database
-- `.env` file in project root (development) or `~/.env` in production containing:
-  - POSTGRES_USER
-  - POSTGRES_HOST
-  - POSTGRES_DATABASE
-  - POSTGRES_PASSWORD
-
-```json
-{
-  "items": [
-    {
-      "german": "name",
-      "english": "name",
-      "english_id": "name",
-      "id": id
-      }
-  ],
-  attack: [
-    {
-      "german": "name",
-      "english": "name",
-      "english_id": "name",
-      "id": id
-      "type": [physical/special/other]
-    }
-  ]
-}
-```

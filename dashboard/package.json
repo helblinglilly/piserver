@@ -6,7 +6,6 @@
   "scripts": {
     "test": "jest test --detectOpenHandles",
     "dev": "nodemon setup.js --ignore cache/ --ignore public/assets/pokemon/cache/",
-    "prepare": "husky install",
     "lint": "prettier --write '**/*.js'"
   },
   "author": "",
@@ -22,7 +21,6 @@
     "pug": "^3.0.2"
   },
   "devDependencies": {
-    "husky": "^7.0.4",
     "jest": "^27.4.5",
     "lint-staged": "^12.1.7",
     "nodemon": "^2.0.15",

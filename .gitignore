@@ -112,4 +112,4 @@ dist
 
 # Cache locations
 cache/
-public/assets/pokemon/cache/*
+dashboard/public/assets/pokemon/cache/*
