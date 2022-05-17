@@ -1,8 +1,6 @@
 const db = require("../db");
 const format = require("pg-format");
 
-const env = process.env.NODE_ENV || "dev";
-
 exports.selectDay = async (day, username) => {
   return db
     .query(

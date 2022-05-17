@@ -1,8 +1,8 @@
 const db = require("./index");
 const utils = require("../utils");
 const format = require("pg-format");
+const env = require("../environment");
 
-const env = process.env.NODE_ENV || "dev";
 exports.seed = async () => {
   const createUsertable = `CREATE TABLE IF NOT EXISTS usertable (
         ip varchar(255) NOT NULL PRIMARY KEY,
@@ -18,6 +18,14 @@ exports.seed = async () => {
     break_out TIME,
     clock_out TIME
     );`;
+
+  const createStopwatch = `CREATE TABLE IF NOT EXISTS stopwatch (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR NOT NULL,
+    day_date DATE NOT NULL,
+    timestamp TIME NOT NULL,
+    action VARCHAR(5) NOT NULL
+  );`;
 
   const insertTimsheet = [
     `INSERT INTO timesheet (username, day_date, clock_in, break_in, break_out, clock_out) VALUES ('joel', '2022-01-01', '09:00:00', '13:00:00', '14:00:00', '17:30:00');`,
@@ -35,27 +43,66 @@ exports.seed = async () => {
     `INSERT INTO timesheet (username, day_date, clock_in, break_in, break_out, clock_out) VALUES ('harry', '2022-01-04', '09:45:00', '13:00:00', '14:00:00', '18:15:00');`,
     /*
 		format(
-			`INSERT INTO "timesheet-${env}" (username, day_date, clock_in, break_in, break_out, clock_out) VALUES ('joel', %L, '09:00', '13:00', '14:00', null);`,
+			`INSERT INTO "timesheet" (username, day_date, clock_in, break_in, break_out, clock_out) VALUES ('joel', %L, '09:00', '13:00', '14:00', null);`,
 			utils.todayIso()
 		),
 		format(
-			`INSERT INTO "timesheet-${env}" (username, day_date, clock_in, break_in, break_out, clock_out) VALUES ('harry', %L, '09:45', null, null, null);`,
+			`INSERT INTO "timesheet" (username, day_date, clock_in, break_in, break_out, clock_out) VALUES ('harry', %L, '09:45', null, null, null);`,
 			utils.todayIso()
 		),
 		*/
   ];
 
+  const insertStopwatch = [
+    `INSERT INTO stopwatch (username, day_date, timestamp, action) VALUES ('joel', '2022-01-01', '09:00:00', 'START');`,
+    `INSERT INTO stopwatch (username, day_date, timestamp, action) VALUES ('joel', '2022-01-01', '09:30:00', 'STOP');`,
+    `INSERT INTO stopwatch (username, day_date, timestamp, action) VALUES ('joel', '2022-01-01', '09:35:00', 'CONT');`,
+    `INSERT INTO stopwatch (username, day_date, timestamp, action) VALUES ('joel', '2022-01-01', '13:00:00', 'STOP');`,
+    `INSERT INTO stopwatch (username, day_date, timestamp, action) VALUES ('joel', '2022-01-01', '14:00:00', 'CONT');`,
+    `INSERT INTO stopwatch (username, day_date, timestamp, action) VALUES ('joel', '2022-01-01', '15:00:00', 'END');`,
+    /*
+    format(
+      `INSERT INTO stopwatch_dev (username, day_date, timestamp, action) VALUES ('joel', %L, '09:00:00', 'START');`,
+      utils.todayIso(),
+    ),
+    format(
+      `INSERT INTO stopwatch_dev (username, day_date, timestamp, action) VALUES ('joel', %L, '09:30:00', 'STOP');`,
+      utils.todayIso(),
+    ),
+    format(
+      `INSERT INTO stopwatch_dev (username, day_date, timestamp, action) VALUES ('joel', %L, '09:35:00', 'CONT');`,
+      utils.todayIso(),
+    ),
+    format(
+      `INSERT INTO stopwatch_dev (username, day_date, timestamp, action) VALUES ('joel', %L, '13:00:00', 'STOP');`,
+      utils.todayIso(),
+    ),
+    format(
+      `INSERT INTO stopwatch_dev (username, day_date, timestamp, action) VALUES ('joel', %L, '13:00:00', 'CONT');`,
+      utils.todayIso(),
+    ),
+    format(
+      `INSERT INTO stopwatch_dev (username, day_date, timestamp, action) VALUES ('joel', %L, '15:00:00', 'END');`,
+      utils.todayIso(),
+    ),
+    */
+  ];
+
   if (env === "dev" || env === "test") {
     await db.query(`DROP TABLE IF EXISTS timesheet`);
+    await db.query(`DROP TABLE IF EXISTS stopwatch`);
     await db.query(`DROP TABLE IF EXISTS usertable`);
   }
 
-  console.log("Seeding - Creating usertable and timesheet");
   await db.query(createUsertable);
   await db.query(createTimesheet);
+  await db.query(createStopwatch);
 
   if (env === "dev" || env === "test") {
     for (query of insertTimsheet) {
+      await db.query(query);
+    }
+    for (query of insertStopwatch) {
       await db.query(query);
     }
   }

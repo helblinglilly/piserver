@@ -16,6 +16,4 @@ timesheetsRouter.get("/edit", userSelection, tc.getEdit);
 timesheetsRouter.post("/edit", userSelection, tc.postEdit);
 timesheetsRouter.all("/edit", error.methodNotAllowed);
 
-timesheetsRouter.all("/*", error.pageNotFound);
-
 module.exports = timesheetsRouter;

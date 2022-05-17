@@ -4,6 +4,7 @@ const utils = require("../utils");
 exports.getIndex = async (req, res, next) => {
   const options = {};
   options.day = utils.today();
+  options.username = req.username;
 
   const rows = await timesheetsModel.selectDay(utils.todayIso(), req.username);
   const now = new Date();
@@ -147,6 +148,7 @@ exports.postEnter = async (req, res, next) => {
 
 exports.getView = async (req, res, next) => {
   const options = {};
+  options.username = req.username;
   options.date = req.query.date ? req.query.date : utils.todayIso();
 
   const entry = await timesheetsModel.selectDay(options.date, req.username);
@@ -172,6 +174,7 @@ exports.getView = async (req, res, next) => {
 
 exports.getEdit = async (req, res, next, message = null) => {
   const options = {};
+  options.username = req.username;
   options.date = req.query.date ? req.query.date : utils.todayIso();
 
   const entry = await timesheetsModel.selectDay(options.date, req.username);

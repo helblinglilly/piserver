@@ -15,5 +15,8 @@ body
       a.navbar-item(href='/')
         img(src='/static/assets/pi.svg')
       a.navbar-item(href='/')  Look Mum No Wifi
-  
+
+      if username
+        img(src=`/static/assets/${username}.png`, alt='Pi Hole Icon', width="50px", height="50px", style="margin-left: auto")
+ 
   block body
