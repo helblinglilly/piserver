@@ -62,6 +62,24 @@ describe("App Router Tests", () => {
     });
   });
 
+  describe("/stopwatch", () => {
+    test("GET - 200", () => {
+      return request(app).get("/stopwatch").expect(200);
+    });
+    test("PATCH - 405", () => {
+      return request(app).patch("/stopwatch").expect(405);
+    });
+    test("POST - 405", () => {
+      return request(app).post("/stopwatch").expect(405);
+    });
+    test("PUT - 405", () => {
+      return request(app).put("/stopwatch").expect(405);
+    });
+    test("DELETE - 405", () => {
+      return request(app).delete("/stopwatch").expect(405);
+    });
+  });
+
   describe("/pokemon", () => {
     test("GET - 200", () => {
       return request(app).get("/pokemon").expect(200);
