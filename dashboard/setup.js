@@ -3,13 +3,11 @@ const seed = require("./db/seed");
 const dbInit = require("./db/initialConnection");
 const env = require("./environment");
 
-const environment = env;
-
 dbInit
   .initialise()
   .then(() => {
-    console.log(`Initialised for ${environment}`);
-    if (environment === "production") {
+    console.log(`Initialised for ${env}`);
+    if (env === "production") {
       global.port = 8080;
       global.host = "127.0.0.1";
     } else {
