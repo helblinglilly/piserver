@@ -2,6 +2,7 @@ extend  ../components/header.pug
 
 block append head
    script(src='/static/scripts/modal.js')
+   script(src="/static/scripts/stopwatch.js")
    title Timesheet
 
 block append body
@@ -13,30 +14,36 @@ block append body
                 li.is-active
                     a(href="", aria-current="page") Stopwatch
         
+        //- (hidden)
+        p#elapsed(hidden) #{elapsed}
+        p#nextAction(hidden) #{nextAction}
+        p#lastEdit(hidden) #{lastEdit}
+
         div.has-text-centered.mt-6.pt-6
-            .title.is-1.mb-0 #{total}
-            p Last edit: #{lastEdit}
+            .title.is-1.mb-0#total #{total}
+            p#lastEditDisplay
         
-        .columns
-            .column
-                .card.mt-6
-                    .card-content
-                        a.card-text(onclick="document.forms['nextActionForm'].submit();") #{nextActionText}
-                                form(action=`/stopwatch/${nextAction}`, method="post", id="nextActionForm") 
-                                    input(type="hidden", name="action", value=nextAction)
+        if (nextActionText)
+            .columns
+                .column
+                    .card.mt-6(onclick="document.forms['nextActionForm'].submit();")
+                        .card-content
+                            a.card-text(onclick="document.forms['nextActionForm'].submit();") #{nextActionText}
+                                    form(action=`/stopwatch/${nextAction}`, method="post", id="nextActionForm") 
+                                        input(type="hidden", name="action", value=nextAction)
                                 
 
         .columns
             .column
                 .card.mt-6
                     .card-content(onclick="location.href='/stopwatch/view';")
-                        a.card-text View Entries
+                        p.card-text View Entries
             
             .column
                 .card.mt-6
                     .card-content(onclick="location.href='/stopwatch/edit';")
-                        a.card-text Edit Entries
-            if (nextActionText !== dayAction)
+                        p.card-text Edit Entries
+            if ((nextActionText !== dayAction) && dayActionText)
                 .column
                     .card.mt-6
                         .card-content.js-modal-trigger(data-target='modal-js-example')
@@ -45,11 +52,13 @@ block append body
                             .modal-background
                             .modal-card
                                 .modal-card-head
-                                    p.modal-card-title #{dayActionText}
+                                    p.modal-card-title #{dayActionText} confirmation
                                 .modal-card-body
-                                    p Are you sure you want to do this? Haha
+                                    p Are you sure you want to end the day?
+                                    br
+                                    p You won't be able to log any more time for today, unless you edit your entries (currently not supported).
                                 footer.modal-card-foot
-                                    form(action="/stopwatch/#{dayAction}", method="post", id="dayActionForm") 
+                                    form(action=`/stopwatch/${dayAction}`, method="post", id="dayActionForm") 
                                         input(type="hidden", name="action", value=dayAction)
-                                    button.button.is-info.is-fullwidth(onclick="document.forms['dayActionForm'].submit();") #{dayAction}
+                                    button.button.is-info.is-fullwidth(onclick="document.forms['dayActionForm'].submit();") #{dayActionText}
                                     button.button.is-danger.is-fullwidth Cancel

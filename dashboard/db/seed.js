@@ -60,29 +60,30 @@ exports.seed = async () => {
     `INSERT INTO stopwatch (username, day_date, timestamp, action) VALUES ('joel', '2022-01-01', '13:00:00', 'STOP');`,
     `INSERT INTO stopwatch (username, day_date, timestamp, action) VALUES ('joel', '2022-01-01', '14:00:00', 'CONT');`,
     `INSERT INTO stopwatch (username, day_date, timestamp, action) VALUES ('joel', '2022-01-01', '15:00:00', 'END');`,
+
+    format(
+      `INSERT INTO stopwatch (username, day_date, timestamp, action) VALUES ('joel', %L, '09:00:00', 'START');`,
+      utils.todayIso(),
+    ),
+    format(
+      `INSERT INTO stopwatch (username, day_date, timestamp, action) VALUES ('joel', %L, '09:30:00', 'STOP');`,
+      utils.todayIso(),
+    ),
+    format(
+      `INSERT INTO stopwatch (username, day_date, timestamp, action) VALUES ('joel', %L, '09:35:00', 'CONT');`,
+      utils.todayIso(),
+    ),
     /*
     format(
-      `INSERT INTO stopwatch_dev (username, day_date, timestamp, action) VALUES ('joel', %L, '09:00:00', 'START');`,
+      `INSERT INTO stopwatch (username, day_date, timestamp, action) VALUES ('joel', %L, '13:00:00', 'STOP');`,
       utils.todayIso(),
     ),
     format(
-      `INSERT INTO stopwatch_dev (username, day_date, timestamp, action) VALUES ('joel', %L, '09:30:00', 'STOP');`,
+      `INSERT INTO stopwatch (username, day_date, timestamp, action) VALUES ('joel', %L, '13:00:00', 'CONT');`,
       utils.todayIso(),
     ),
     format(
-      `INSERT INTO stopwatch_dev (username, day_date, timestamp, action) VALUES ('joel', %L, '09:35:00', 'CONT');`,
-      utils.todayIso(),
-    ),
-    format(
-      `INSERT INTO stopwatch_dev (username, day_date, timestamp, action) VALUES ('joel', %L, '13:00:00', 'STOP');`,
-      utils.todayIso(),
-    ),
-    format(
-      `INSERT INTO stopwatch_dev (username, day_date, timestamp, action) VALUES ('joel', %L, '13:00:00', 'CONT');`,
-      utils.todayIso(),
-    ),
-    format(
-      `INSERT INTO stopwatch_dev (username, day_date, timestamp, action) VALUES ('joel', %L, '15:00:00', 'END');`,
+      `INSERT INTO stopwatch (username, day_date, timestamp, action) VALUES ('joel', %L, '15:00:00', 'END');`,
       utils.todayIso(),
     ),
     */
@@ -105,11 +106,9 @@ exports.seed = async () => {
     for (query of insertStopwatch) {
       await db.query(query);
     }
+    // await db.query("INSERT INTO usertable (ip, username) VALUES ('127.0.0.1', 'joel');");
   }
 
   if (env === "test") {
-    await db.query(
-      "INSERT INTO usertable (ip, username) VALUES ('::ffff:127.0.0.1', 'test');",
-    );
   }
 };
