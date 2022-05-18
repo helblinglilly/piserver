@@ -11,7 +11,6 @@ exports.getRoot = async (req, res, next) => {
   const existing = await stopwatchModel.readByDate(req.username, new Date());
   if (existing.length === 0) {
     options.total = "Not started";
-    options.lastEdit = new Date(0, 0, 0, 0, 0, 0, 0);
     options.nextAction = "START";
     options.nextActionText = "Start day";
     options.dayAction = "START";

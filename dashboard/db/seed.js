@@ -61,6 +61,7 @@ exports.seed = async () => {
     `INSERT INTO stopwatch (username, day_date, timestamp, action) VALUES ('joel', '2022-01-01', '14:00:00', 'CONT');`,
     `INSERT INTO stopwatch (username, day_date, timestamp, action) VALUES ('joel', '2022-01-01', '15:00:00', 'END');`,
 
+    /*
     format(
       `INSERT INTO stopwatch (username, day_date, timestamp, action) VALUES ('joel', %L, '09:00:00', 'START');`,
       utils.todayIso(),
@@ -73,7 +74,6 @@ exports.seed = async () => {
       `INSERT INTO stopwatch (username, day_date, timestamp, action) VALUES ('joel', %L, '09:35:00', 'CONT');`,
       utils.todayIso(),
     ),
-    /*
     format(
       `INSERT INTO stopwatch (username, day_date, timestamp, action) VALUES ('joel', %L, '13:00:00', 'STOP');`,
       utils.todayIso(),
