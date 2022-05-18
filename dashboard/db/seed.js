@@ -106,7 +106,7 @@ exports.seed = async () => {
     for (query of insertStopwatch) {
       await db.query(query);
     }
-    // await db.query("INSERT INTO usertable (ip, username) VALUES ('127.0.0.1', 'joel');");
+    await db.query("INSERT INTO usertable (ip, username) VALUES ('127.0.0.1', 'joel');");
   }
 
   if (env === "test") {
