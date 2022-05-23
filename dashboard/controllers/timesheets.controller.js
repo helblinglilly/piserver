@@ -1,98 +1,107 @@
 const timesheetsModel = require("../models/timsheets.model");
 const utils = require("../utils");
 
-exports.getIndex = async (req, res, next) => {
-  const options = {};
-  options.day = utils.today();
-  options.username = req.username;
-
-  const rows = await timesheetsModel.selectDay(utils.todayIso(), req.username);
+const calculateTime = (rows) => {
   const now = new Date();
+  // Init as clock in
+  const result = {};
+  result.day = new Date();
+  result.nextAction = "Clock In";
+  result.proposedEndTime = utils.addTime(now, {
+    hours: 8,
+    minutes: 30,
+  });
+  result.overtimeStatus = false;
 
-  if (!rows) {
-    options.nextAction = "Clock In";
-    let endTime = utils.addTime(now, {
-      hours: 8,
-      minutes: 30,
-    });
-    options.endTime = `${utils.dateTimeToTime(endTime)}`;
-  } else {
-    if (rows.clock_in && !rows.break_in && !rows.break_out && !rows.clock_out) {
-      options.nextAction = "Break In";
-      const clockIn = utils.constructDateTime(now, rows.clock_in);
-
-      const endTime = utils.addTime(clockIn, { hours: 8, minutes: 30 });
-      if (endTime < now) {
-        const overtimeWorked = {
-          hours: Math.trunc((now - endTime) / 60 / 60 / 1000),
-          minutes: Math.trunc((((now - endTime) / 60 / 60 / 1000) % 1) * 60),
-        };
-        options.endTime = `Overtime: ${overtimeWorked.hours}h ${overtimeWorked.minutes}min`;
-      } else options.endTime = `${utils.dateTimeToTime(endTime)}`;
-    } else if (rows.clock_in && rows.break_in && !rows.break_out && !rows.clock_out) {
-      options.nextAction = "Break End";
-      const clock_in = utils.constructDateTime(rows.day_date, rows.clock_in);
-      const break_in = utils.constructDateTime(rows.day_date, rows.break_in);
-
-      const plusOneHour = utils.addTime(break_in, {
-        hours: 1,
-        minutes: 0,
-      });
-      const difference = now > plusOneHour ? now : plusOneHour;
-      const backFromBreakTime = utils.dateTimeToTime(difference);
-
-      const millisecondsLeft = 7.5 * 60 * 60 * 1000 - (break_in - clock_in);
-      const timeLeftAtWork = {
-        hours: Math.round(millisecondsLeft / 60 / 60 / 1000),
-        minutes: ((millisecondsLeft / 60 / 60 / 1000) % 1) * 60,
+  if (!rows) return result;
+  // Break In
+  if (rows.clock_in && !rows.break_in && !rows.break_out && !rows.clock_out) {
+    result.nextAction = "Break In";
+    const clockIn = utils.constructDateTime(now, rows.clock_in);
+    const endTime = utils.addTime(clockIn, { hours: 8, minutes: 30 });
+    if (endTime < new Date()) {
+      const overtimeWorked = {
+        hours: Math.trunc((now - endTime) / 60 / 60 / 1000),
+        minutes: Math.trunc((((now - endTime) / 60 / 60 / 1000) % 1) * 60),
       };
+      result.overtimeStatus = true;
+      result.overtimeWorked = {
+        hours: overtimeWorked.hours,
+        minutes: overtimeWorked.minutes,
+      };
+    } else {
+      result.proposedEndTime = endTime;
+    }
+  }
+  // Break End
+  if (rows.clock_in && rows.break_in && !rows.break_out && !rows.clock_out) {
+    result.nextAction = "Break End";
+    const clock_in = utils.constructDateTime(rows.day_date, rows.clock_in);
+    const break_in = utils.constructDateTime(rows.day_date, rows.break_in);
 
-      const doneWithWork = utils.dateTimeToTime(
-        utils.addTime(difference, timeLeftAtWork),
-      );
-      options.endTime = `Back: ${backFromBreakTime}\nDone by: ${doneWithWork}`;
-    } else if (rows.clock_in && rows.break_in && rows.break_out && !rows.clock_out) {
-      options.nextAction = "Clock Out";
-      let displayText = "";
-      const clock_in = utils.constructDateTime(rows.day_date, rows.clock_in);
-      const break_in = utils.constructDateTime(rows.day_date, rows.break_in);
-      const break_out = utils.constructDateTime(rows.day_date, rows.break_out);
+    const plusOneHour = utils.addTime(break_in, {
+      hours: 1,
+      minutes: 0,
+    });
+    const difference = now > plusOneHour ? now : plusOneHour;
 
-      // 7.5hours/day work contract
-      const timeWorked = now - break_out + (break_in - clock_in);
-      const millisecondsLeft = 7.5 * 60 * 60 * 1000 - timeWorked;
+    const millisecondsLeft = 7.5 * 60 * 60 * 1000 - (break_in - clock_in);
+    const timeLeftAtWork = {
+      hours: Math.round(millisecondsLeft / 60 / 60 / 1000),
+      minutes: ((millisecondsLeft / 60 / 60 / 1000) % 1) * 60,
+    };
 
-      if (millisecondsLeft > 0) {
-        const timeLeftAtWork = {
-          hours: Math.trunc(millisecondsLeft / 60000 / 60),
-          minutes: (millisecondsLeft / 60000) % 60,
-        };
+    const doneWithWork = utils.addTime(difference, timeLeftAtWork);
+    result.proposedBreakEndTime = difference;
+    result.proposedEndTime = doneWithWork;
+  }
 
-        displayText = utils.dateTimeToTime(utils.addTime(now, timeLeftAtWork));
-      } else {
-        displayText = overtime(
-          rows.clock_in,
-          rows.break_in,
-          rows.break_out,
-          utils.dateTimeToTime(new Date()),
-        );
-      }
+  // Clock out
+  if (rows.clock_in && rows.break_in && rows.break_out && !rows.clock_out) {
+    result.nextAction = "Clock Out";
+    let displayText = "";
+    const clock_in = utils.constructDateTime(rows.day_date, rows.clock_in);
+    const break_in = utils.constructDateTime(rows.day_date, rows.break_in);
+    const break_out = utils.constructDateTime(rows.day_date, rows.break_out);
 
-      options.endTime = `${displayText}`;
-    } else if (rows.clock_in && rows.break_in && rows.break_out && rows.clock_out) {
-      options.nextAction = "Done for the day :)";
-      let displayText = "";
+    // 7.5hours/day work contract
+    const timeWorked = now - break_out + (break_in - clock_in);
+    const millisecondsLeft = 7.5 * 60 * 60 * 1000 - timeWorked;
 
-      displayText = overtime(
+    if (millisecondsLeft > 0) {
+      const timeLeftAtWork = {
+        hours: Math.trunc(millisecondsLeft / 60000 / 60),
+        minutes: (millisecondsLeft / 60000) % 60,
+      };
+      result.proposedEndTime = utils.addTime(now, timeLeftAtWork);
+    } else {
+      result.overtimeStatus = true;
+      result.overtimeWorked = overtime(
         rows.clock_in,
         rows.break_in,
         rows.break_out,
-        rows.clock_out,
+        utils.dateTimeToTime(new Date()),
       );
-
-      options.endTime = `${displayText}`;
     }
   }
+  // Done
+  if (rows.clock_in && rows.break_in && rows.break_out && rows.clock_out) {
+    result.nextAction = "Done for the day :)";
+    result.overtimeStatus = true;
+    result.overtimeWorked = overtime(
+      rows.clock_in,
+      rows.break_in,
+      rows.break_out,
+      rows.clock_out,
+    );
+  }
+  return result;
+};
+
+exports.getIndex = async (req, res, next) => {
+  const rows = await timesheetsModel.selectDay(utils.todayIso(), req.username);
+  const options = calculateTime(rows);
+  options.username = req.username;
   res.render("timesheets/index", { ...options });
 };
 
