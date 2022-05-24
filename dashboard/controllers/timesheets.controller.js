@@ -51,7 +51,7 @@ const calculateTime = (rows) => {
     };
 
     result.proposedBreakEndTime = proposedBreakEnd;
-    result.proposedEndTime = utils.addTime(proposedBreakEnd, timeLeftAtWork);
+    result.proposedEndTime = utils.addTime(new Date(), timeLeftAtWork);
   }
 
   // Clock out
@@ -79,10 +79,30 @@ const calculateTime = (rows) => {
         rows.break_out,
         utils.dateTimeToTime(new Date()),
       );
+      const breaktime = {
+        hours: Math.trunc((break_out - break_in) / 60000 / 60),
+        minutes: ((break_out - break_in) / 60000) % 60,
+      };
+      result.proposedEndTime = utils.addTime(utils.addTime(clock_in, breaktime), {
+        hours: 7,
+        minutes: 30,
+      });
     }
   }
   // Done
   if (rows.clock_in && rows.break_in && rows.break_out && rows.clock_out) {
+    const clock_in = utils.constructDateTime(rows.day_date, rows.clock_in);
+    const break_in = utils.constructDateTime(rows.day_date, rows.break_in);
+    const break_out = utils.constructDateTime(rows.day_date, rows.break_out);
+
+    const breaktime = {
+      hours: Math.trunc((break_out - break_in) / 60000 / 60),
+      minutes: ((break_out - break_in) / 60000) % 60,
+    };
+    result.proposedEndTime = utils.addTime(utils.addTime(clock_in, breaktime), {
+      hours: 7,
+      minutes: 30,
+    });
     result.nextAction = "Done for the day :)";
     result.overtimeStatus = true;
     result.overtimeWorked = overtime(

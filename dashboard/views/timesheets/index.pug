@@ -2,7 +2,7 @@ extend  ../components/header.pug
 
 block append head
    script(src='/static/scripts/modal.js')
-   script(src="/static/scripts/timesheetIndex.js")
+   script(src="/static/scripts/timesheet/index.js")
    style.
     @media screen and (min-width: 769px){
     #day {
@@ -19,7 +19,7 @@ block append body
                     a(href="/") Home
                 li.is-active
                     a(href="", aria-current="page") Timesheet
-        p#proposedEndTime #{proposedEndTime}
+        p#proposedEndTime(hidden) #{proposedEndTime}
         p#proposedBreakEndTime(hidden) #{proposedBreakEndTime}
         p#nextAction(hidden) #{nextAction}
         p#overtimeStatus(hidden) #{overtimeStatus}

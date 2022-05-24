@@ -32,25 +32,23 @@ document.addEventListener("DOMContentLoaded", () => {
     const overtimeStatus = document.getElementById("overtimeStatus").innerHTML;
     const overtimeWorked = document.getElementById("overtimeWorked").innerHTML;
 
-    if (overtimeStatus == false) {
-      document.getElementById("status").innerHTML = toTime(proposedEndTime);
-    } else {
-      document.getElementById("breakEnd").hidden = false;
-      document.getElementById("breakEnd").innerHTML = toTime(proposedEndTime);
+    if (overtimeStatus === true) {
       document.getElementById("status").innerHTML = overtimeWorked;
+      document.getElementById("breakEnd").innerHTML = toTime(proposedEndTime);
+      document.getElementById("breakEnd").hidden = false;
+    } else {
+      document.getElementById("status").innerHTML = toTime(proposedEndTime);
     }
   } else if (nextAction.includes("Done")) {
     const proposedEndTime = document.getElementById("proposedEndTime").innerHTML;
     const overtimeStatus = document.getElementById("overtimeStatus").innerHTML;
     const overtimeWorked = document.getElementById("overtimeWorked").innerHTML;
 
-    if (overtimeStatus == false) {
-      document.getElementById("status").innerHTML = toTime(proposedEndTime);
-    } else {
-      document.getElementById("breakEnd").hidden = false;
-      document.getElementById("breakEnd").innerHTML = toTime(proposedEndTime);
-      document.getElementById("status").innerHTML = overtimeWorked;
-    }
+    console.log(proposedEndTime, overtimeStatus, overtimeWorked);
+
+    document.getElementById("status").innerHTML = overtimeWorked;
+    document.getElementById("breakEnd").innerHTML = toTime(proposedEndTime);
+    document.getElementById("breakEnd").hidden = false;
   }
 });
 
