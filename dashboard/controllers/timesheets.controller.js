@@ -39,11 +39,10 @@ const calculateTime = (rows) => {
     const clock_in = utils.constructDateTime(rows.day_date, rows.clock_in);
     const break_in = utils.constructDateTime(rows.day_date, rows.break_in);
 
-    const plusOneHour = utils.addTime(break_in, {
+    const proposedBreakEnd = utils.addTime(break_in, {
       hours: 1,
       minutes: 0,
     });
-    const difference = now > plusOneHour ? now : plusOneHour;
 
     const millisecondsLeft = 7.5 * 60 * 60 * 1000 - (break_in - clock_in);
     const timeLeftAtWork = {
@@ -51,15 +50,13 @@ const calculateTime = (rows) => {
       minutes: ((millisecondsLeft / 60 / 60 / 1000) % 1) * 60,
     };
 
-    const doneWithWork = utils.addTime(difference, timeLeftAtWork);
-    result.proposedBreakEndTime = difference;
-    result.proposedEndTime = doneWithWork;
+    result.proposedBreakEndTime = proposedBreakEnd;
+    result.proposedEndTime = utils.addTime(proposedBreakEnd, timeLeftAtWork);
   }
 
   // Clock out
   if (rows.clock_in && rows.break_in && rows.break_out && !rows.clock_out) {
     result.nextAction = "Clock Out";
-    let displayText = "";
     const clock_in = utils.constructDateTime(rows.day_date, rows.clock_in);
     const break_in = utils.constructDateTime(rows.day_date, rows.break_in);
     const break_out = utils.constructDateTime(rows.day_date, rows.break_out);

@@ -32,9 +32,10 @@ exports.addTime = (startTime, addTime = { hours: 0, minutes: 0 }) => {
   else if (typeof addTime !== "object")
     throw "Invalid Argument - addTime is not an object";
 
-  startTime.setHours(startTime.getHours() + addTime.hours);
-  startTime.setMinutes(startTime.getMinutes() + addTime.minutes);
-  return startTime;
+  var copiedDate = new Date(startTime.getTime());
+  copiedDate.setHours(copiedDate.getHours() + addTime.hours);
+  copiedDate.setMinutes(copiedDate.getMinutes() + addTime.minutes);
+  return copiedDate;
 };
 
 exports.isShortTime = (allegedTime) => {
