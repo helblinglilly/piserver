@@ -21,20 +21,29 @@ exports.today = () => {
 
 exports.todayIso = () => {
   const date = new Date();
-  return date.toISOString().substr(0, 10);
+  return date.toISOString().substring(0, 10);
 };
 
 exports.addTime = (startTime, addTime = { hours: 0, minutes: 0 }) => {
-  // Does not need to worry about localising time
   if (!startTime || !addTime) throw "Invalid Argument - empty";
   else if (typeof startTime !== "object")
     throw "Invalid Argument - startTime is not DateTime";
   else if (typeof addTime !== "object")
     throw "Invalid Argument - addTime is not an object";
 
-  var copiedDate = new Date(startTime.getTime());
-  copiedDate.setHours(copiedDate.getHours() + addTime.hours);
-  copiedDate.setMinutes(copiedDate.getMinutes() + addTime.minutes);
+  var copiedDate = new Date(
+    Date.UTC(
+      startTime.getFullYear(),
+      startTime.getMonth(),
+      startTime.getDate(),
+      startTime.getHours() + addTime.hours,
+      startTime.getMinutes() + addTime.minutes,
+      startTime.getSeconds(),
+    ),
+  );
+
+  console.log(startTime.toUTCString(), addTime, copiedDate.toUTCString());
+
   return copiedDate;
 };
 
@@ -46,13 +55,12 @@ exports.isShortTime = (allegedTime) => {
   return result;
 };
 
-exports.dateTimeToTime = (date) => {
+exports.dateTimetoHourMinute = (date) => {
   if (date === undefined) throw "Invalid Argument - empty";
   else if (typeof date !== "object") throw "Invalid Argument - Not an object";
 
   let hours = date.toTimeString().split(":")[0];
   let minutes = date.toTimeString().split(":")[1];
-
   return `${hours}:${minutes}`;
 };
 
@@ -61,9 +69,15 @@ exports.constructUTCDateTime = (day, time) => {
   else if (typeof day !== "object") throw "Invalid Argument - Not an object";
   else if (typeof time !== "string") throw "Invalid Argument - Not a string";
 
-  const dateTime = new Date(day);
-  dateTime.setHours(time.split(":")[0]);
-  dateTime.setMinutes(time.split(":")[1]);
+  const dateTime = new Date(
+    Date.UTC(
+      day.getFullYear(),
+      day.getMonth(),
+      day.getDate(),
+      time.split(":")[0],
+      time.split(":")[1],
+    ),
+  );
   return dateTime;
 };
 

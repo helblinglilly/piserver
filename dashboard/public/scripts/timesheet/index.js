@@ -35,8 +35,11 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("breakEnd").innerHTML = `Back: ${toTime(
       proposedBreakEndTime,
     )}`;
+
+    if (overtimeStatus === "true")
+      document.getElementById("status").innerHTML = overtimeWorked;
+    else document.getElementById("status").innerHTML = `Done: ${toTime(proposedEndTime)}`;
     document.getElementById("breakEnd").hidden = false;
-    document.getElementById("status").innerHTML = `Done: ${toTime(proposedEndTime)}`;
   } else if (nextAction === "Clock Out") {
     if (overtimeStatus === "true") {
       document.getElementById("status").innerHTML = overtimeWorked;
