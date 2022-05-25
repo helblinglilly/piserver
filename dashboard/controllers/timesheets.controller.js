@@ -25,7 +25,7 @@ const viewClockIn = () => {
     now.getFullYear(),
     now.getMonth(),
     now.getDate(),
-    now.getHours() + 8,
+    now.getHours() + 7,
     now.getMinutes() + 30,
   );
   return indexObject(new Date(), "Clock In", proposedEndTime);
