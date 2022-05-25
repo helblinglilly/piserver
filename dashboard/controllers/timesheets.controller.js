@@ -18,6 +18,7 @@ const calculateTime = (rows) => {
   if (rows.clock_in && !rows.break_in && !rows.break_out && !rows.clock_out) {
     result.nextAction = "Break In";
     const clockIn = utils.constructUTCDateTime(now, rows.clock_in);
+
     const endTime = utils.addTime(clockIn, { hours: 8, minutes: 30 });
     if (endTime < new Date()) {
       const overtimeWorked = {
@@ -25,13 +26,11 @@ const calculateTime = (rows) => {
         minutes: Math.trunc((((now - endTime) / 60 / 60 / 1000) % 1) * 60),
       };
       result.overtimeStatus = true;
-      result.overtimeWorked = {
-        hours: overtimeWorked.hours,
-        minutes: overtimeWorked.minutes,
-      };
-    } else {
-      result.proposedEndTime = endTime;
+      result.overtimeWorked = `+${
+        overtimeWorked.hours >= 1 ? overtimeWorked.hours + "h" : ""
+      } ${overtimeWorked.minutes}min`;
     }
+    result.proposedEndTime = endTime;
   }
   // Break End
   if (rows.clock_in && rows.break_in && !rows.break_out && !rows.clock_out) {
@@ -89,6 +88,7 @@ const calculateTime = (rows) => {
       });
     }
   }
+
   // Done
   if (rows.clock_in && rows.break_in && rows.break_out && rows.clock_out) {
     const clock_in = utils.constructUTCDateTime(rows.day_date, rows.clock_in);

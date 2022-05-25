@@ -5,7 +5,7 @@ const env = require("./environment");
 
 dbInit
   .initialise()
-  .then(() => {
+  .then(async () => {
     console.log(`Initialised for ${env}`);
     if (env === "production") {
       global.port = 8080;
@@ -14,7 +14,7 @@ dbInit
       global.port = 9090;
       global.host = "127.0.0.1";
     }
-    seed.seed();
+    await seed.seed();
     app.listen(port, "0.0.0.0", () => {
       console.log(`Listening on http://${host}:${port}`);
     });
