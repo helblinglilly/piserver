@@ -1,6 +1,5 @@
 const fs = require("fs");
 const axios = require("axios");
-const utils = require("pg/lib/utils");
 
 weekday = () => {
   const dayNames = [
@@ -26,6 +25,7 @@ exports.todayIso = () => {
 };
 
 exports.addTime = (startTime, addTime = { hours: 0, minutes: 0 }) => {
+  // Does not need to worry about localising time
   if (!startTime || !addTime) throw "Invalid Argument - empty";
   else if (typeof startTime !== "object")
     throw "Invalid Argument - startTime is not DateTime";
@@ -56,14 +56,14 @@ exports.dateTimeToTime = (date) => {
   return `${hours}:${minutes}`;
 };
 
-exports.constructDateTime = (day, time) => {
+exports.constructUTCDateTime = (day, time) => {
   if (day === undefined || time === undefined) throw "Invalid Argument - empty";
   else if (typeof day !== "object") throw "Invalid Argument - Not an object";
   else if (typeof time !== "string") throw "Invalid Argument - Not a string";
 
   const dateTime = new Date(day);
-  dateTime.setHours(time.substr(0, 2));
-  dateTime.setMinutes(time.substr(3, 2));
+  dateTime.setHours(time.split(":")[0]);
+  dateTime.setMinutes(time.split(":")[1]);
   return dateTime;
 };
 

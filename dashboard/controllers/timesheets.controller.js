@@ -17,7 +17,7 @@ const calculateTime = (rows) => {
   // Break In
   if (rows.clock_in && !rows.break_in && !rows.break_out && !rows.clock_out) {
     result.nextAction = "Break In";
-    const clockIn = utils.constructDateTime(now, rows.clock_in);
+    const clockIn = utils.constructUTCDateTime(now, rows.clock_in);
     const endTime = utils.addTime(clockIn, { hours: 8, minutes: 30 });
     if (endTime < new Date()) {
       const overtimeWorked = {
@@ -36,8 +36,8 @@ const calculateTime = (rows) => {
   // Break End
   if (rows.clock_in && rows.break_in && !rows.break_out && !rows.clock_out) {
     result.nextAction = "Break End";
-    const clock_in = utils.constructDateTime(rows.day_date, rows.clock_in);
-    const break_in = utils.constructDateTime(rows.day_date, rows.break_in);
+    const clock_in = utils.constructUTCDateTime(rows.day_date, rows.clock_in);
+    const break_in = utils.constructUTCDateTime(rows.day_date, rows.break_in);
 
     const proposedBreakEnd = utils.addTime(break_in, {
       hours: 1,
@@ -57,9 +57,9 @@ const calculateTime = (rows) => {
   // Clock out
   if (rows.clock_in && rows.break_in && rows.break_out && !rows.clock_out) {
     result.nextAction = "Clock Out";
-    const clock_in = utils.constructDateTime(rows.day_date, rows.clock_in);
-    const break_in = utils.constructDateTime(rows.day_date, rows.break_in);
-    const break_out = utils.constructDateTime(rows.day_date, rows.break_out);
+    const clock_in = utils.constructUTCDateTime(rows.day_date, rows.clock_in);
+    const break_in = utils.constructUTCDateTime(rows.day_date, rows.break_in);
+    const break_out = utils.constructUTCDateTime(rows.day_date, rows.break_out);
 
     // 7.5hours/day work contract
     const timeWorked = now - break_out + (break_in - clock_in);
@@ -91,9 +91,9 @@ const calculateTime = (rows) => {
   }
   // Done
   if (rows.clock_in && rows.break_in && rows.break_out && rows.clock_out) {
-    const clock_in = utils.constructDateTime(rows.day_date, rows.clock_in);
-    const break_in = utils.constructDateTime(rows.day_date, rows.break_in);
-    const break_out = utils.constructDateTime(rows.day_date, rows.break_out);
+    const clock_in = utils.constructUTCDateTime(rows.day_date, rows.clock_in);
+    const break_in = utils.constructUTCDateTime(rows.day_date, rows.break_in);
+    const break_out = utils.constructUTCDateTime(rows.day_date, rows.break_out);
 
     const breaktime = {
       hours: Math.trunc((break_out - break_in) / 60000 / 60),
@@ -292,15 +292,15 @@ exports.postEdit = async (req, res, next) => {
 overtime = (clock_in, break_in, break_out, clock_out) => {
   if (!clock_in || !clock_out) return;
 
-  clock_in = utils.constructDateTime(new Date(), clock_in);
-  clock_out = utils.constructDateTime(new Date(), clock_out);
+  clock_in = utils.constructUTCDateTime(new Date(), clock_in);
+  clock_out = utils.constructUTCDateTime(new Date(), clock_out);
 
   let timeWorked = 0;
   if (!break_in && !break_out) {
     timeWorked = clock_out - clock_in;
   } else {
-    break_in = utils.constructDateTime(new Date(), break_in);
-    break_out = utils.constructDateTime(new Date(), break_out);
+    break_in = utils.constructUTCDateTime(new Date(), break_in);
+    break_out = utils.constructUTCDateTime(new Date(), break_out);
     timeWorked = clock_out - break_out + (break_in - clock_in);
   }
 
