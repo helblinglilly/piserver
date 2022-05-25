@@ -25,7 +25,7 @@ const viewClockIn = () => {
     now.getFullYear(),
     now.getMonth(),
     now.getDate(),
-    now.getHours() + 7,
+    now.getHours() + 8,
     now.getMinutes() + 30,
   );
   return indexObject(new Date(), "Clock In", proposedEndTime);
@@ -83,7 +83,7 @@ const viewClockOut = (rows) => {
   const proposedEndTime = timesheetUtils.buildBaseDate(rows.day_date);
   let overtimeWorked = false;
 
-  const hoursLeft = 8 - timeWorked.getHours();
+  const hoursLeft = 7 - timeWorked.getHours();
   const minutesLeft = 30 - timeWorked.getMinutes();
 
   proposedEndTime.setMinutes(new Date().getMinutes() + minutesLeft);
