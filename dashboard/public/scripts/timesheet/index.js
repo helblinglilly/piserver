@@ -20,6 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
     3,
   )} ${today.getDate()}/${today.getMonth()}`;
 
+  console.log(proposedEndTime);
   if (nextAction === "Clock In") {
     document.getElementById("status").innerHTML = toTime(proposedEndTime);
   } else if (nextAction === "Break In") {
