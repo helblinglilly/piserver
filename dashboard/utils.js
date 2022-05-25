@@ -49,11 +49,9 @@ exports.isShortTime = (allegedTime) => {
 exports.dateTimeToTime = (date) => {
   if (date === undefined) throw "Invalid Argument - empty";
   else if (typeof date !== "object") throw "Invalid Argument - Not an object";
-  let hours = date.getHours();
-  let minutes = date.getMinutes();
 
-  if (hours < 10) hours = "0" + hours;
-  if (minutes < 10) minutes = "0" + minutes;
+  let hours = date.toTimeString().split(":")[0];
+  let minutes = date.toTimeString().split(":")[1];
 
   return `${hours}:${minutes}`;
 };
