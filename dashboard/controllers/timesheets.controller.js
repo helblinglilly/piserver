@@ -159,7 +159,7 @@ exports.postEnter = async (req, res, next) => {
         timesheetsModel.insertClockIn(
           now,
           username,
-          generalUtils.dateTimetoHourMinute(now),
+          now.toLocaleTimeString().substring(0, 5),
         );
         res.redirect("/timesheet");
         break;
@@ -171,7 +171,7 @@ exports.postEnter = async (req, res, next) => {
         timesheetsModel.updateBreakStart(
           now,
           username,
-          generalUtils.dateTimetoHourMinute(now),
+          now.toLocaleTimeString().substring(0, 5),
         );
         res.redirect("/timesheet");
         break;
@@ -186,7 +186,7 @@ exports.postEnter = async (req, res, next) => {
         timesheetsModel.updateBreakEnd(
           now,
           username,
-          generalUtils.dateTimetoHourMinute(now),
+          now.toLocaleTimeString().substring(0, 5),
         );
         res.redirect("/timesheet");
         break;
@@ -198,7 +198,7 @@ exports.postEnter = async (req, res, next) => {
         timesheetsModel.updateClockOut(
           now,
           username,
-          generalUtils.dateTimetoHourMinute(now),
+          now.toLocaleTimeString().substring(0, 5),
         );
         res.redirect("/timesheet");
         break;
