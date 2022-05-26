@@ -6,7 +6,8 @@ exports.buildDateWithTime = (day_date, hhmm) => {
     hhmm.split(":")[0],
     hhmm.split(":")[1],
   );
-  date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
+  date.setHours(date.getHours() - Math.trunc(date.getTimezoneOffset() / 60));
+  date.setMinutes(date.getMinutes() - (date.getTimezoneOffset() % 60));
   return date;
 };
 
