@@ -4,6 +4,7 @@ const timesheetRouter = require("./routers/timesheets.router.js");
 const stopwatchRouter = require("./routers/stopwatch.router.js");
 const pokemonRouter = require("./routers/pokemon.router.js");
 const userRouter = require("./routers/user.router");
+const apiRouter = require("./routers/api.router");
 const userSelection = require("./middleware/user.middleware");
 
 const app = express();
@@ -18,6 +19,7 @@ app.use("/timesheet", timesheetRouter);
 app.use("/stopwatch", stopwatchRouter);
 app.use("/pokemon", pokemonRouter);
 app.use("/user", userRouter);
+app.use("/api", apiRouter);
 
 app.get("/", userSelection, (req, res, next) => {
   res.render("home/index", { host: ``, username: req.username });
