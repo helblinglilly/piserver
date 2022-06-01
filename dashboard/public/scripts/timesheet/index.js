@@ -15,11 +15,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const overtimeStatus = document.getElementById("overtimeStatus").innerHTML;
   const overtimeWorked = document.getElementById("overtimeWorked").innerHTML;
 
-  console.log(proposedEndTime);
   document.getElementById("day").innerHTML = `${days[today.getDay()].substring(
     0,
     3,
-  )} ${today.getDate()}/${today.getMonth()}`;
+  )} ${today.getDate()}/${today.getMonth() + 1}`;
 
   if (nextAction === "Clock In") {
     document.getElementById("status").innerHTML = toTime(proposedEndTime);
