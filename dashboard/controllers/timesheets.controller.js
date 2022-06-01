@@ -226,22 +226,15 @@ exports.getView = async (req, res, next) => {
 exports.getEdit = async (req, res, next, message = null) => {
   const options = {};
   options.username = req.username;
-  options.date = req.query.date ? req.query.date : generalUtils.todayIso();
+  options.date = req.query.date ? new Date(req.query.date) : new Date();
 
   const entry = await timesheetsModel.selectDay(options.date, req.username);
 
   if (entry) {
-    options.clock_in = entry.clock_in.substr(0, 5);
-    options.break_in = entry.break_in ? entry.break_in.substr(0, 5) : null;
-    options.break_out = entry.break_out ? entry.break_out.substr(0, 5) : null;
-    options.clock_out = entry.clock_out ? entry.clock_out.substr(0, 5) : null;
-
-    options.difference = overtime(
-      entry.clock_in,
-      entry.break_in,
-      entry.break_out,
-      entry.clock_out,
-    );
+    options.clock_in = entry.clock_in;
+    options.break_in = entry.break_in ? entry.break_in : null;
+    options.break_out = entry.break_out ? entry.break_out : null;
+    options.clock_out = entry.clock_out ? entry.clock_out : null;
 
     if (!options.clock_out) options.alert = "Day not completed yet";
   }
