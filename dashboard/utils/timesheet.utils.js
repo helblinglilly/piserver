@@ -22,6 +22,6 @@ exports.timeWorked = (clock_in, break_in, break_out, clock_out) => {
   if (!break_in && !break_out && !clock_out) return null;
   if (!break_out && !clock_out) return break_in - clock_in;
   if (!clock_out) return break_in - clock_in + (break_in - new Date());
-  if (clock_out) return clock_out - break_out + (break_in - clock_in);
+  if (clock_out) return break_in - clock_in + (break_in - clock_out);
   return null;
 };

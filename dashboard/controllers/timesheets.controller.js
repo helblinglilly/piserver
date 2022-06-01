@@ -214,7 +214,7 @@ exports.getView = async (req, res, next) => {
     const sign = difference >= 0 ? "+" : "-";
     let minutes;
     if (sign === "+") minutes = 60 - Math.ceil((Math.abs(difference) / 60) % 60);
-    else minutes = 60 - Math.floor((Math.abs(difference) / 60) % 60);
+    else minutes = 60 - Math.floor(Math.abs(difference / 60) % 60);
     const hours = Math.floor(Math.abs(difference / 60 / 60));
     options.difference = `${sign}${hours ? hours + "h" : ""} ${minutes}min`;
     if (!options.clock_out) options.alert = "Day not completed yet";
