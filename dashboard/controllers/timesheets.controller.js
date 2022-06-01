@@ -33,38 +33,33 @@ const viewClockIn = () => {
 
 const viewBreakIn = (rows) => {
   const now = new Date();
-  const clockIn = timesheetUtils.buildDateWithTime(rows.day_date, rows.clock_in);
-  const proposedEndTime = timesheetUtils.buildBaseDate(rows.day_date);
+  const proposedEndTime = timesheetUtils.copyDate(rows.clock_in);
+  proposedEndTime.setHours(proposedEndTime.getHours() + 8);
+  proposedEndTime.setMinutes(proposedEndTime.getMinutes() + 30);
   let overtimeWorked = false;
-
-  proposedEndTime.setHours(clockIn.getHours() + 8);
-  proposedEndTime.setMinutes(clockIn.getMinutes() + 30);
 
   if (proposedEndTime < now) {
     const hours = Math.trunc((now - proposedEndTime) / 60 / 60 / 1000);
     const minutes = Math.trunc((((now - proposedEndTime) / 60 / 60 / 1000) % 1) * 60);
     overtimeWorked = `+${hours >= 1 ? hours + "h" : ""}${minutes}min`;
   }
-  return indexObject(new Date(), "Break In", proposedEndTime, false, overtimeWorked);
+  return indexObject(now, "Break In", proposedEndTime, false, overtimeWorked);
 };
 
 const viewBreakEnd = (rows) => {
-  const clockIn = timesheetUtils.buildDateWithTime(rows.day_date, rows.clock_in);
-  const breakIn = timesheetUtils.buildDateWithTime(rows.day_date, rows.break_in);
-  const timeWorked = new Date(breakIn - clockIn);
-  const proposedBreakEndTime = new Date(breakIn);
-  const proposedEndTime = timesheetUtils.buildBaseDate(rows.day_date);
+  const clockIn = rows.clock_in;
+  const breakIn = rows.break_in;
+  const minutesWorked = (breakIn - clockIn) / 60000;
+  const hoursWorked = Math.trunc(minutesWorked / 60);
+
   let overtimeWorked = false;
 
+  const proposedBreakEndTime = timesheetUtils.copyDate(breakIn);
   proposedBreakEndTime.setHours(breakIn.getHours() + 1);
-  proposedEndTime.setHours(proposedBreakEndTime.getHours() + timeWorked.getHours());
-  proposedEndTime.setMinutes(proposedBreakEndTime.getMinutes() + timeWorked.getMinutes());
+  const proposedEndTime = timesheetUtils.copyDate(proposedBreakEndTime);
 
-  if (timeWorked.getHours() >= 7 && timeWorked.getMinutes() >= 30) {
-    const hours = timeWorked.getHours() - 7;
-    const minutes = timeWorked.getMinutes() - 30;
-    overtimeWorked = `+${hours >= 1 ? hours + "h" : ""}${minutes}min`;
-  }
+  proposedEndTime.setHours(proposedEndTime.getHours() + (6 - hoursWorked));
+  proposedEndTime.setMinutes(proposedEndTime.getMinutes() + (30 - minutesWorked));
 
   return indexObject(
     new Date(),
@@ -76,52 +71,51 @@ const viewBreakEnd = (rows) => {
 };
 
 const viewClockOut = (rows) => {
-  const clockIn = timesheetUtils.buildDateWithTime(rows.day_date, rows.clock_in);
-  const breakIn = timesheetUtils.buildDateWithTime(rows.day_date, rows.break_in);
-  const breakEnd = timesheetUtils.buildDateWithTime(rows.day_date, rows.break_out);
-  const timeWorked = new Date(breakIn - clockIn + (new Date() - breakEnd));
-  const proposedEndTime = timesheetUtils.buildBaseDate(rows.day_date);
+  const clockIn = rows.clock_in;
+  const breakIn = rows.break_in;
+  const breakEnd = rows.break_out;
+
+  const timeWorked = timesheetUtils.timeWorked(
+    rows.clock_in,
+    rows.break_in,
+    rows.break_out,
+    new Date(),
+  );
+
+  const minutesWorked = Math.trunc(breakIn - clockIn + (new Date() - breakEnd) / 60000);
+  const proposedEndTime = new Date(Date.UTC(0, 0, 0, 0, 0, 0, 0));
+  const minutesLeft = 8 * 60 + 30 - minutesWorked;
   let overtimeWorked = false;
 
-  const hoursLeft = 7 - timeWorked.getHours();
-  const minutesLeft = 30 - timeWorked.getMinutes();
+  proposedEndTime.setMinutes(new Date().getMinutes() + (minutesLeft % 60));
+  proposedEndTime.setHours(new Date().getHours() + Math.trunc(minutesLeft / 60));
 
-  proposedEndTime.setMinutes(new Date().getMinutes() + minutesLeft);
-  proposedEndTime.setHours(new Date().getHours() + hoursLeft);
-
-  if (hoursLeft <= 0 || minutesLeft <= 0) {
-    overtimeWorked = `+${Math.abs(hoursLeft) >= 1 ? Math.abs(hoursLeft) + "h" : ""}${
-      minutesLeft <= 0 ? Math.abs(minutesLeft) + 30 : Math.abs(minutesLeft)
-    }min`;
+  if (minutesLeft <= 0) {
+    overtimeWorked = `+${
+      Math.abs(Math.trunc(minutesLeft / 60)) >= 1
+        ? Math.abs(Math.trunc(minutesLeft / 60)) + "h"
+        : ""
+    }${minutesLeft <= 0 ? Math.abs(minutesLeft) + 30 : Math.abs(minutesLeft)}min`;
   }
 
   return indexObject(new Date(), "Clock Out", proposedEndTime, breakEnd, overtimeWorked);
 };
 
 const viewDone = (rows) => {
-  const clockIn = timesheetUtils.buildDateWithTime(rows.day_date, rows.clock_in);
-  const breakIn = timesheetUtils.buildDateWithTime(rows.day_date, rows.break_in);
-  const breakEnd = timesheetUtils.buildDateWithTime(rows.day_date, rows.break_out);
-  const clockOut = timesheetUtils.buildDateWithTime(rows.day_date, rows.clock_out);
-  const timeWorked = new Date(breakIn - clockIn + (clockOut - breakEnd));
-  const totalThreshold = 7 * 60 + 30;
-  const totalMinutesWorked = timeWorked.getHours() * 60 + timeWorked.getMinutes();
-  let overtimeWorked = false;
+  const clockIn = rows.clock_in;
+  const breakIn = rows.break_in;
+  const breakEnd = rows.break_out;
+  const clockOut = rows.clock_out;
+  const minutesWorked = Math.trunc(breakIn - clockIn + (clockOut - breakEnd) / 60000);
+  const minutesLeft = 7 * 60 + 30 - minutesWorked;
+  const hoursLeft = Math.trunc(minutesLeft / 60);
 
-  const sign = totalMinutesWorked > totalThreshold ? "+" : "-";
-  const hours =
-    timeWorked.getHours() - 8 === 0 ? "" : `${Math.abs(timeWorked.getHours() - 8)}h`;
-  const minutes = `${Math.abs(timeWorked.getMinutes() - 30)}min`;
-  overtimeWorked = `${sign}${hours}${minutes}`;
+  const sign = minutesLeft <= 0 ? "+" : "-";
+  const overtime = `${sign}${hoursLeft > 0 ? hoursLeft + "h" : ""}${Math.trunc(
+    minutesLeft % 60,
+  )}min`;
 
-  console.log(overtimeWorked);
-  return indexObject(
-    new Date(),
-    "Done for the day :)",
-    clockOut,
-    breakEnd,
-    overtimeWorked,
-  );
+  return indexObject(new Date(), "Done for the day :)", clockOut, breakEnd, overtime);
 };
 
 const calculateTime = (rows) => {
@@ -141,10 +135,9 @@ const calculateTime = (rows) => {
 };
 
 exports.getIndex = async (req, res, next) => {
-  const rows = await timesheetsModel.selectDay(generalUtils.todayIso(), req.username);
+  const rows = await timesheetsModel.selectDay(new Date(), req.username);
   const options = calculateTime(rows);
   options.username = req.username;
-  console.log(options);
   res.render("timesheets/index", { ...options });
 };
 
@@ -152,15 +145,11 @@ exports.postEnter = async (req, res, next) => {
   if (req.body.action) {
     const now = new Date();
     const username = req.username;
-    const existing = await timesheetsModel.selectDay(generalUtils.todayIso(), username);
+    const existing = await timesheetsModel.selectDay(now, username);
 
     switch (req.body.action) {
       case "Clock In":
-        timesheetsModel.insertClockIn(
-          now,
-          username,
-          now.toLocaleTimeString().substring(0, 5),
-        );
+        timesheetsModel.insertClockIn(now, username);
         res.redirect("/timesheet");
         break;
       case "Break In":
@@ -168,11 +157,7 @@ exports.postEnter = async (req, res, next) => {
           next({ statusCode: 400, msg: `Can't '${req.body.action}' yet` });
           break;
         }
-        timesheetsModel.updateBreakStart(
-          now,
-          username,
-          now.toLocaleTimeString().substring(0, 5),
-        );
+        timesheetsModel.updateBreakStart(now, username, now);
         res.redirect("/timesheet");
         break;
       case "Break End":
@@ -183,11 +168,7 @@ exports.postEnter = async (req, res, next) => {
           next({ statusCode: 400, msg: `Can't '${req.body.action}' before 'Break In'` });
           break;
         }
-        timesheetsModel.updateBreakEnd(
-          now,
-          username,
-          now.toLocaleTimeString().substring(0, 5),
-        );
+        timesheetsModel.updateBreakEnd(now, username, now);
         res.redirect("/timesheet");
         break;
       case "Clock Out":
@@ -195,11 +176,7 @@ exports.postEnter = async (req, res, next) => {
           next({ statusCode: 400, msg: `Can't '${req.body.action}' yet` });
           break;
         }
-        timesheetsModel.updateClockOut(
-          now,
-          username,
-          now.toLocaleTimeString().substring(0, 5),
-        );
+        timesheetsModel.updateClockOut(now, username, now);
         res.redirect("/timesheet");
         break;
       case "Done for the day :)":
@@ -217,23 +194,29 @@ exports.postEnter = async (req, res, next) => {
 exports.getView = async (req, res, next) => {
   const options = {};
   options.username = req.username;
-  options.date = req.query.date ? req.query.date : generalUtils.todayIso();
-
+  options.date = req.query.date ? new Date(req.query.date) : new Date();
   const entry = await timesheetsModel.selectDay(options.date, req.username);
 
   if (entry) {
-    options.clock_in = entry.clock_in.substr(0, 5);
-    options.break_in = entry.break_in ? entry.break_in.substr(0, 5) : null;
-    options.break_out = entry.break_out ? entry.break_out.substr(0, 5) : null;
-    options.clock_out = entry.clock_out ? entry.clock_out.substr(0, 5) : null;
+    options.clock_in = entry.clock_in;
+    options.break_in = entry.break_in ? entry.break_in : null;
+    options.break_out = entry.break_out ? entry.break_out : null;
+    options.clock_out = entry.clock_out ? entry.clock_out : null;
 
-    options.difference = overtime(
-      entry.clock_in,
-      entry.break_in,
-      entry.break_out,
-      entry.clock_out,
+    const timeWorked = timesheetUtils.timeWorked(
+      options.clock_in,
+      options.break_in,
+      options.break_out,
+      options.clock_out,
     );
 
+    const difference = -Math.abs(7.5 * 60 * 60 * 1000 - timeWorked) / 1000;
+    const sign = difference >= 0 ? "+" : "-";
+    let minutes;
+    if (sign === "+") minutes = 60 - Math.ceil((Math.abs(difference) / 60) % 60);
+    else minutes = 60 - Math.floor((Math.abs(difference) / 60) % 60);
+    const hours = Math.floor(Math.abs(difference / 60 / 60));
+    options.difference = `${sign}${hours ? hours + "h" : ""} ${minutes}min`;
     if (!options.clock_out) options.alert = "Day not completed yet";
   }
 
@@ -329,32 +312,4 @@ exports.postEdit = async (req, res, next) => {
   } else res.sendStatus(400);
 
   res.redirect(`/timesheet/edit?date=${args.date}`);
-};
-
-overtime = (clock_in, break_in, break_out, clock_out) => {
-  if (!clock_in || !clock_out) return;
-
-  clock_in = generalUtils.constructUTCDateTime(new Date(), clock_in);
-  clock_out = generalUtils.constructUTCDateTime(new Date(), clock_out);
-
-  let timeWorked = 0;
-  if (!break_in && !break_out) {
-    timeWorked = clock_out - clock_in;
-  } else {
-    break_in = generalUtils.constructUTCDateTime(new Date(), break_in);
-    break_out = generalUtils.constructUTCDateTime(new Date(), break_out);
-    timeWorked = clock_out - break_out + (break_in - clock_in);
-  }
-
-  let millisecondDifference = 7.5 * 60 * 60 * 1000 - timeWorked;
-  const plusMinus = millisecondDifference < 0 ? "+" : "-";
-  millisecondDifference = Math.abs(millisecondDifference);
-
-  const difference = {
-    hours: Math.trunc(millisecondDifference / 60000 / 60),
-    minutes: (millisecondDifference / 60000) % 60,
-  };
-  return difference.hours >= 1
-    ? `${plusMinus}${difference.hours}h${difference.minutes}min`
-    : `${plusMinus}${difference.minutes}min`;
 };

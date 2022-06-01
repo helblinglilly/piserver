@@ -42,8 +42,6 @@ exports.addTime = (startTime, addTime = { hours: 0, minutes: 0 }) => {
     ),
   );
 
-  console.log(startTime.toUTCString(), addTime, copiedDate.toUTCString());
-
   return copiedDate;
 };
 

@@ -1,16 +1,27 @@
-exports.buildDateWithTime = (day_date, hhmm) => {
-  const date = new Date(
-    day_date.getFullYear(),
-    day_date.getMonth(),
-    day_date.getDate(),
-    hhmm.split(":")[0],
-    hhmm.split(":")[1],
+exports.constructUTCDateTime = (day, time) => {
+  if (day === null || time === null) return null;
+  const parts = time.split(":");
+  return new Date(
+    Date.UTC(day.getFullYear(), day.getMonth(), day.getDate(), parts[0], parts[1], 0, 0),
   );
-  date.setHours(date.getHours() - Math.trunc(date.getTimezoneOffset() / 60));
-  date.setMinutes(date.getMinutes() - (date.getTimezoneOffset() % 60));
-  return date;
 };
 
-exports.buildBaseDate = (day_date) => {
-  return new Date(day_date.getFullYear(), day_date.getMonth(), day_date.getDate());
+exports.copyDate = (date) => {
+  return new Date(
+    date.getFullYear(),
+    date.getMonth(),
+    date.getDate(),
+    date.getHours(),
+    date.getMinutes(),
+    0,
+    0,
+  );
+};
+
+exports.timeWorked = (clock_in, break_in, break_out, clock_out) => {
+  if (!break_in && !break_out && !clock_out) return null;
+  if (!break_out && !clock_out) return break_in - clock_in;
+  if (!clock_out) return break_in - clock_in + (break_in - new Date());
+  if (clock_out) return clock_out - break_out + (break_in - clock_in);
+  return null;
 };

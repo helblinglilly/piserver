@@ -44,7 +44,7 @@ exports.seed = async () => {
 
     /*
     format(
-      `INSERT INTO "timesheet" (username, day_date, clock_in, break_in, break_out, clock_out) VALUES ('joel', %L, '13:00', null, null, null);`,
+      `INSERT INTO "timesheet" (username, day_date, clock_in, break_in, break_out, clock_out) VALUES ('joel', %L, '08:00', null, null, null);`,
       utils.todayIso(),
     ),
     format(
@@ -91,25 +91,23 @@ exports.seed = async () => {
   ];
 
   if (env !== "production") {
-    await db.query(`DROP TABLE IF EXISTS timesheet`);
-    await db.query(`DROP TABLE IF EXISTS stopwatch`);
-    await db.query(`DROP TABLE IF EXISTS usertable`);
+    await db.query(`DROP TABLE IF EXISTS timesheet;`);
+    await db.query(`DROP TABLE IF EXISTS stopwatch;`);
+    await db.query(`DROP TABLE IF EXISTS usertable;`);
   }
 
   await db.query(createUsertable);
-  await db.query(createTimesheet);
   await db.query(createStopwatch);
+  await db.query(createTimesheet);
 
   if (env !== "production") {
     for (query of insertTimsheet) {
       await db.query(query);
     }
+
     for (query of insertStopwatch) {
       await db.query(query);
     }
     await db.query("INSERT INTO usertable (ip, username) VALUES ('127.0.0.1', 'joel');");
-  }
-
-  if (env === "test") {
   }
 };

@@ -2,10 +2,7 @@ extend  ../components/header.pug
   
 block append head
     link(rel='stylesheet', href='/static/styles/table-abbreviation.css')
-    script.
-        function handler(e){
-            alert(e.target.value)
-        }
+    script(src='/static/scripts/timesheet/view.js')
     title View timesheet
 
     
@@ -20,8 +17,9 @@ block append body
                 li.is-active
                     a(href="", aria-current="page") View Time
         p.title.is-3 View Time
+        p#date(hidden) #{date}
         form(action="/timesheet/view", method="get", id="view") 
-            input(type='date', name='date', onchange="document.forms['view'].submit();", value=date).input
+            input(id="datepicker" type='date', name='date', onchange="document.forms['view'].submit();", value=`${date}`).input
 
         .container.pt-6
         if locals.alert
@@ -44,10 +42,10 @@ block append body
                     th.abbr +/-
                 tbody
                     tr
-                    td #{clock_in}
-                    td #{break_in}
-                    td #{break_out}
-                    td #{clock_out}
+                    td #{clock_in.toTimeString().split(" ")[0].substring(0, 5)}
+                    td #{break_in ? break_in.toTimeString().split(" ")[0].substring(0, 5) : null}
+                    td #{break_out ? break_out.toTimeString().split(" ")[0].substring(0, 5) : null}
+                    td #{clock_out ? clock_out.toTimeString().split(" ")[0].substring(0, 5) : null}
                     if locals.difference
                         td #{difference}
     

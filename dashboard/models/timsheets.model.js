@@ -1,21 +1,33 @@
 const db = require("../db");
+const utils = require("../utils/timesheet.utils");
 const format = require("pg-format");
 
 exports.selectDay = async (day, username) => {
   return db
     .query(
-      format(`SELECT * FROM timesheet WHERE day_date=%L AND username=%L`, day, username),
+      format(
+        `SELECT * FROM timesheet WHERE day_date=%L AND username=%L`,
+        day.toISOString().split("T")[0],
+        username,
+      ),
     )
-    .then(({ rows }) => rows[0]);
+    .then(({ rows }) => {
+      if (rows.length === 0) return null;
+      rows[0].clock_in = utils.constructUTCDateTime(rows[0].day_date, rows[0].clock_in);
+      rows[0].break_in = utils.constructUTCDateTime(rows[0].day_date, rows[0].break_in);
+      rows[0].break_out = utils.constructUTCDateTime(rows[0].day_date, rows[0].break_out);
+      rows[0].clock_out = utils.constructUTCDateTime(rows[0].day_date, rows[0].clock_out);
+      return rows[0];
+    });
 };
 
-exports.insertClockIn = async (day, username, time) => {
+exports.insertClockIn = async (day, username) => {
   db.query(
     format(
       `INSERT INTO timesheet (day_date, username, clock_in) VALUES (%L, %L, %L)`,
       day,
       username,
-      time,
+      day,
     ),
   ).catch((err) => console.log(err));
 };
