@@ -21,56 +21,66 @@ exports.selectDay = async (day, username) => {
     });
 };
 
-exports.insertClockIn = async (day, username) => {
+exports.insertClockIn = async (dayTime, username) => {
+  dayTime.setSeconds(0);
+  dayTime.setMilliseconds(0);
   db.query(
     format(
       `INSERT INTO timesheet (day_date, username, clock_in) VALUES (%L, %L, %L)`,
-      day,
+      dayTime.toISOString().split("T")[0],
       username,
-      day,
+      dayTime.toISOString().split("T")[1],
     ),
   ).catch((err) => console.log(err));
 };
 
-exports.updateClockIn = async (day, username, time) => {
+exports.updateClockIn = async (dayTime, username) => {
+  dayTime.setSeconds(0);
+  dayTime.setMilliseconds(0);
   db.query(
     format(
       `UPDATE timesheet SET clock_in=%L WHERE day_date=%L AND username=%L`,
-      time,
-      day,
+      dayTime.toISOString().split("T")[1],
+      dayTime.toISOString().split("T")[0],
       username,
     ),
   ).catch((err) => console.log(err));
 };
 
-exports.updateBreakStart = async (day, username, time) => {
+exports.updateBreakStart = async (dayTime, username) => {
+  dayTime.setSeconds(0);
+  dayTime.setMilliseconds(0);
   db.query(
     format(
       `UPDATE timesheet SET break_in=%L WHERE day_date=%L AND username=%L`,
-      time,
-      day,
+      dayTime.toISOString().split("T")[1],
+      dayTime.toISOString().split("T")[0],
       username,
     ),
   ).catch((err) => console.log(err));
 };
 
-exports.updateBreakEnd = async (day, username, time) => {
+exports.updateBreakEnd = async (dayTime, username) => {
+  dayTime.setSeconds(0);
+  dayTime.setMilliseconds(0);
   db.query(
     format(
       `UPDATE timesheet SET break_out=%L WHERE day_date=%L AND username=%L`,
-      time,
-      day,
+      dayTime.toISOString().split("T")[1],
+      dayTime.toISOString().split("T")[0],
       username,
     ),
   ).catch((err) => console.log(err));
 };
 
-exports.updateClockOut = async (day, username, time) => {
+exports.updateClockOut = async (dayTime, username) => {
+  dayTime.setSeconds(0);
+  dayTime.setMilliseconds(0);
   db.query(
     format(
       `UPDATE timesheet SET clock_out=%L WHERE day_date=%L AND username=%L`,
-      time,
-      day,
+      dayTime.toISOString().split("T")[1],
+      dayTime.toISOString().split("T")[0],
       username,
     ),
   ).catch((err) => console.log(err));

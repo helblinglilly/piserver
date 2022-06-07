@@ -247,12 +247,15 @@ exports.postEdit = async (req, res, next) => {
   const username = req.username;
   if (!args.date) res.sendStatus(400);
 
-  const hasEntryYet = await timesheetsModel.selectDay(args.date, username);
+  const hasEntryYet = await timesheetsModel.selectDay(new Date(args.date), username);
 
   // Using update when no entry exists yet will just not write - use insert instead
   if (!hasEntryYet && args.clock_in) {
     if (generalUtils.isShortTime(args.clock_in)) {
-      await timesheetsModel.insertClockIn(args.date, username, args.clock_in);
+      const insertClockInTime = new Date(args.date);
+      insertClockInTime.setHours(args.clock_in.split(":")[0]);
+      insertClockInTime.setMinutes(args.clock_in.split(":")[1]);
+      await timesheetsModel.insertClockIn(insertClockInTime, username);
       res.redirect(`/timesheet/edit?date=${args.date}`);
       return;
     } else {
@@ -276,28 +279,42 @@ exports.postEdit = async (req, res, next) => {
   // Validation complete - just update values
   if (args.clock_in) {
     if (generalUtils.isShortTime(args.clock_in)) {
-      await timesheetsModel.updateClockIn(args.date, username, args.clock_in);
+      const updateClockInTime = new Date(args.date);
+      updateClockInTime.setHours(args.clock_in.split(":")[0]);
+      updateClockInTime.setMinutes(args.clock_in.split(":")[1]);
+
+      await timesheetsModel.updateClockIn(updateClockInTime, username);
     } else {
       res.sendStatus(400);
       return;
     }
   } else if (args.break_in)
     if (generalUtils.isShortTime(args.break_in)) {
-      await timesheetsModel.updateBreakStart(args.date, username, args.break_in);
+      const updateBreakStartTime = new Date(args.date);
+      updateBreakStartTime.setHours(args.break_in.split(":")[0]);
+      updateBreakStartTime.setMinutes(args.break_in.split(":")[1]);
+
+      await timesheetsModel.updateBreakStart(updateBreakStartTime, username);
     } else {
       res.sendStatus(400);
       return;
     }
   else if (args.break_out)
     if (generalUtils.isShortTime(args.break_out)) {
-      await timesheetsModel.updateBreakEnd(args.date, username, args.break_out);
+      const updateBreakOutTime = new Date(args.date);
+      updateBreakOutTime.setHours(args.break_out.split(":")[0]);
+      updateBreakOutTime.setMinutes(args.break_out.split(":")[1]);
+      await timesheetsModel.updateBreakEnd(updateBreakOutTime, username);
     } else {
       res.sendStatus(400);
       return;
     }
   else if (args.clock_out) {
     if (generalUtils.isShortTime(args.clock_out)) {
-      await timesheetsModel.updateClockOut(args.date, username, args.clock_out);
+      const updateClockOut = new Date(args.date);
+      updateClockOut.setHours(args.clock_out.split(":")[0]);
+      updateClockOut.setMinutes(args.clock_out.split(":")[1]);
+      await timesheetsModel.updateClockOut(updateClockOut, username);
     } else {
       res.sendStatus(400);
       return;
