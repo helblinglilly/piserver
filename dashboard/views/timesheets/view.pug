@@ -24,7 +24,7 @@ block append body
         .container.pt-6
         if locals.alert
             .notification.is-warning #{alert}
-        if !locals.clock_in
+        if !clock_in
             .notification No data for this day
         else
             table.table.is-fullwidth
@@ -42,11 +42,11 @@ block append body
                     th.abbr +/-
                 tbody
                     tr
-                    td #{clock_in.toTimeString().split(" ")[0].substring(0, 5)}
-                    td #{break_in ? break_in.toTimeString().split(" ")[0].substring(0, 5) : null}
-                    td #{break_out ? break_out.toTimeString().split(" ")[0].substring(0, 5) : null}
-                    td #{clock_out ? clock_out.toTimeString().split(" ")[0].substring(0, 5) : null}
-                    if locals.difference
-                        td #{difference}
+                        td #{clock_in.toLocaleTimeString().substring(0, 5)}
+                        td #{break_in ? break_in.toLocaleTimeString().substring(0, 5) : null}
+                        td #{break_out ? break_out.toLocaleTimeString().substring(0, 5) : null}
+                        td #{clock_out ? clock_out.toLocaleTimeString().substring(0, 5) : null}
+                        if locals.difference
+                            td #{difference}
     
             
