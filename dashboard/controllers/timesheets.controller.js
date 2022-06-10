@@ -82,8 +82,10 @@ const viewClockOut = (rows) => {
     new Date(),
   );
 
-  const minutesWorked = Math.trunc(breakIn - clockIn + (new Date() - breakEnd) / 60000);
-  const proposedEndTime = new Date(Date.UTC(0, 0, 0, 0, 0, 0, 0));
+  console.log(timeWorked);
+
+  const minutesWorked = Math.trunc(timeWorked / 60000);
+  const proposedEndTime = new Date();
   const minutesLeft = 8 * 60 + 30 - minutesWorked;
   let overtimeWorked = false;
 
