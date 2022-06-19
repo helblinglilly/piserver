@@ -49,8 +49,9 @@ const viewBreakIn = (rows) => {
 const viewBreakEnd = (rows) => {
   const clockIn = rows.clock_in;
   const breakIn = rows.break_in;
-  const minutesWorked = (breakIn - clockIn) / 60000;
+  let minutesWorked = (breakIn - clockIn) / 60000;
   const hoursWorked = Math.trunc(minutesWorked / 60);
+  minutesWorked = minutesWorked - hoursWorked * 60;
 
   let overtimeWorked = false;
 
@@ -82,22 +83,25 @@ const viewClockOut = (rows) => {
     new Date(),
   );
 
-  console.log(timeWorked);
-
   const minutesWorked = Math.trunc(timeWorked / 60000);
   const proposedEndTime = new Date();
-  const minutesLeft = 8 * 60 + 30 - minutesWorked;
+  const minutesLeft = 7 * 60 + 30 - minutesWorked;
   let overtimeWorked = false;
 
   proposedEndTime.setMinutes(new Date().getMinutes() + (minutesLeft % 60));
   proposedEndTime.setHours(new Date().getHours() + Math.trunc(minutesLeft / 60));
 
+  let sign = "-";
+  let displayHours = false;
+  if (minutesLeft > 60 || minutesLeft <= -60) displayHours = true;
+
   if (minutesLeft <= 0) {
-    overtimeWorked = `+${
-      Math.abs(Math.trunc(minutesLeft / 60)) >= 1
-        ? Math.abs(Math.trunc(minutesLeft / 60)) + "h"
-        : ""
-    }${minutesLeft <= 0 ? Math.abs(minutesLeft) + 30 : Math.abs(minutesLeft)}min`;
+    sign = "+";
+    overtimeWorked =
+      sign +
+      `${displayHours ? Math.abs(Math.trunc(minutesLeft / 60)) + "h" : ""}${Math.abs(
+        minutesLeft,
+      )}min`;
   }
 
   return indexObject(new Date(), "Clock Out", proposedEndTime, breakEnd, overtimeWorked);
@@ -108,14 +112,22 @@ const viewDone = (rows) => {
   const breakIn = rows.break_in;
   const breakEnd = rows.break_out;
   const clockOut = rows.clock_out;
-  const minutesWorked = Math.trunc(breakIn - clockIn + (clockOut - breakEnd) / 60000);
+
+  const timeWorked = timesheetUtils.timeWorked(
+    rows.clock_in,
+    rows.break_in,
+    rows.break_out,
+    new Date(),
+  );
+
+  const minutesWorked = Math.trunc(timeWorked / 60000);
   const minutesLeft = 7 * 60 + 30 - minutesWorked;
   const hoursLeft = Math.trunc(minutesLeft / 60);
 
   const sign = minutesLeft <= 0 ? "+" : "-";
-  const overtime = `${sign}${hoursLeft > 0 ? hoursLeft + "h" : ""}${Math.trunc(
-    minutesLeft % 60,
-  )}min`;
+  const displayHours = hoursLeft > 0 ? true : false;
+  const overtime = (overtimeWorked =
+    sign + `${displayHours ? Math.abs(hoursLeft) + "h" : ""}${Math.abs(minutesLeft)}min`);
 
   return indexObject(new Date(), "Done for the day :)", clockOut, breakEnd, overtime);
 };

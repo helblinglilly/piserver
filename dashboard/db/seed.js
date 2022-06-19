@@ -42,16 +42,14 @@ exports.seed = async () => {
     `INSERT INTO timesheet (username, day_date, clock_in, break_in, break_out, clock_out) VALUES ('harry', '2022-01-04', '09:15:00', '13:00:00', '14:00:00', '17:30:00');`,
     `INSERT INTO timesheet (username, day_date, clock_in, break_in, break_out, clock_out) VALUES ('harry', '2022-01-04', '09:45:00', '13:00:00', '14:00:00', '18:15:00');`,
 
-    /*
     format(
-      `INSERT INTO "timesheet" (username, day_date, clock_in, break_in, break_out, clock_out) VALUES ('joel', %L, '08:00', null, null, null);`,
+      `INSERT INTO "timesheet" (username, day_date, clock_in, break_in, break_out, clock_out) VALUES ('joel', %L, '11:30', '13:00', '14:00', null);`,
       utils.todayIso(),
     ),
     format(
       `INSERT INTO "timesheet" (username, day_date, clock_in, break_in, break_out, clock_out) VALUES ('harry', %L, '09:45', null, null, null);`,
       utils.todayIso(),
     ),
-    */
   ];
 
   const insertStopwatch = [
