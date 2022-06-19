@@ -22,16 +22,21 @@ const update = () => {
     elapsed.setHours(elapsed.getHours() + extraHours);
     elapsed.setMinutes(elapsed.getMinutes() + extraMinutes);
     elapsed.setSeconds(elapsed.getSeconds() + extraSeconds);
-    document.getElementById(
-      "total",
-    ).innerHTML = `${elapsed.getHours()}h ${elapsed.getMinutes()}min`;
+    const time = elapsed.toTimeString().split(" ")[0];
+    const hourString = time.split(":")[0] === "00" ? "" : time.split(":")[0] + "h";
+    document.getElementById("total").innerHTML = `${hourString} ${time.split(":")[0]}min`;
   } else if (nextAction === "CONT") {
     elapsed.setHours(elapsed.getHours());
-    document.getElementById(
-      "total",
-    ).innerHTML = `${elapsed.getHours()}h ${elapsed.getMinutes()}min`;
+    const time = elapsed.toTimeString().split(" ");
+    const hourString = time.split(":")[0] === "00" ? "" : time.split(":")[0] + "h";
+
+    document.getElementById("total").innerHTML = `${hourString} ${time.split(":")[1]}min`;
   } else if (nextAction === "START") {
     document.getElementById("total").innerHTML = "Not started";
     document.getElementById("lastEditDisplay").innerHTML = "Have a productive time :)";
   }
+
+  console.log(now);
+  console.log(lastEdit);
+  console.log(elapsed);
 };
