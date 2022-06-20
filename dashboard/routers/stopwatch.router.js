@@ -6,6 +6,9 @@ const userSelection = require("../middleware/user.middleware");
 stopwatchRouter.get("/", userSelection, controller.getRoot);
 stopwatchRouter.all("/", error.methodNotAllowed);
 
+stopwatchRouter.get("/view", userSelection, controller.getView);
+stopwatchRouter.all("/view", error.methodNotAllowed);
+
 stopwatchRouter.post("/start", userSelection, controller.start);
 stopwatchRouter.all("/start", error.methodNotAllowed);
 

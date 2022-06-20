@@ -42,10 +42,10 @@ block append body
                     th.abbr +/-
                 tbody
                     tr
-                        td #{clock_in.toLocaleTimeString().substring(0, 5)}
-                        td #{break_in ? break_in.toLocaleTimeString().substring(0, 5) : null}
-                        td #{break_out ? break_out.toLocaleTimeString().substring(0, 5) : null}
-                        td #{clock_out ? clock_out.toLocaleTimeString().substring(0, 5) : null}
+                        td #{clock_in.toLocaleTimeString().split(":")[0]}:#{clock_in.toLocaleTimeString().split(":")[1]}
+                        td #{break_in ? break_in.toLocaleTimeString().split(":")[0] + ':' + break_in.toLocaleTimeString().split(":")[1]: null}
+                        td #{break_out ? break_out.toLocaleTimeString().split(":")[0] + ':' + break_out.toLocaleTimeString().split(":")[1] : null}
+                        td #{clock_out ? clock_out.toLocaleTimeString().split(":")[0] + ':' + clock_out.toLocaleTimeString().split(":")[1]: null}
                         if locals.difference
                             td #{difference}
     

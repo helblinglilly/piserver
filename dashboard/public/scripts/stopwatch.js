@@ -35,8 +35,4 @@ const update = () => {
     document.getElementById("total").innerHTML = "Not started";
     document.getElementById("lastEditDisplay").innerHTML = "Have a productive time :)";
   }
-
-  console.log(now);
-  console.log(lastEdit);
-  console.log(elapsed);
 };

@@ -85,7 +85,7 @@ const viewClockOut = (rows) => {
 
   const minutesWorked = Math.trunc(timeWorked / 60000);
   const proposedEndTime = new Date();
-  const minutesLeft = 7 * 60 + 30 - minutesWorked;
+  const minutesLeft = 8 * 60 + 30 - minutesWorked;
   let overtimeWorked = false;
 
   proposedEndTime.setMinutes(new Date().getMinutes() + (minutesLeft % 60));

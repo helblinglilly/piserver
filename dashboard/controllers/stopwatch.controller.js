@@ -49,6 +49,10 @@ exports.getRoot = async (req, res, next) => {
   res.render("stopwatch/index", { ...options });
 };
 
+exports.getView = async (req, res, next) => {
+  res.send(200);
+};
+
 exports.start = async (req, res, next) => {
   await stopwatchModel.insert(req.username, new Date(), "START");
   res.redirect("/stopwatch");
