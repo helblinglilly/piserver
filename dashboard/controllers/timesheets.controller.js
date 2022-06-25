@@ -208,7 +208,10 @@ exports.postEnter = async (req, res, next) => {
 exports.getView = async (req, res, next) => {
   const options = {};
   options.username = req.username;
-  options.date = req.query.date ? new Date(req.query.date) : new Date();
+  options.date = req.query.date
+    ? timesheetUtils.constructUTCDateTime(new Date(req.query.date))
+    : new Date();
+
   const entry = await timesheetsModel.selectDay(options.date, req.username);
 
   if (entry) {
@@ -243,7 +246,6 @@ exports.getEdit = async (req, res, next, message = null) => {
   options.date = req.query.date ? new Date(req.query.date) : new Date();
 
   const entry = await timesheetsModel.selectDay(options.date, req.username);
-
   if (entry) {
     options.clock_in = entry.clock_in;
     options.break_in = entry.break_in ? entry.break_in : null;

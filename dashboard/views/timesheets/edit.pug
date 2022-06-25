@@ -30,7 +30,7 @@ block append body
                     .card-header-title Clock In
                     .card-content 
                         form(action="/timesheet/edit", method="post", id="save-clock_in")
-                            input.input(id="input-clock_in", name="clock_in" placeholder="Clock In", value=`${clock_in ? clock_in.toTimeString().split(" ")[0].substring(0, 5) : null}`, readonly, style="color: #c2c2c2", type="time").is-danger
+                            input.input(id="input-clock_in", name="clock_in" placeholder="Clock In", value=`${clock_in ? clock_in.toISOString() : null}`, readonly, style="color: #c2c2c2", type="time").is-danger
                             input(type='hidden', name='date', value=date)
                     .card-footer
                         .card-footer-item(onclick="edit('clock_in')")
@@ -42,7 +42,7 @@ block append body
                     .card-header-title Break Start
                     .card-content 
                         form(action="/timesheet/edit", method="post", id="save-break_in")
-                            input.input(id="input-break_in", name="break_in" placeholder="Break In", value=`${break_in ? break_in.toTimeString().split(" ")[0].substring(0, 5) : null}`, readonly, style="color: #c2c2c2", type="time").is-danger
+                            input.input(id="input-break_in", name="break_in" placeholder="Break In", value=`${break_in ? break_in.toISOString() : null}`, readonly, style="color: #c2c2c2", type="time").is-danger
                             input(type='hidden', name='date', value=date)
                     .card-footer
                         .card-footer-item(onclick="edit('break_in')")
@@ -54,7 +54,7 @@ block append body
                     .card-header-title Break End
                     .card-content 
                         form(action="/timesheet/edit", method="post", id="save-break_out")
-                            input.input(id="input-break_out", name="break_out" placeholder="Break Out", value=`${break_out ? break_out.toTimeString().split(" ")[0].substring(0, 5) : null}`, readonly, style="color: #c2c2c2", type="time").is-danger
+                            input.input(id="input-break_out", name="break_out" placeholder="Break Out", value=`${break_out ? break_out.toISOString() : null}`, readonly, style="color: #c2c2c2", type="time").is-danger
                             input(type='hidden', name='date', value=date)
                     .card-footer
                         .card-footer-item(onclick="edit('break_out')")
@@ -66,7 +66,7 @@ block append body
                     .card-header-title Clock Out
                     .card-content 
                         form(action="/timesheet/edit", method="post", id="save-clock_out")
-                            input.input(id="input-clock_out", name="clock_out" placeholder="Clock Out", value=`${clock_out ? clock_out.toTimeString().split(" ")[0].substring(0, 5) : null}`, readonly, style="color: #c2c2c2", type="time").is-danger
+                            input.input(id="input-clock_out", name="clock_out" placeholder="Clock Out", value=`${clock_out ? clock_out.toISOString() : null}`, readonly, style="color: #c2c2c2", type="time").is-danger
                             input(type='hidden', name='date', value=date)
                     .card-footer
                         .card-footer-item(onclick="edit('clock_out')")

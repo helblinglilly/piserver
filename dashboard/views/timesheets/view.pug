@@ -41,11 +41,11 @@ block append body
                     th.full +/-
                     th.abbr +/-
                 tbody
-                    tr
-                        td #{clock_in.toLocaleTimeString().split(":")[0]}:#{clock_in.toLocaleTimeString().split(":")[1]}
-                        td #{break_in ? break_in.toLocaleTimeString().split(":")[0] + ':' + break_in.toLocaleTimeString().split(":")[1]: null}
-                        td #{break_out ? break_out.toLocaleTimeString().split(":")[0] + ':' + break_out.toLocaleTimeString().split(":")[1] : null}
-                        td #{clock_out ? clock_out.toLocaleTimeString().split(":")[0] + ':' + clock_out.toLocaleTimeString().split(":")[1]: null}
+                    tr  
+                        td#clock_in #{clock_in ? clock_in.toISOString() : ""}
+                        td#break_in #{break_in ? break_in.toISOString() : ""}
+                        td#break_out #{break_out ? break_out.toISOString() : ""}
+                        td#clock_out #{clock_out ? clock_out.toISOString() : ""}
                         if locals.difference
                             td #{difference}
     
