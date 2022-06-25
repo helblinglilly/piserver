@@ -209,7 +209,7 @@ exports.getView = async (req, res, next) => {
   const options = {};
   options.username = req.username;
   options.date = req.query.date
-    ? timesheetUtils.constructUTCDateTime(new Date(req.query.date))
+    ? timesheetUtils.constructUTCDateTime(new Date(req.query.date), "12:00:00")
     : new Date();
 
   const entry = await timesheetsModel.selectDay(options.date, req.username);
