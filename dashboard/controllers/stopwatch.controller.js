@@ -1,14 +1,14 @@
 const stopwatchModel = require("../models/stopwatch.model.js");
+const timesheetUtils = require("../utils/timesheet.utils");
 
 exports.getRoot = async (req, res, next) => {
   const options = {};
   options.username = req.username;
-  options.total = "8 hours 21 minutes";
-  options.lastEdit = "14:25";
-  options.nextAction = "Next Action";
-  options.dayAction = "End day";
 
-  const existing = await stopwatchModel.readByDate(req.username, new Date());
+  const existing = await stopwatchModel.readByDate(
+    req.username,
+    timesheetUtils.constructUTCDateTime(new Date()),
+  );
   if (existing.length === 0) {
     options.total = "Not started";
     options.nextAction = "START";
@@ -38,14 +38,12 @@ exports.getRoot = async (req, res, next) => {
       options.dayActionText = "End day";
     }
     if (last.action) options.total = "Loading";
-
-    const lastEdit = new Date();
-    lastEdit.setHours(Number.parseInt(last.timestamp.split(":")[0]));
-    lastEdit.setMinutes(Number.parseInt(last.timestamp.split(":")[1]));
-    lastEdit.setSeconds(Number.parseInt(last.timestamp.split(":")[2]));
-    options.lastEdit = lastEdit;
+    console.log(last);
+    options.lastEdit = last.timestamp;
   }
   options.elapsed = calculateTimeElapsed(existing);
+
+  console.log(options);
   res.render("stopwatch/index", { ...options });
 };
 

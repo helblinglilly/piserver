@@ -24,7 +24,7 @@ exports.insert = async (username, date, action) => {
       `INSERT INTO stopwatch (username, day_date, timestamp, action) VALUES (%L, %L, %L, %L)`,
       username,
       date.toISOString().split("T")[0],
-      date.toLocaleTimeString(),
+      date.toISOString().split("T")[1].split(".")[0],
       action,
     ),
   );
