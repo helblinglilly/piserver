@@ -5,18 +5,19 @@ exports.getRoot = async (req, res, next) => {
   const options = {};
   options.username = req.username;
 
-  const existing = await stopwatchModel.readByDate(
+  const existingEntry = await stopwatchModel.readByDate(
     req.username,
-    timesheetUtils.constructUTCDateTime(new Date()),
+    timesheetUtils.constructUTCDate(new Date()),
   );
-  if (existing.length === 0) {
-    options.total = "Not started";
+
+  if (existingEntry.length === 0) {
     options.nextAction = "START";
     options.nextActionText = "Start day";
     options.dayAction = "START";
     options.dayActionText = "Start day";
   } else {
-    const last = existing[existing.length - 1];
+    const last = existingEntry[0];
+    console.log("Last", last);
 
     if (last.action === "START") {
       options.nextAction = "STOP";
@@ -37,12 +38,11 @@ exports.getRoot = async (req, res, next) => {
       options.dayAction = "END";
       options.dayActionText = "End day";
     }
-    if (last.action) options.total = "Loading";
-    console.log(last);
+
     options.lastEdit = last.timestamp;
   }
-  options.elapsed = calculateTimeElapsed(existing);
-
+  options.elapsed = calculateTimeElapsed(existingEntry);
+  options.payloadTimestamp = new Date();
   console.log(options);
   res.render("stopwatch/index", { ...options });
 };
@@ -72,32 +72,25 @@ exports.end = async (req, res, next) => {
 };
 
 const calculateTimeElapsed = (arr) => {
-  let previousTimestamp = new Date();
-  let sum = new Date();
-  previousTimestamp.setHours(0);
-  previousTimestamp.setMinutes(0);
-  previousTimestamp.setSeconds(0);
-  sum.setHours(0);
-  sum.setMinutes(0);
-  sum.setSeconds(0);
+  // arr is coming in with the latest entries at the start. [0] = most recent, [n] = oldest
+  let sum = new Date(0); // sum should be a plain count of hh/mm/ss
+  let previousTimestamp = new Date(); // If the only entry is START we need to subtract from NOW
 
   for (const entry of arr) {
-    const segments = entry.timestamp.split(":");
-    const hours = Number.parseInt(segments[0]);
-    const minutes = Number.parseInt(segments[1]);
-    const seconds = Number.parseInt(segments[2]);
+    // Work out how much time has passed since the last entry
+    const millisecondDifference = previousTimestamp - entry.timestamp;
+    const seconds = Math.floor(millisecondDifference / 1000) % 60;
+    const minutes = Math.floor(millisecondDifference / 1000 / 60);
+    const hours = Math.floor(millisecondDifference / 1000 / 60 / 60);
 
-    if (["STOP", "END"].includes(entry.action)) {
-      // Add current timestamp to sum
-      sum.setHours(sum.getHours() + (hours - previousTimestamp.getHours()));
-      sum.setMinutes(sum.getMinutes() + (minutes - previousTimestamp.getMinutes()));
-      sum.setSeconds(sum.getSeconds() + (seconds - previousTimestamp.getSeconds()));
-    } else if (["START", "CONT"].includes(entry.action)) {
-      // Set the previous timestamp to this (START or CONT)
-      previousTimestamp.setHours(hours);
-      previousTimestamp.setMinutes(minutes);
-      previousTimestamp.setSeconds(seconds);
+    // Only increase the sum if we are currently adding time
+    if (["START", "CONT"].includes(entry.action)) {
+      sum.setHours(sum.getHours() + hours);
+      sum.setMinutes(sum.getMinutes() + minutes);
+      sum.setSeconds(sum.getSeconds() + seconds);
     }
+
+    previousTimestamp = entry.timestamp;
   }
   return sum;
 };
