@@ -11,14 +11,11 @@ exports.readByDate = async (username, date) => {
       ),
     )
     .then((result) => {
-      result.rows.forEach(
-        (entry) =>
-          (entry.timestamp = new Date(
-            Date.parse(
-              date.toISOString().split("T")[0] + "T" + entry.timestamp + ".000Z",
-            ),
-          )),
-      );
+      result.rows.forEach((entry) => {
+        return (entry.timestamp = new Date(
+          Date.parse(date.toISOString().split("T")[0] + "T" + entry.timestamp + "Z"),
+        ));
+      });
       return result.rows;
     });
 };
@@ -34,7 +31,7 @@ exports.insert = async (username, date, action) => {
       `INSERT INTO stopwatch (username, day_date, timestamp, action) VALUES (%L, %L, %L, %L)`,
       username,
       date.toISOString().split("T")[0],
-      date.toISOString().split("T")[1].split(".")[0],
+      date.toISOString().split("T")[1],
       action,
     ),
   );
