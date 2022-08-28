@@ -1,3 +1,26 @@
+document.addEventListener("DOMContentLoaded", () => {
+  const date = new Date(document.getElementById("date").innerHTML);
+  const datePicker = document.getElementById("datepicker");
+  datePicker.value = date.toISOString().split("T")[0];
+
+  document.getElementById("input-clock_in").defaultValue = getLocalTime("input-clock_in");
+  document.getElementById("input-break_in").defaultValue = getLocalTime("input-break_in");
+  document.getElementById("input-break_out").defaultValue =
+    getLocalTime("input-break_out");
+  document.getElementById("input-clock_out").defaultValue =
+    getLocalTime("input-clock_out");
+});
+
+getLocalTime = (id) => {
+  const isostring = document.getElementById(id).defaultValue;
+  if (!isostring) return "";
+
+  const localStringFull = new Date(isostring).toLocaleTimeString();
+  const hours = localStringFull.split(":")[0];
+  const minutes = localStringFull.split(":")[1];
+  return `${hours}:${minutes}`;
+};
+
 function edit(action) {
   let editLabel;
   let saveLabel;

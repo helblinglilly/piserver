@@ -2,6 +2,13 @@ extend  ../components/header.pug
 
 block append head
    script(src='/static/scripts/modal.js')
+   script(src="/static/scripts/timesheet/index.js")
+   style.
+    @media screen and (min-width: 769px){
+    #day {
+    float: right;
+    }
+    }
    title Timesheet
 
 block append body
@@ -12,9 +19,18 @@ block append body
                     a(href="/") Home
                 li.is-active
                     a(href="", aria-current="page") Timesheet
-                    
-        .title.is-1 #{day}
-        .title.is-2 #{endTime}
+        p#proposedEndTime(hidden) #{proposedEndTime}
+        p#proposedBreakEndTime(hidden) #{proposedBreakEndTime}
+        p#nextAction(hidden) #{nextAction}
+        p#overtimeStatus(hidden) #{overtimeStatus}
+        p#overtimeWorked(hidden) #{overtimeWorked}
+
+        .columns
+            .column.is-half
+                .title.is-2(hidden).mb-1#breakEnd
+                .title.is-2#status
+            .column.is-half
+                .title.is-2#day #{day}
         .card
             .card-content.js-modal-trigger(data-target='modal-js-example')
                 a.card-text #{nextAction}

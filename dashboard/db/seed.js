@@ -41,16 +41,15 @@ exports.seed = async () => {
     `INSERT INTO timesheet (username, day_date, clock_in, break_in, break_out, clock_out) VALUES ('harry', '2022-01-03', '08:30:00', NULL, NULL, '17:00:00');`,
     `INSERT INTO timesheet (username, day_date, clock_in, break_in, break_out, clock_out) VALUES ('harry', '2022-01-04', '09:15:00', '13:00:00', '14:00:00', '17:30:00');`,
     `INSERT INTO timesheet (username, day_date, clock_in, break_in, break_out, clock_out) VALUES ('harry', '2022-01-04', '09:45:00', '13:00:00', '14:00:00', '18:15:00');`,
-    /*
-		format(
-			`INSERT INTO "timesheet" (username, day_date, clock_in, break_in, break_out, clock_out) VALUES ('joel', %L, '09:00', '13:00', '14:00', null);`,
-			utils.todayIso()
-		),
-		format(
-			`INSERT INTO "timesheet" (username, day_date, clock_in, break_in, break_out, clock_out) VALUES ('harry', %L, '09:45', null, null, null);`,
-			utils.todayIso()
-		),
-		*/
+
+    format(
+      `INSERT INTO "timesheet" (username, day_date, clock_in, break_in, break_out, clock_out) VALUES ('joel', %L, '11:30', '13:00', '14:00', null);`,
+      utils.todayIso(),
+    ),
+    format(
+      `INSERT INTO "timesheet" (username, day_date, clock_in, break_in, break_out, clock_out) VALUES ('harry', %L, '09:45', null, null, null);`,
+      utils.todayIso(),
+    ),
   ];
 
   const insertStopwatch = [
@@ -60,56 +59,53 @@ exports.seed = async () => {
     `INSERT INTO stopwatch (username, day_date, timestamp, action) VALUES ('joel', '2022-01-01', '13:00:00', 'STOP');`,
     `INSERT INTO stopwatch (username, day_date, timestamp, action) VALUES ('joel', '2022-01-01', '14:00:00', 'CONT');`,
     `INSERT INTO stopwatch (username, day_date, timestamp, action) VALUES ('joel', '2022-01-01', '15:00:00', 'END');`,
+
     /*
     format(
-      `INSERT INTO stopwatch_dev (username, day_date, timestamp, action) VALUES ('joel', %L, '09:00:00', 'START');`,
+      `INSERT INTO stopwatch (username, day_date, timestamp, action) VALUES ('joel', %L, '09:00:00', 'START');`,
       utils.todayIso(),
     ),
     format(
-      `INSERT INTO stopwatch_dev (username, day_date, timestamp, action) VALUES ('joel', %L, '09:30:00', 'STOP');`,
+      `INSERT INTO stopwatch (username, day_date, timestamp, action) VALUES ('joel', %L, '09:30:00', 'STOP');`,
       utils.todayIso(),
     ),
     format(
-      `INSERT INTO stopwatch_dev (username, day_date, timestamp, action) VALUES ('joel', %L, '09:35:00', 'CONT');`,
+      `INSERT INTO stopwatch (username, day_date, timestamp, action) VALUES ('joel', %L, '09:35:00', 'CONT');`,
       utils.todayIso(),
     ),
     format(
-      `INSERT INTO stopwatch_dev (username, day_date, timestamp, action) VALUES ('joel', %L, '13:00:00', 'STOP');`,
+      `INSERT INTO stopwatch (username, day_date, timestamp, action) VALUES ('joel', %L, '13:00:00', 'STOP');`,
       utils.todayIso(),
     ),
     format(
-      `INSERT INTO stopwatch_dev (username, day_date, timestamp, action) VALUES ('joel', %L, '13:00:00', 'CONT');`,
+      `INSERT INTO stopwatch (username, day_date, timestamp, action) VALUES ('joel', %L, '13:00:00', 'CONT');`,
       utils.todayIso(),
     ),
     format(
-      `INSERT INTO stopwatch_dev (username, day_date, timestamp, action) VALUES ('joel', %L, '15:00:00', 'END');`,
+      `INSERT INTO stopwatch (username, day_date, timestamp, action) VALUES ('joel', %L, '15:00:00', 'END');`,
       utils.todayIso(),
     ),
     */
   ];
 
-  if (env === "dev" || env === "test") {
-    await db.query(`DROP TABLE IF EXISTS timesheet`);
-    await db.query(`DROP TABLE IF EXISTS stopwatch`);
-    await db.query(`DROP TABLE IF EXISTS usertable`);
+  if (env !== "production") {
+    await db.query(`DROP TABLE IF EXISTS timesheet;`);
+    await db.query(`DROP TABLE IF EXISTS stopwatch;`);
+    await db.query(`DROP TABLE IF EXISTS usertable;`);
   }
 
   await db.query(createUsertable);
-  await db.query(createTimesheet);
   await db.query(createStopwatch);
+  await db.query(createTimesheet);
 
-  if (env === "dev" || env === "test") {
+  if (env !== "production") {
     for (query of insertTimsheet) {
       await db.query(query);
     }
+
     for (query of insertStopwatch) {
       await db.query(query);
     }
-  }
-
-  if (env === "test") {
-    await db.query(
-      "INSERT INTO usertable (ip, username) VALUES ('::ffff:127.0.0.1', 'test');",
-    );
+    await db.query("INSERT INTO usertable (ip, username) VALUES ('127.0.0.1', 'joel');");
   }
 };

@@ -74,6 +74,8 @@ services:
     container_name: castblock
     network_mode: host
     restart: unless-stopped
+    environment:
+      - MUTE_ADS=true
 
   filebrowser:
     image: hurlenko/filebrowser

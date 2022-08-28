@@ -2,10 +2,7 @@ extend  ../components/header.pug
   
 block append head
     link(rel='stylesheet', href='/static/styles/table-abbreviation.css')
-    script.
-        function handler(e){
-            alert(e.target.value)
-        }
+    script(src='/static/scripts/timesheet/view.js')
     title View timesheet
 
     
@@ -20,13 +17,14 @@ block append body
                 li.is-active
                     a(href="", aria-current="page") View Time
         p.title.is-3 View Time
+        p#date(hidden) #{date}
         form(action="/timesheet/view", method="get", id="view") 
-            input(type='date', name='date', onchange="document.forms['view'].submit();", value=date).input
+            input(id="datepicker" type='date', name='date', onchange="document.forms['view'].submit();", value=`${date}`).input
 
         .container.pt-6
         if locals.alert
             .notification.is-warning #{alert}
-        if !locals.clock_in
+        if !clock_in
             .notification No data for this day
         else
             table.table.is-fullwidth
@@ -43,12 +41,12 @@ block append body
                     th.full +/-
                     th.abbr +/-
                 tbody
-                    tr
-                    td #{clock_in}
-                    td #{break_in}
-                    td #{break_out}
-                    td #{clock_out}
-                    if locals.difference
-                        td #{difference}
+                    tr  
+                        td#clock_in #{clock_in ? clock_in.toISOString() : ""}
+                        td#break_in #{break_in ? break_in.toISOString() : ""}
+                        td#break_out #{break_out ? break_out.toISOString() : ""}
+                        td#clock_out #{clock_out ? clock_out.toISOString() : ""}
+                        if locals.difference
+                            td #{difference}
     
             

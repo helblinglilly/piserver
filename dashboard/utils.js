@@ -1,6 +1,5 @@
 const fs = require("fs");
 const axios = require("axios");
-const utils = require("pg/lib/utils");
 
 weekday = () => {
   const dayNames = [
@@ -22,7 +21,7 @@ exports.today = () => {
 
 exports.todayIso = () => {
   const date = new Date();
-  return date.toISOString().substr(0, 10);
+  return date.toISOString().substring(0, 10);
 };
 
 exports.addTime = (startTime, addTime = { hours: 0, minutes: 0 }) => {
@@ -32,9 +31,18 @@ exports.addTime = (startTime, addTime = { hours: 0, minutes: 0 }) => {
   else if (typeof addTime !== "object")
     throw "Invalid Argument - addTime is not an object";
 
-  startTime.setHours(startTime.getHours() + addTime.hours);
-  startTime.setMinutes(startTime.getMinutes() + addTime.minutes);
-  return startTime;
+  var copiedDate = new Date(
+    Date.UTC(
+      startTime.getFullYear(),
+      startTime.getMonth(),
+      startTime.getDate(),
+      startTime.getHours() + addTime.hours,
+      startTime.getMinutes() + addTime.minutes,
+      startTime.getSeconds(),
+    ),
+  );
+
+  return copiedDate;
 };
 
 exports.isShortTime = (allegedTime) => {
@@ -45,26 +53,29 @@ exports.isShortTime = (allegedTime) => {
   return result;
 };
 
-exports.dateTimeToTime = (date) => {
+exports.dateTimetoHourMinute = (date) => {
   if (date === undefined) throw "Invalid Argument - empty";
   else if (typeof date !== "object") throw "Invalid Argument - Not an object";
-  let hours = date.getHours();
-  let minutes = date.getMinutes();
 
-  if (hours < 10) hours = "0" + hours;
-  if (minutes < 10) minutes = "0" + minutes;
-
+  let hours = date.toTimeString().split(":")[0];
+  let minutes = date.toTimeString().split(":")[1];
   return `${hours}:${minutes}`;
 };
 
-exports.constructDateTime = (day, time) => {
+exports.constructUTCDateTime = (day, time) => {
   if (day === undefined || time === undefined) throw "Invalid Argument - empty";
   else if (typeof day !== "object") throw "Invalid Argument - Not an object";
   else if (typeof time !== "string") throw "Invalid Argument - Not a string";
 
-  const dateTime = new Date(day);
-  dateTime.setHours(time.substr(0, 2));
-  dateTime.setMinutes(time.substr(3, 2));
+  const dateTime = new Date(
+    Date.UTC(
+      day.getFullYear(),
+      day.getMonth(),
+      day.getDate(),
+      time.split(":")[0],
+      time.split(":")[1],
+    ),
+  );
   return dateTime;
 };
 
