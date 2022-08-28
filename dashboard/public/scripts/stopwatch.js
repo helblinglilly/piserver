@@ -1,4 +1,5 @@
 let manuallyUpdated = false;
+let refreshMilliseconds = 1000;
 
 document.addEventListener("DOMContentLoaded", () => {
   const lastEdit = new Date(document.getElementById("lastEdit").innerHTML);
@@ -38,7 +39,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   update();
-  setInterval(update, 1000 * 1); // * 10
+  setInterval(update, refreshMilliseconds * 1);
 });
 
 const update = () => {
@@ -88,6 +89,11 @@ const update = () => {
   const hoursDisplay = hoursPassed > 0 ? hoursPassed + "h " : "";
   const minutesDisplay = minutesPassed > 0 ? minutesPassed + "min " : "";
   const secondsDisplay = minutesPassed <= 2 ? secondsPassed + "sec" : "";
+
+  // If seconds are no longer beind displayed, only refresh every 20 seconds
+  if (secondsDisplay === "") {
+    refreshMilliseconds = 20000;
+  }
 
   document.getElementById(
     "total",
