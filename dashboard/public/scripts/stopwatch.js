@@ -39,12 +39,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   update();
   setInterval(update, 1000 * 1); // * 10
-  console.log("initalised");
 });
 
 const update = () => {
   const nextAction = document.getElementById("nextAction").innerHTML;
-  console.log(nextAction);
 
   if (nextAction == "START") {
     const currentTotal = document.getElementById("total").innerHTML;
@@ -70,11 +68,7 @@ const update = () => {
   const now = new Date().toISOString();
 
   // If we are currently running, then we need to manually work out how much to add
-  console.log(manuallyUpdated);
-  if (
-    (["STOP", "END"].includes(nextAction) && !manuallyUpdated) ||
-    (nextAction === "CONT" && manuallyUpdated)
-  ) {
+  if (["STOP", "END"].includes(nextAction) && !manuallyUpdated) {
     const extraMilliseconds = new Date(Date.parse(now)) - payloadTimestamp;
     const extraSeconds = Math.floor(extraMilliseconds / 1000) % 60;
     const extraMinutes = Math.floor(extraMilliseconds / 1000 / 60);
@@ -93,8 +87,7 @@ const update = () => {
 
   const hoursDisplay = hoursPassed > 0 ? hoursPassed + "h " : "";
   const minutesDisplay = minutesPassed > 0 ? minutesPassed + "min " : "";
-  const secondsDisplay = secondsPassed + "sec";
-  //const secondsDisplay = secondsPassed > 0 ? secondsPassed + "sec" : "";
+  const secondsDisplay = minutesPassed <= 2 ? secondsPassed + "sec" : "";
 
   document.getElementById(
     "total",

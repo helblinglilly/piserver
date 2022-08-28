@@ -17,7 +17,6 @@ exports.getRoot = async (req, res, next) => {
     options.dayActionText = "Start day";
   } else {
     const last = existingEntry[0];
-    console.log("Last", last);
 
     if (last.action === "START") {
       options.nextAction = "STOP";
@@ -43,7 +42,6 @@ exports.getRoot = async (req, res, next) => {
   }
   options.elapsed = calculateTimeElapsed(existingEntry);
   options.payloadTimestamp = new Date();
-  console.log(options);
   res.render("stopwatch/index", { ...options });
 };
 

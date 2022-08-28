@@ -1,6 +1,5 @@
 exports.constructUTCDateTime = (day, time) => {
   if (day === null || time === null) return null;
-  console.log(time);
   const parts = time.split(":");
   return new Date(
     Date.UTC(day.getFullYear(), day.getMonth(), day.getDate(), parts[0], parts[1], 0, 0),
