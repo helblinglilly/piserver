@@ -39,6 +39,18 @@ exports.seed = async () => {
     after_tax DECIMAL NOT NULL
   )`;
 
+  const createGas = `CREATE TABLE IF NOT EXISTS gas(
+    id SERIAL PRIMARY KEY,
+    billing_start DATE NOT NULL,
+    billing_end DATE NOT NULL,
+    standing_order_charge_days INTEGER NOT NULL,
+    standing_order_rate DECIMAL NOT NULL,
+    usage_kwh DECIMAL NOT NULL,
+    rate_kwh DECIMAL NOT NULL,
+    pre_tax DECIMAL NOT NULL,
+    after_tax DECIMAL NOT NULL
+  )`;
+
   const insertTimsheet = [
     `INSERT INTO timesheet (username, day_date, clock_in, break_in, break_out, clock_out) VALUES ('joel', '2022-01-01', '09:00:00', '13:00:00', '14:00:00', '17:30:00');`,
     `INSERT INTO timesheet (username, day_date, clock_in, break_in, break_out, clock_out) VALUES ('joel', '2022-01-02', '09:00:00', '13:15:00', '14:15:00', '18:00:00');`,
@@ -78,12 +90,14 @@ exports.seed = async () => {
     await db.query(`DROP TABLE IF EXISTS stopwatch;`);
     await db.query(`DROP TABLE IF EXISTS usertable;`);
     await db.query(`DROP TABLE IF EXISTS energy`);
+    await db.query(`DROP TABLE IF EXISTS gas`);
   }
 
   await db.query(createUsertable);
   await db.query(createStopwatch);
   await db.query(createTimesheet);
   await db.query(createEnergy);
+  await db.query(createGas);
 
   if (env !== "production") {
     for (query of insertTimsheet) {
