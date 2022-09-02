@@ -15,21 +15,22 @@ exports.getInsertElectric = async (req, res, next) => {
   res.render("energy/insert_electric", { ...options });
 };
 
-exports.postInsert = async (req, res, next) => {
-  if (req.body.kind === "electric") await insertElectric(req.body);
-  else if (req.body.kind === "gas") await insertGas(req.body);
-  else {
-    res.send(400);
-    return;
-  }
-  res.redirect("/energy");
+exports.getInsertGas = async (req, res, next) => {
+  const options = {};
+  options.username = req.username;
+  res.render("energy/insert_gas", { ...options });
 };
 
-insertElectric = async (data) => {
+exports.postInsert = async (req, res, next) => {
+  data = req.body;
+
   start_date = new Date(data.start_date);
   end_date = new Date(data.end_date);
 
-  if (start_date > end_date) return;
+  if (start_date > end_date) {
+    res.sendStatus(400, "Start date can't be before end date");
+    return;
+  }
 
   standing_charge_days = parseInt(data.standing_charge_days);
   standing_charge_rate = parseFloat(data.standing_charge_rate);
@@ -42,30 +43,31 @@ insertElectric = async (data) => {
   before_tax = standing_charge + energy_charge;
   after_tax = before_tax * 1.05;
 
-  log = false;
-  if (log) {
-    console.log("Standing order charge days:", standing_charge_days);
-    console.log("Standing order charge rate:", standing_charge_rate);
-    console.log("Standing order charge sum:", standing_charge);
-    console.log("\nEnergy units used:", units_used);
-    console.log("Energy unit price:", unit_price);
-    console.log("Energy charge:", energy_charge);
-    console.log("\nBefore Tax:", before_tax);
-    console.log("After Tax:", after_tax);
+  if (req.body.kind === "electric") {
+    await model.insertEnergyEntry(
+      start_date,
+      end_date,
+      standing_charge_days,
+      standing_charge_rate,
+      units_used,
+      unit_price,
+      before_tax,
+      after_tax,
+    );
+  } else if (req.body.kind === "gas") {
+    await model.insertGasEntry(
+      start_date,
+      end_date,
+      standing_charge_days,
+      standing_charge_rate,
+      units_used,
+      unit_price,
+      before_tax,
+      after_tax,
+    );
+  } else {
+    res.send(400);
+    return;
   }
-
-  await model.insertEnergyEntry(
-    start_date,
-    end_date,
-    standing_charge_days,
-    standing_charge_rate,
-    units_used,
-    unit_price,
-    before_tax,
-    after_tax,
-  );
-};
-
-insertGas = async (data) => {
-  console.log(data);
+  res.redirect("/energy");
 };

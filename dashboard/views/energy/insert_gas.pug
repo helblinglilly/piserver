@@ -29,11 +29,11 @@ block append body
                 li
                     a(href="/energy") Energy
                 li.is-active
-                    a(href="", aria-current="page") Add electricity bill
+                    a(href="", aria-current="page") Add gas bill
 
-        form(action="/energy/insert_electric", method="post", id="electric").mb-6
-            input(name="kind", value="electric" hidden)
-            .title.is-3 Add electricity bill
+        form(action="/energy/insert_gas", method="post", id="gas").mb-6
+            input(name="kind", value="gas" hidden)
+            .title.is-3 Add gas bill
             
             .columns
                 .column
@@ -61,7 +61,7 @@ block append body
                         .card-header-title Standing Charge Rate
                         .card-content
                             .input-group
-                                input(id="standing_charge_rate" type="number", name="standing_charge_rate", value=sc_rate, step="0.01", placeholder="@ 45.96" required).input
+                                input(id="standing_charge_rate" type="number", name="standing_charge_rate", value=sc_rate, step="0.01", placeholder="@ 25.92" required).input
                                 span.input-group-addon p/day
 
             .columns
@@ -70,14 +70,14 @@ block append body
                         .card-header-title kWh used
                         .card-content
                             .input-group
-                                input(id="standing_charge_days" type="number", name="units_used", value=units_used, step="0.01", placeholder="89.51" required).input
+                                input(id="kwh_used" type="number", name="units_used", value=units_used, step="0.01", placeholder="89.51" required).input
                                 span.input-group-addon kWh
                 .column
                     .card
                         .card-header-title kWh rate
                         .card-content
                             .input-group
-                                input(id="standing_charge_rate" type="number", name="unit_price", value=unit_price, step="0.01", placeholder="@ 26.06" required).input
+                                input(id="kwh_rate" type="number", name="unit_price", value=unit_price, step="0.01", placeholder="@ 6.93" required).input
                                 span.input-group-addon p/kWh
             button(type="submit").button.is-fullwidth#submit_button Submit
         

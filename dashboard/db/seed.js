@@ -89,7 +89,7 @@ exports.seed = async () => {
     await db.query(`DROP TABLE IF EXISTS timesheet;`);
     await db.query(`DROP TABLE IF EXISTS stopwatch;`);
     await db.query(`DROP TABLE IF EXISTS usertable;`);
-    await db.query(`DROP TABLE IF EXISTS energy`);
+    await db.query(`DROP TABLE IF EXISTS electric`);
     await db.query(`DROP TABLE IF EXISTS gas`);
   }
 

@@ -8,6 +8,9 @@ energyRouter.get("/", userSelection, ec.getRoot);
 energyRouter.get("/insert_electric", userSelection, ec.getInsertElectric);
 energyRouter.post("/insert_electric", userSelection, ec.postInsert);
 
+energyRouter.get("/insert_gas", userSelection, ec.getInsertGas);
+energyRouter.post("/insert_gas", userSelection, ec.postInsert);
+
 energyRouter.all("/*", error.pageNotFound);
 
 module.exports = energyRouter;

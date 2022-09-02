@@ -29,6 +29,34 @@ exports.insertEnergyEntry = async (
   );
 };
 
+exports.insertGasEntry = async (
+  start_date,
+  end_date,
+  standing_days,
+  standing_rate,
+  usage,
+  rate,
+  pre_tax,
+  after_tax,
+) => {
+  return db.query(
+    format(
+      `INSERT INTO gas 
+      (billing_start, billing_end, standing_order_charge_days, standing_order_rate, usage_kwh, rate_kwh, pre_tax, after_tax)
+      VALUES
+      (%L, %L, %L, %L, %L, %L, %L, %L)`,
+      start_date,
+      end_date,
+      standing_days,
+      standing_rate,
+      usage,
+      rate,
+      pre_tax,
+      after_tax,
+    ),
+  );
+};
+
 exports.selectEnergyEntry = async () => {
   return db
     .query(
