@@ -27,6 +27,18 @@ exports.seed = async () => {
     action VARCHAR(5) NOT NULL
   );`;
 
+  const createEnergy = `CREATE TABLE IF NOT EXISTS energy(
+    id SERIAL PRIMARY KEY,
+    billing_start DATE NOT NULL,
+    billing_end DATE NOT NULL,
+    standing_order_charge_days INTEGER NOT NULL,
+    standing_order_rate DECIMAL NOT NULL,
+    usage_kwh DECIMAL NOT NULL,
+    rate_kwh DECIMAL NOT NULL,
+    pre_tax DECIMAL NOT NULL,
+    after_tax DECIMAL NOT NULL
+  )`;
+
   const insertTimsheet = [
     `INSERT INTO timesheet (username, day_date, clock_in, break_in, break_out, clock_out) VALUES ('joel', '2022-01-01', '09:00:00', '13:00:00', '14:00:00', '17:30:00');`,
     `INSERT INTO timesheet (username, day_date, clock_in, break_in, break_out, clock_out) VALUES ('joel', '2022-01-02', '09:00:00', '13:15:00', '14:15:00', '18:00:00');`,
@@ -59,44 +71,19 @@ exports.seed = async () => {
     `INSERT INTO stopwatch (username, day_date, timestamp, action) VALUES ('joel', '2022-01-01', '13:00:00', 'STOP');`,
     `INSERT INTO stopwatch (username, day_date, timestamp, action) VALUES ('joel', '2022-01-01', '14:00:00', 'CONT');`,
     `INSERT INTO stopwatch (username, day_date, timestamp, action) VALUES ('joel', '2022-01-01', '15:00:00', 'END');`,
-
-    /*
-    format(
-      `INSERT INTO stopwatch (username, day_date, timestamp, action) VALUES ('joel', %L, '09:00:00', 'START');`,
-      utils.todayIso(),
-    ),
-    format(
-      `INSERT INTO stopwatch (username, day_date, timestamp, action) VALUES ('joel', %L, '09:30:00', 'STOP');`,
-      utils.todayIso(),
-    ),
-    format(
-      `INSERT INTO stopwatch (username, day_date, timestamp, action) VALUES ('joel', %L, '09:35:00', 'CONT');`,
-      utils.todayIso(),
-    ),
-    format(
-      `INSERT INTO stopwatch (username, day_date, timestamp, action) VALUES ('joel', %L, '13:00:00', 'STOP');`,
-      utils.todayIso(),
-    ),
-    format(
-      `INSERT INTO stopwatch (username, day_date, timestamp, action) VALUES ('joel', %L, '13:00:00', 'CONT');`,
-      utils.todayIso(),
-    ),
-    format(
-      `INSERT INTO stopwatch (username, day_date, timestamp, action) VALUES ('joel', %L, '15:00:00', 'END');`,
-      utils.todayIso(),
-    ),
-    */
   ];
 
   if (env !== "production") {
     await db.query(`DROP TABLE IF EXISTS timesheet;`);
     await db.query(`DROP TABLE IF EXISTS stopwatch;`);
     await db.query(`DROP TABLE IF EXISTS usertable;`);
+    await db.query(`DROP TABLE IF EXISTS energy`);
   }
 
   await db.query(createUsertable);
   await db.query(createStopwatch);
   await db.query(createTimesheet);
+  await db.query(createEnergy);
 
   if (env !== "production") {
     for (query of insertTimsheet) {
