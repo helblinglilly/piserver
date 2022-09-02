@@ -27,7 +27,7 @@ exports.seed = async () => {
     action VARCHAR(5) NOT NULL
   );`;
 
-  const createEnergy = `CREATE TABLE IF NOT EXISTS energy(
+  const createElectric = `CREATE TABLE IF NOT EXISTS electric(
     id SERIAL PRIMARY KEY,
     billing_start DATE NOT NULL,
     billing_end DATE NOT NULL,
@@ -96,7 +96,7 @@ exports.seed = async () => {
   await db.query(createUsertable);
   await db.query(createStopwatch);
   await db.query(createTimesheet);
-  await db.query(createEnergy);
+  await db.query(createElectric);
   await db.query(createGas);
 
   if (env !== "production") {

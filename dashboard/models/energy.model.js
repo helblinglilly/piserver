@@ -13,7 +13,7 @@ exports.insertEnergyEntry = async (
 ) => {
   return db.query(
     format(
-      `INSERT INTO energy 
+      `INSERT INTO electric 
       (billing_start, billing_end, standing_order_charge_days, standing_order_rate, usage_kwh, rate_kwh, pre_tax, after_tax)
       VALUES
       (%L, %L, %L, %L, %L, %L, %L, %L)`,

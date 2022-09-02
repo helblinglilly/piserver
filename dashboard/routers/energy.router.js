@@ -5,6 +5,9 @@ const userSelection = require("../middleware/user.middleware");
 
 energyRouter.get("/", userSelection, ec.getRoot);
 
+energyRouter.get("/insert_electric", userSelection, ec.getInsertElectric);
+energyRouter.post("/insert_electric", userSelection, ec.postInsert);
+
 energyRouter.all("/*", error.pageNotFound);
 
 module.exports = energyRouter;

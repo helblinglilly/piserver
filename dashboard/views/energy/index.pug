@@ -9,6 +9,14 @@ block append body
                 li.is-active
                     a(href="", aria-current="page") Energy
 
-        form(action="/energy/insert", method="get", id="search").mb-6
-                input.input(type="text" name="search" placeholder="Search for something!" onsubmit="document.forms['search'].submit()")
-                input(type="submit" hidden)
+        .columns
+            .column
+                .title.is-3 Electric
+                .card.mt-6(onclick="location.href='/energy/insert_electric'")
+                    .card-content
+                        figure.container(style="display: flex; align-items: center;")
+                            a.card-text(href='/energy/insert_electric') Insert Electric Bill
+
+
+            .column 
+                .title.is-3 Gas
