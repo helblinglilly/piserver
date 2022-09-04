@@ -99,7 +99,7 @@ exports.getRoot = async (req, res, next) => {
       },
       title: {
         display: true,
-        text: `${startDate.toLocaleDateString()} kWh`,
+        text: `${startDate.toLocaleDateString("en-GB")} kWh`,
       },
     },
   });
@@ -126,7 +126,7 @@ exports.getRoot = async (req, res, next) => {
       },
       title: {
         display: true,
-        text: `${startDate.toLocaleDateString()} kWh`,
+        text: `${startDate.toLocaleDateString("en-GB")} kWh`,
       },
     },
   });
@@ -178,7 +178,7 @@ exports.getBills = async (req, res, next) => {
     standingDataPoint.push(parseFloat(entry.standing_order_rate));
     kWhDataPoint.push(parseFloat(entry.rate_kwh));
     pricesDataPoint.push(parseFloat(entry.after_tax));
-    labels.push(entry.billing_end.toLocaleDateString());
+    labels.push(entry.billing_end.toLocaleDateString("en-GB"));
   });
 
   let highestUsage = Math.max(usageDataPoint);

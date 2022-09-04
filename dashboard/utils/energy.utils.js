@@ -22,7 +22,10 @@ exports.updateReadings = async () => {
   console.log(typeof latestElectricityDate);
   console.log(latestElectricityDate);
 
-  if (latestElectricityDate.toLocaleDateString() == todaysDate.toLocaleDateString()) {
+  if (
+    latestElectricityDate.toLocaleDateString("en-GB") ==
+    todaysDate.toLocaleDateString("en-GB")
+  ) {
     return;
   }
 

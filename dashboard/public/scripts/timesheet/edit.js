@@ -15,7 +15,7 @@ getLocalTime = (id) => {
   const isostring = document.getElementById(id).defaultValue;
   if (!isostring) return "";
 
-  const localStringFull = new Date(isostring).toLocaleTimeString();
+  const localStringFull = new Date(isostring).toLocaleTimeString("en-GB");
   const hours = localStringFull.split(":")[0];
   const minutes = localStringFull.split(":")[1];
   return `${hours}:${minutes}`;

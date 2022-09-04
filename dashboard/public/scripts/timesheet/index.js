@@ -55,5 +55,5 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function toTime(date) {
-  return new Date(date).toLocaleTimeString().substring(0, 5);
+  return new Date(date).toLocaleTimeString("en-GB").substring(0, 5);
 }
