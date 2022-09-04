@@ -1,8 +1,17 @@
 const utils = require("../utils");
 const model = require("../models/energy.model");
 const error = require("./error.controller");
+const energy = require("../utils/energy.utils");
 
 exports.getRoot = async (req, res, next) => {
+  const fromDate = new Date();
+  fromDate.setUTCDate(fromDate.getUTCDate() - 5);
+  fromDate.setHours(0);
+  fromDate.setMinutes(0);
+  fromDate.setSeconds(0);
+  fromDate.setMilliseconds(0);
+  await energy.updateReadingsForDay(fromDate.toISOString());
+
   const options = {};
   options.username = req.username;
 
