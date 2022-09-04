@@ -1,5 +1,9 @@
 extend  ../components/header.pug
 
+block append head
+    script(src='/static/scripts/energy/electricityUsageChart.js')
+    script(src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js')
+
 block append body
     .container.is-max-desktop.pl-6.pr-6
         nav.breadcrumb(aria-label="breadcrumbs")
@@ -17,6 +21,12 @@ block append body
                         figure.container(style="display: flex; align-items: center;")
                             a.card-text(href='/energy/insert_electric') Add electricity bill
 
+                .card.mt-6
+                    .card-header-title Electricty usage at billing date
+                    .card-content
+                        p#electricity_data(hidden) #{electricity_usage_data}
+                        canvas#electricity_usage
+
 
             .column 
                 .title.is-3 Gas
@@ -24,3 +34,8 @@ block append body
                     .card-content
                         figure.container(style="display: flex; align-items: center;")
                             a.card-text(href='/energy/insert_gas') Add gas bill
+                .card.mt-6
+                    .card-header-title Gas usage at billing date
+                    .card-content
+                        p#gas_usage_data(hidden) #{gas_usage_data}
+                        canvas#gas_usage

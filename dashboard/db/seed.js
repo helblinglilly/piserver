@@ -27,7 +27,7 @@ exports.seed = async () => {
     action VARCHAR(5) NOT NULL
   );`;
 
-  const createElectric = `CREATE TABLE IF NOT EXISTS electric(
+  const createElectricBill = `CREATE TABLE IF NOT EXISTS electricity_bill(
     id SERIAL PRIMARY KEY,
     billing_start DATE NOT NULL,
     billing_end DATE NOT NULL,
@@ -39,7 +39,28 @@ exports.seed = async () => {
     after_tax DECIMAL NOT NULL
   )`;
 
-  const createGas = `CREATE TABLE IF NOT EXISTS gas(
+  const createElectricityUsage = `CREATE TABLE IF NOT EXISTS electricity_usage(
+    id SERIAL PRIMARY KEY,
+    usage_kwh DECIMAL NOT NULL,
+    start_date TIMESTAMP WITH TIME ZONE NOT NULL,
+    end_date TIMESTAMP WITH TIME ZONE NOT NULL
+  )`;
+
+  const createGasUsage = `CREATE TABLE IF NOT EXISTS gas_usage(
+    id SERIAL PRIMARY KEY,
+    usage_kwh DECIMAL NOT NULL,
+    start_date TIMESTAMP WITH TIME ZONE NOT NULL,
+    end_date TIMESTAMP WITH TIME ZONE NOT NULL
+  )`;
+
+  const insertElectricBills = [
+    `INSERT INTO electricity_bill
+    (billing_start, billing_end, standing_order_charge_days, standing_order_rate, usage_kwh, rate_kwh, pre_tax, after_tax)
+    VALUES
+    ('2021-09-29', '2021-10-12', 13, 25.54, 44.4, 17.35, 11.02, 11.57)`,
+  ];
+
+  const createGasBill = `CREATE TABLE IF NOT EXISTS gas_bill(
     id SERIAL PRIMARY KEY,
     billing_start DATE NOT NULL,
     billing_end DATE NOT NULL,
@@ -89,15 +110,19 @@ exports.seed = async () => {
     await db.query(`DROP TABLE IF EXISTS timesheet;`);
     await db.query(`DROP TABLE IF EXISTS stopwatch;`);
     await db.query(`DROP TABLE IF EXISTS usertable;`);
-    await db.query(`DROP TABLE IF EXISTS electric`);
-    await db.query(`DROP TABLE IF EXISTS gas`);
+    await db.query(`DROP TABLE IF EXISTS electricity_bill`);
+    await db.query(`DROP TABLE IF EXISTS gas_bill`);
+    await db.query(`DROP TABLE IF EXISTS electricity_usage`);
+    await db.query(`DROP TABLE IF EXISTS gas_bill_usage`);
   }
 
   await db.query(createUsertable);
   await db.query(createStopwatch);
   await db.query(createTimesheet);
-  await db.query(createElectric);
-  await db.query(createGas);
+  await db.query(createElectricBill);
+  await db.query(createGasBill);
+  await db.query(createElectricityUsage);
+  await db.query(createGasUsage);
 
   if (env !== "production") {
     for (query of insertTimsheet) {
@@ -105,6 +130,10 @@ exports.seed = async () => {
     }
 
     for (query of insertStopwatch) {
+      await db.query(query);
+    }
+
+    for (query of insertElectricBills) {
       await db.query(query);
     }
     await db.query("INSERT INTO usertable (ip, username) VALUES ('127.0.0.1', 'joel');");
