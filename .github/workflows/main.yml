@@ -24,7 +24,7 @@ jobs:
 
   docker:
     name: Push Docker Image
-    runs-on: ARM64
+    runs-on: raspberry
     # needs: test
     if: github.event_name == 'pull_request'
     steps:
