@@ -78,7 +78,7 @@ const fetchGasReading = async (
   to = null,
   orderBy = "period",
 ) => {
-  let requestURL = `${baseURL}v1/gas-meter-points/${process.env.OCTOPUS_GAS_MPRN}/meters/${process.env.OCTPUS_GAS_SERIAL}/consumption/`;
+  let requestURL = `${baseURL}v1/gas-meter-points/${process.env.OCTOPUS_GAS_MPRN}/meters/${process.env.OCTOPUS_GAS_SERIAL}/consumption/`;
 
   requestURL += `?page_size=${pageSize}`;
   if (from != null) requestURL += `&period_from=${from}`;
@@ -92,7 +92,7 @@ const genericRequest = async (requestURL) => {
   console.log(requestURL);
   const response = await axios.get(requestURL, {
     auth: {
-      username: process.env.OCOTPUS_API_KEY,
+      username: process.env.OCTOPUS_API_KEY,
       password: baseURL,
     },
   });
