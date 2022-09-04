@@ -16,46 +16,28 @@ const getAppropriatePageSize = (daysToFetch) => {
 };
 
 exports.updateReadings = async () => {
+  const todaysDate = new Date(new Date().toISOString().split("T")[0]);
+  let latestGasDate = await model.selectLatestGasEntry();
   let latestElectricityDate = await model.selectLatestElectricityEntry();
-  if (latestElectricityDate === null) {
-    latestElectricityDate = new Date(process.env.MOVE_IN_DATE).toISOString();
-  } else {
-    latestElectricityDate = new Date(latestElectricityDate).toISOString();
-  }
 
-  if (latestElectricityDate >= new Date(new Date().toISOString().split("T")[0])) {
+  if (latestElectricityDate.toLocaleDateString() == todaysDate.toLocaleDateString()) {
     return;
   }
 
-  console.log(`Retrieving electricity use data since ${latestElectricityDate}`);
-
   const electricityDaysToFetch = utils.daysBetweenTwoDates(
-    new Date(latestElectricityDate),
+    latestElectricityDate,
     new Date(),
   );
   const electricityPageSize = getAppropriatePageSize(electricityDaysToFetch);
-
-  let latestGasDate = await model.selectLatestGasEntry();
-  if (latestGasDate === null) {
-    latestGasDate = new Date(process.env.MOVE_IN_DATE).toISOString();
-  } else {
-    latestGasDate = new Date(latestGasDate).toISOString();
-  }
-
-  if (latestGasDate >= new Date(new Date().toISOString().split("T")[0])) {
-    return;
-  }
-
-  console.log(`Retrieving gas use data since ${latestGasDate}`);
 
   const gasDaysToFetch = utils.daysBetweenTwoDates(new Date(latestGasDate), new Date());
   const gasPageSize = getAppropriatePageSize(gasDaysToFetch);
 
   const electricityData = await fetchElectricityReading(
     electricityPageSize,
-    latestElectricityDate,
+    latestElectricityDate.toISOString(),
   );
-  const gasData = await fetchGasReading(gasPageSize, latestElectricityDate);
+  const gasData = await fetchGasReading(gasPageSize, latestGasDate.toISOString());
 
   electricityData.forEach(async (entry) => {
     await model.insertElectricityEntry(

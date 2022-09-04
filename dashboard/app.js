@@ -7,6 +7,7 @@ const userRouter = require("./routers/user.router");
 const apiRouter = require("./routers/api.router");
 const energyRouter = require("./routers/energy.router");
 const userSelection = require("./middleware/user.middleware");
+const energyUtils = require("./utils/energy.utils");
 
 const app = express();
 app.set("view engine", "pug");
@@ -23,7 +24,8 @@ app.use("/user", userRouter);
 app.use("/api", apiRouter);
 app.use("/energy", energyRouter);
 
-app.get("/", userSelection, (req, res, next) => {
+app.get("/", userSelection, async (req, res, next) => {
+  await energyUtils.updateReadings();
   res.render("home/index", { host: ``, username: req.username });
 });
 

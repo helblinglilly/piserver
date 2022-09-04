@@ -1,0 +1,54 @@
+extend  ../components/header.pug
+
+block append head
+    script(src='/static/scripts/energy/electricityUsageChart.js')
+    script(src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js')
+    title #{mode} Bills
+
+block append body
+    .container.is-max-desktop.pl-6.pr-6
+        nav.breadcrumb(aria-label="breadcrumbs")
+            ul
+                li
+                    a(href="/") Home
+                li
+                    a(href="/energy") Energy
+                li.is-active
+                    a(href="", aria-current="page") View Bills
+
+        .columns
+            .column
+                .title.is-3 #{mode}
+            .column(style="text-align: right")
+                button.button(onclick=`location.href='/energy/bills?mode=${otherMode}'`) Switch to #{otherMode}
+
+        .columns
+            .column
+                .card
+                    .card-header-title
+                        p Standing charge
+                    .card-content
+                        p#standing_charge_data(hidden) #{chart_standing_charge_data}
+                        canvas#standing_charge_chart
+
+            .column
+                .card
+                    .card-header-title
+                        p kWh rate
+                    .card-content
+                        p#kwh_rate_data(hidden) #{chart_kwh_rate_data}
+                        canvas#kwh_rate_chart
+            
+        .card.mt-6
+            .card-header-title
+                p kWh usage
+            .card-content
+                p#usage_data(hidden) #{chart_usage_data}
+                canvas#usage_chart
+
+        .card.mt-6
+            .card-header-title
+                p Pounds charged
+            .card-content
+                p#charged_data(hidden) #{chart_price_data}
+                canvas#charged_data_chart

@@ -7,28 +7,52 @@ exports.getRoot = async (req, res, next) => {
   const options = {};
   options.username = req.username;
 
-  await energy.updateReadings();
+  // await energy.updateReadings();
 
-  const energy_data = await model.selectEnergyBill();
-  const energyData = [];
-  const energyLabels = [];
-  let highestEnergyUsage = 0;
+  res.render("energy/index", { ...options });
+};
 
-  energy_data.forEach((entry) => {
-    energyData.push(entry.usage_kwh);
-    energyLabels.push(entry.billing_end.toLocaleDateString());
+exports.getBills = async (req, res, next) => {
+  const options = {};
+  options.username = req.username;
 
-    if (entry.usage_kwh > highestEnergyUsage) highestEnergyUsage = entry.usage_kwh;
+  let mode = "electric";
+  if (req.query.mode.toLowerCase() === "gas") mode = "gas";
+
+  let raw_data;
+  if (mode === "electric") {
+    raw_data = await model.selectEnergyBill();
+  } else {
+    raw_data = await model.selectGasBill();
+  }
+
+  const usageDataPoint = [];
+  const standingDataPoint = [];
+  const kWhDataPoint = [];
+  const pricesDataPoint = [];
+  const labels = [];
+
+  raw_data.forEach((entry) => {
+    usageDataPoint.push(parseFloat(entry.usage_kwh));
+    standingDataPoint.push(parseFloat(entry.standing_order_rate));
+    kWhDataPoint.push(parseFloat(entry.rate_kwh));
+    pricesDataPoint.push(parseFloat(entry.after_tax));
+    labels.push(entry.billing_end.toLocaleDateString());
   });
 
-  options.electricity_usage_data = JSON.stringify({
+  let highestUsage = Math.max(usageDataPoint);
+  let highestStandingCharge = Math.max(standingDataPoint);
+  let highestkWhRate = Math.max(pricesDataPoint);
+  let highestPrice = Math.max(pricesDataPoint);
+
+  options.chart_usage_data = JSON.stringify({
     data: {
-      labels: energyLabels,
+      labels: labels,
       datasets: [
         {
           pointRadius: 4,
           pointBackgroundColor: "rgb(0,0,255)",
-          data: energyData,
+          data: usageDataPoint,
         },
       ],
     },
@@ -40,46 +64,115 @@ exports.getRoot = async (req, res, next) => {
             display: true,
             ticks: {
               suggestedMin: 0,
-              suggestedMax: highestEnergyUsage + 10,
+              suggestedMax: highestUsage + 10,
             },
           },
         ],
       },
+      title: {
+        display: true,
+        text: "kWh usage at billing date",
+      },
     },
   });
 
-  options.gas_usage_data = JSON.stringify({
+  options.chart_standing_charge_data = JSON.stringify({
     data: {
+      labels: labels,
       datasets: [
         {
           pointRadius: 4,
           pointBackgroundColor: "rgb(0,0,255)",
-          data: [
-            { x: 50, y: 7 },
-            { x: 60, y: 8 },
-            { x: 70, y: 8 },
-            { x: 80, y: 9 },
-            { x: 90, y: 9 },
-            { x: 100, y: 9 },
-            { x: 110, y: 10 },
-            { x: 120, y: 11 },
-            { x: 130, y: 14 },
-            { x: 140, y: 14 },
-            { x: 150, y: 15 },
-          ],
+          data: standingDataPoint,
         },
       ],
     },
     options: {
       legend: { display: false },
       scales: {
-        xAxes: [{ ticks: { min: 40, max: 160 } }],
-        yAxes: [{ ticks: { min: 6, max: 16 } }],
+        yAxes: [
+          {
+            display: true,
+            ticks: {
+              suggestedMin: 0,
+              suggestedMax: highestStandingCharge + 5,
+            },
+          },
+        ],
+      },
+      title: {
+        display: true,
+        text: "Standing charge rate (pennies/day)",
       },
     },
   });
 
-  res.render("energy/index", { ...options });
+  options.chart_kwh_rate_data = JSON.stringify({
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          pointRadius: 4,
+          pointBackgroundColor: "rgb(0,0,255)",
+          data: kWhDataPoint,
+        },
+      ],
+    },
+    options: {
+      legend: { display: false },
+      scales: {
+        yAxes: [
+          {
+            display: true,
+            ticks: {
+              suggestedMin: 0,
+              suggestedMax: highestkWhRate + 5,
+            },
+          },
+        ],
+      },
+      title: {
+        display: true,
+        text: "kWh unit rate",
+      },
+    },
+  });
+
+  options.chart_price_data = JSON.stringify({
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          pointRadius: 4,
+          pointBackgroundColor: "rgb(0,0,255)",
+          data: pricesDataPoint,
+        },
+      ],
+    },
+    options: {
+      legend: { display: false },
+      scales: {
+        yAxes: [
+          {
+            display: true,
+            ticks: {
+              suggestedMin: 0,
+              suggestedMax: highestPrice + 10,
+            },
+          },
+        ],
+      },
+      title: {
+        display: true,
+        text: "Pounds charged",
+      },
+    },
+  });
+
+  options.mode = mode[0].toUpperCase() + mode.slice(1);
+  options.otherMode = mode === "electric" ? "Gas" : "Electric";
+
+  res.render("energy/bills", { ...options });
 };
 
 exports.getInsertElectric = async (req, res, next) => {

@@ -89,12 +89,13 @@ exports.insertElectricityEntry = async (startDate, endDate, usage) => {
   return db.query(
     format(
       `INSERT INTO electricity_usage
-      (start_date, end_date, usage_kwh)
+      (start_date, end_date, usage_kwh, entry_created)
       VALUES
-      (%L, %L, %L)`,
+      (%L, %L, %L, %L)`,
       startDate,
       endDate,
       usage,
+      new Date(),
     ),
   );
 };
@@ -103,26 +104,33 @@ exports.insertGasEntry = async (startDate, endDate, usage) => {
   return db.query(
     format(
       `INSERT INTO gas_usage
-      (start_date, end_date, usage_kwh)
+      (start_date, end_date, usage_kwh, entry_created)
       VALUES
-      (%L, %L, %L)`,
+      (%L, %L, %L, %L)`,
       startDate,
       endDate,
       usage,
+      new Date(),
     ),
   );
 };
 
 exports.selectLatestElectricityEntry = async () => {
   return db
-    .query(format(`SELECT MAX(end_date) FROM electricity_usage`))
+    .query(format(`SELECT MAX(entry_created) FROM electricity_usage`))
     .then((result) => {
-      return result.rows[0].max;
+      if (result.rows[0].max == null) {
+        return new Date(process.env.MOVE_IN_DATE);
+      }
+      return new Date(result.rows[0].max);
     });
 };
 
 exports.selectLatestGasEntry = async () => {
-  return db.query(format(`SELECT MAX(end_date) FROM gas_usage`)).then((result) => {
-    return result.rows[0].max;
+  return db.query(format(`SELECT MAX(entry_created) FROM gas_usage`)).then((result) => {
+    if (result.rows[0].max == null) {
+      return new Date(process.env.MOVE_IN_DATE);
+    }
+    return new Date(result.rows[0].max);
   });
 };

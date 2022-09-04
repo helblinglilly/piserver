@@ -1,19 +1,37 @@
 document.addEventListener("DOMContentLoaded", function () {
-  electricityData = document.getElementById("electricity_data");
-  electricityData = JSON.parse(electricityData.innerHTML);
+  let usageData = document.getElementById("usage_data");
+  usageData = JSON.parse(usageData.innerHTML);
 
-  gasData = document.getElementById("gas_usage_data");
-  gasData = JSON.parse(gasData.innerHTML);
+  let standingChargeData = document.getElementById("standing_charge_data");
+  standingChargeData = JSON.parse(standingChargeData.innerHTML);
 
-  new Chart("electricity_usage", {
+  let kwhChargeData = document.getElementById("kwh_rate_data");
+  kwhChargeData = JSON.parse(kwhChargeData.innerHTML);
+
+  let chargedData = document.getElementById("charged_data");
+  chargedData = JSON.parse(chargedData.innerHTML);
+
+  new Chart("usage_chart", {
     type: "line",
-    data: electricityData.data,
-    options: electricityData.options,
+    data: usageData.data,
+    options: usageData.options,
   });
 
-  new Chart("gas_usage", {
+  new Chart("standing_charge_chart", {
     type: "line",
-    data: gasData.data,
-    options: gasData.options,
+    data: standingChargeData.data,
+    options: standingChargeData.options,
+  });
+
+  new Chart("kwh_rate_chart", {
+    type: "line",
+    data: kwhChargeData.data,
+    options: kwhChargeData.options,
+  });
+
+  new Chart("charged_data_chart", {
+    type: "line",
+    data: chargedData.data,
+    options: chargedData.options,
   });
 });
