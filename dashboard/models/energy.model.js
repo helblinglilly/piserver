@@ -183,6 +183,12 @@ exports.selectLatestElectricityRateAndCharge = async () => {
   `),
     )
     .then((result) => {
+      if (result.rows.length === 0) {
+        return {
+          standing_order_rate: 45.96,
+          rate_kwh: 26.05,
+        };
+      }
       return result.rows[0];
     });
 };
