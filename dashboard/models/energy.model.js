@@ -100,6 +100,44 @@ exports.insertElectricityEntry = async (startDate, endDate, usage) => {
   );
 };
 
+exports.selectElectricityEntry = async (startDate, endDate) => {
+  // select * from electricity_usage where start_date >= '2021-10-01'::date and end_date < '2021-10-05'::date ORDER BY start_date ASC;
+  return db
+    .query(
+      format(
+        `SELECT usage_kwh, start_date, end_date 
+      FROM electricity_usage 
+      WHERE start_date >= %L::date 
+      AND end_date <= %L::date 
+      ORDER BY start_date ASC`,
+        startDate.toISOString(),
+        endDate.toISOString(),
+      ),
+    )
+    .then((result) => {
+      return result.rows;
+    });
+};
+
+exports.selectGasEntry = async (startDate, endDate) => {
+  // select * from electricity_usage where start_date >= '2021-10-01'::date and end_date < '2021-10-05'::date ORDER BY start_date ASC;
+  return db
+    .query(
+      format(
+        `SELECT usage_kwh, start_date, end_date 
+      FROM gas_usage 
+      WHERE start_date >= %L::date 
+      AND end_date <= %L::date 
+      ORDER BY start_date ASC`,
+        startDate.toISOString(),
+        endDate.toISOString(),
+      ),
+    )
+    .then((result) => {
+      return result.rows;
+    });
+};
+
 exports.insertGasEntry = async (startDate, endDate, usage) => {
   return db.query(
     format(
@@ -133,4 +171,18 @@ exports.selectLatestGasEntry = async () => {
     }
     return new Date(result.rows[0].max);
   });
+};
+
+exports.selectLatestElectricityRateAndCharge = async () => {
+  return db
+    .query(
+      format(`SELECT standing_order_rate, rate_kwh
+  FROM electricity_bill
+  ORDER BY billing_end DESC
+  LIMIT 1
+  `),
+    )
+    .then((result) => {
+      return result.rows[0];
+    });
 };

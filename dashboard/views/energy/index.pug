@@ -1,12 +1,12 @@
 extend  ../components/header.pug
 
 block append head
-    script(src='/static/scripts/energy/electricityUsageChart.js')
     script(src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js')
+    script(src='/static/scripts/energy/yesterdayHistoryChart.js')
     title Energy
 
 block append body
-    .container.is-max-desktop.pl-6.pr-6
+    .container.pl-3.pr-3
         nav.breadcrumb(aria-label="breadcrumbs")
             ul
                 li
@@ -14,7 +14,7 @@ block append body
                 li.is-active
                     a(href="", aria-current="page") Energy
 
-        .columns
+        .columns.mb-6
             .column
                 .title.is-3 Electric
                 .card.mt-6(onclick="location.href='/energy/insert_electric'")
@@ -39,3 +39,37 @@ block append body
                     .card-content
                         figure.container(style="display: flex; align-items: center;")
                             a.card-text(href='/energy/bills?mode=gas') View gas bill history
+
+        
+        .title.is-3 Hourly view - Electric
+        .card
+            .card-content
+                form(action="/energy", method="get", id="electric")
+                    input(id="view_date" type="date", name="date", value=`${date}` required).input.mb-2
+                    button(type="submit").button.is-fullwidth#submit_button Submit
+
+       
+        .card.mt-3
+            .card-content
+                .columns
+                    .column.has-text-weight-bold
+                        p #{energy_used}
+                    .column.has-text-right.has-text-weight-bold
+                        p #{energy_charged}
+        .card.mt-3
+            .card-content
+                p#energy_chart_data(hidden) #{energy_chart_data}
+                canvas#electric_history_chart
+
+        .title.is-3.mt-6 Hourly view - Gas
+        .card
+            .card-content
+                .columns
+                    .column.has-text-weight-bold
+                        p #{gas_used}
+                    .column.has-text-right.has-text-weight-bold
+                        p #{gas_charged}
+        .card.mt-3.mb-6
+            .card-content
+                p#gas_chart_data(hidden) #{gas_chart_data}
+                canvas#gas_history_chart

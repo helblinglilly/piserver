@@ -5,7 +5,7 @@ const utils = require("../utils");
 
 const baseURL = "https://api.octopus.energy/";
 const defaultPageSize = 100;
-const maximumPageSize = 100;
+const maximumPageSize = 20000;
 
 const getAppropriatePageSize = (daysToFetch) => {
   const requiredEntries = 24 * 2 * daysToFetch;
