@@ -27,6 +27,11 @@ block append body
                         figure.container(style="display: flex; align-items: center;")
                             a.card-text(href='/energy/bills?mode=electric') View electricity bill history
 
+                .card.mt-3(onclick="location.href='/energy/view?mode=electric'")
+                    .card-content
+                        figure.container(style="display: flex; align-items: center;")
+                            a.card-text(href='/energy/view?mode=electric') View monthly electricity usage
+
 
             .column 
                 .title.is-3 Gas
@@ -45,7 +50,7 @@ block append body
         .card
             .card-content
                 form(action="/energy", method="get", id="electric")
-                    input(id="view_date" type="date", name="date", value=`${date}` required).input.mb-2
+                    input(id="view_date" type="date", name="daily_date", value=`${date}` required).input.mb-2
                     button(type="submit").button.is-fullwidth#submit_button Submit
 
        

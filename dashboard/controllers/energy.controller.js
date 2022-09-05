@@ -11,8 +11,8 @@ exports.getRoot = async (req, res, next) => {
 
   let startDate;
   let endDate;
-  if (req.query.date) {
-    startDate = new Date(req.query.date);
+  if (req.query.daily_date) {
+    startDate = new Date(req.query.daily_date);
     startDate.setDate(startDate.getDate());
     startDate.setHours(0, 0, 0, 0);
 
@@ -314,6 +314,21 @@ exports.getBills = async (req, res, next) => {
   options.otherMode = mode === "electric" ? "Gas" : "Electric";
 
   res.render("energy/bills", { ...options });
+};
+
+exports.getView = async (req, res, next) => {
+  const options = {};
+  options.username = req.username;
+
+  let mode = "electric";
+  if (req.query.mode.toLowerCase() === "gas") mode = "gas";
+
+  let month = new Date();
+  if (req.query.date) {
+    month = new Date(req.query.date);
+  }
+
+  res.render("energy/view", { ...options });
 };
 
 exports.getInsertElectric = async (req, res, next) => {

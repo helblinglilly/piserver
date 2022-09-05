@@ -5,43 +5,46 @@ block append head
 
 block append body
     .container.is-max-desktop.p-6
-      .card(onclick="location.href='http://192.168.0.10:81/admin';")
-        .card-content
-          figure.container(style="display: flex; align-items: center;")
-            img.icon(src='/static/assets/pihole.svg', alt='Pi Hole Icon').mr-1
-            a.card-text Pi Hole
-      .card.mt-6(onclick="location.href='http://192.168.0.10:32400/web/'")
-        .card-content
-          figure.container(style="display: flex; align-items: center;")
-            img.icon(src='/static/assets/plex.png', alt='Plex Logo').mr-1
-            a.card-text(href='http://192.168.0.10:32400/web') Plex
-      .card.mt-6(onclick="location.href='https://192.168.0.10:1234'")
-        .card-content
-          figure.container(style="display: flex; align-items: center;")
-            img.icon(src='/static/assets/docker.png', alt='Portainer Icon').mr-1
-            a.card-text(href='https://192.168.0.10:1234') Portainer
-      .card.mt-6(onclick="location.href='http://192.168.0.10:5000/files/'")
-        .card-content
-          figure.container(style="display: flex; align-items: center;")
-            img.icon(src='/static/assets/files.png', alt='Files Icon').mr-1
-            a.card-text(href='http://192.168.0.10:5000/files/') Files
-      .card.mt-6(onclick="location.href='/timesheet'")
-        .card-content
-          figure.container(style="display: flex; align-items: center;")
-            img.icon(src='/static/assets/clock.png', alt='Clock Icon').mr-1
-            a.card-text Timesheet
-      .card.mt-6(onclick="location.href='/stopwatch'")
-        .card-content
-          figure.container(style="display: flex; align-items: center;")
-            img.icon(src='/static/assets/stopwatch.png', alt='Stopwatch Icon').mr-1
-            a.card-text(href='/stopwatch') Stopwatch
-      .card.mt-6(onclick="location.href='/pokemon'")
-        .card-content
-          figure.container(style="display: flex; align-items: center;")
-            img.icon(src='/static/assets/pokemon.png', alt='Pokeball Icon').mr-1
-            a.card-text(href='/pokemon') Pokemon
-      .card.mt-6(onclick="location.href='/energy'")
-        .card-content
-          figure.container(style="display: flex; align-items: center;")
-            img.icon(src='/static/assets/energy.png', alt='Energy Logo').mr-1
-            a.card-text(href='/energy') Energy
+      .columns
+        .column
+          .card(onclick="location.href='http://192.168.0.10:81/admin';")
+            .card-content
+              figure.container(style="display: flex; align-items: center;")
+                img.icon(src='/static/assets/pihole.svg', alt='Pi Hole Icon').mr-1
+                a.card-text Pi Hole
+          .card.mt-6(onclick="location.href='http://192.168.0.10:5000/files/'")
+            .card-content
+              figure.container(style="display: flex; align-items: center;")
+                img.icon(src='/static/assets/files.png', alt='Files Icon').mr-1
+                a.card-text(href='http://192.168.0.10:5000/files/') Files
+          .card.mt-6(onclick="location.href='http://192.168.0.10:32400/web/'")
+            .card-content
+              figure.container(style="display: flex; align-items: center;")
+                img.icon(src='/static/assets/plex.png', alt='Plex Logo').mr-1
+                a.card-text(href='http://192.168.0.10:32400/web') Plex
+          .card.mt-6(onclick="location.href='https://192.168.0.10:1234'")
+            .card-content
+              figure.container(style="display: flex; align-items: center;")
+                img.icon(src='/static/assets/docker.png', alt='Portainer Icon').mr-1
+                a.card-text(href='https://192.168.0.10:1234') Portainer
+        .column
+          .card(onclick="location.href='/timesheet'")
+            .card-content
+              figure.container(style="display: flex; align-items: center;")
+                img.icon(src='/static/assets/clock.png', alt='Clock Icon').mr-1
+                a.card-text Timesheet
+          .card.mt-6(onclick="location.href='/energy'")
+            .card-content
+              figure.container(style="display: flex; align-items: center;")
+                img.icon(src='/static/assets/energy.png', alt='Energy Logo').mr-1
+                a.card-text(href='/energy') Energy
+          .card.mt-6(onclick="location.href='/stopwatch'")
+            .card-content
+              figure.container(style="display: flex; align-items: center;")
+                img.icon(src='/static/assets/stopwatch.png', alt='Stopwatch Icon').mr-1
+                a.card-text(href='/stopwatch') Stopwatch
+          .card.mt-6(onclick="location.href='/pokemon'")
+            .card-content
+              figure.container(style="display: flex; align-items: center;")
+                img.icon(src='/static/assets/pokemon.png', alt='Pokeball Icon').mr-1
+                a.card-text(href='/pokemon') Pokemon

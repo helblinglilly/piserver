@@ -16,6 +16,9 @@ energyRouter.get("/insert_gas", userSelection, ec.getInsertGas);
 energyRouter.post("/insert_gas", userSelection, ec.postInsert);
 energyRouter.all("/insert_gas", error.methodNotAllowed);
 
+energyRouter.get("/view", userSelection, ec.getView);
+energyRouter.all("/view", error.methodNotAllowed);
+
 energyRouter.all("/*", error.pageNotFound);
 
 module.exports = energyRouter;

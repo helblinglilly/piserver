@@ -1,0 +1,30 @@
+extend  ../components/header.pug
+
+block append head
+    script(src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js')
+    script(src='/static/scripts/energy/yesterdayHistoryChart.js')
+    title View Monthly Energy
+
+block append body
+    .container.pl-3.pr-3
+        nav.breadcrumb(aria-label="breadcrumbs")
+            ul
+                li
+                    a(href="/") Home
+                li
+                    a(href="/energy") Energy
+                li.is-active
+                    a(href="", aria-current="page") View Monthly
+       
+        .card.mt-3
+            .card-content
+                .columns
+                    .column.has-text-weight-bold
+                        p #{date}
+                        p #{energy_used}
+                    .column.has-text-right.has-text-weight-bold
+                        p #{energy_charged}
+        .card.mt-3
+            .card-content
+                p#energy_chart_data(hidden) #{energy_chart_data}
+                canvas#electric_history_chart
