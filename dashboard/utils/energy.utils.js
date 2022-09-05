@@ -111,7 +111,7 @@ const genericRequest = async (requestURL) => {
   return response.data.results;
 };
 
-exports.getDataBetweenDates = async (startDate, endDate, mode) => {
+exports.getDataBetweenDates = async (startDate, endDate, mode, labelMode) => {
   let entries;
 
   if (mode.toLowerCase() === "electric")
@@ -130,11 +130,15 @@ exports.getDataBetweenDates = async (startDate, endDate, mode) => {
       dataPoint.push(parseFloat((dataPoint[dataPoint.length - 1] + usage).toFixed(5)));
     }
 
-    const start_range_time = entry.start_date.toUTCString().split(" ")[4].split(":");
-    const end_range_time = entry.end_date.toUTCString().split(" ")[4].split(":");
+    if (labelMode === "time") {
+      const start_range_time = entry.start_date.toUTCString().split(" ")[4].split(":");
+      const end_range_time = entry.end_date.toUTCString().split(" ")[4].split(":");
 
-    const label = `${start_range_time[0]}:${start_range_time[1]}-${end_range_time[0]}:${end_range_time[1]}`;
-    labels.push(label);
+      const label = `${start_range_time[0]}:${start_range_time[1]}-${end_range_time[0]}:${end_range_time[1]}`;
+      labels.push(label);
+    } else if (labelMode === "date") {
+      labels.push(entry.start_date.toLocaleDateString());
+    }
   });
 
   const chart = {
