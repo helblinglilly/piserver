@@ -55,7 +55,6 @@ exports.seed = async () => {
     PRIMARY KEY(usage_kwh, start_date, end_date)
   )`;
 
-  /*
   const insertElectricBills = `INSERT INTO electricity_bill
     (billing_start, billing_end, standing_order_charge_days, standing_order_rate, usage_kwh, rate_kwh, pre_tax, after_tax)
     VALUES
@@ -72,9 +71,10 @@ exports.seed = async () => {
     ('2022-04-24', '2022-05-23', 30, 45.96, 79.5, 26.05, 24.50, 36.22),
     ('2022-05-24', '2022-06-23', 31, 45.96, 86.4, 26.05, 36.75, 38.59),
     ('2022-06-24', '2022-07-23', 30, 45.96, 87.4, 26.05, 36.56, 38.38),
-    ('2022-07-24', '2022-08-23', 31, 45.96, 89.4, 26.05, 37.54, 39.41)
+    ('2022-07-24', '2022-08-23', 31, 45.96, 89.4, 26.05, 37.54, 39.41),
+    ('2022-08-24', '2022-09-23', 31, 45.96, 89.4, 26.05, 37.54, 39.41)
     `;
-*/
+
   const createGasBill = `CREATE TABLE IF NOT EXISTS gas_bill(
     id SERIAL PRIMARY KEY,
     billing_start DATE NOT NULL,
@@ -87,7 +87,6 @@ exports.seed = async () => {
     after_tax DECIMAL NOT NULL
   )`;
 
-  /*
   const insertGasBills = `INSERT INTO gas_bill
   (billing_start, billing_end, standing_order_charge_days, standing_order_rate, usage_kwh, rate_kwh, pre_tax, after_tax)
   VALUES
@@ -105,7 +104,7 @@ exports.seed = async () => {
   ('2022-06-24', '2022-07-23', 30, 25.92, 83, 6.93, 13.5, 14.18),
   ('2022-07-24', '2022-08-23', 31, 25.92, 60, 6.93, 12.18, 12.70)
   `;
-*/
+
   const insertTimsheet = [
     `INSERT INTO timesheet (username, day_date, clock_in, break_in, break_out, clock_out) VALUES ('joel', '2022-01-01', '09:00:00', '13:00:00', '14:00:00', '17:30:00');`,
     `INSERT INTO timesheet (username, day_date, clock_in, break_in, break_out, clock_out) VALUES ('joel', '2022-01-02', '09:00:00', '13:15:00', '14:15:00', '18:00:00');`,
@@ -146,8 +145,8 @@ exports.seed = async () => {
     await db.query(`DROP TABLE IF EXISTS usertable;`);
     await db.query(`DROP TABLE IF EXISTS electricity_bill`);
     await db.query(`DROP TABLE IF EXISTS gas_bill`);
-    await db.query(`DROP TABLE IF EXISTS electricity_usage`);
-    await db.query(`DROP TABLE IF EXISTS gas_usage`);
+    // await db.query(`DROP TABLE IF EXISTS electricity_usage`);
+    // await db.query(`DROP TABLE IF EXISTS gas_usage`);
   }
 
   await db.query(createUsertable);
@@ -167,8 +166,8 @@ exports.seed = async () => {
       await db.query(query);
     }
 
-    // await db.query(insertElectricBills);
-    // await db.query(insertGasBills);
+    await db.query(insertElectricBills);
+    await db.query(insertGasBills);
 
     await db.query("INSERT INTO usertable (ip, username) VALUES ('127.0.0.1', 'joel');");
   }

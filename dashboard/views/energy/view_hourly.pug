@@ -6,7 +6,7 @@ block append head
     title View Hourly Energy
 
 block append body
-    .container.is-max-desktop.p-6
+    .container.is-max-desktop.pl-6.pr-6
         nav.breadcrumb(aria-label="breadcrumbs")
             ul
                 li
@@ -38,24 +38,11 @@ block append body
                     .card.mt-3
                         .card-content
                             .columns
-                                .column
+                                .column.has-text-weight-bold
                                     p #{energy_used}
-                                .column.has-text-right
+                                .column.has-text-right.has-text-weight-bold
                                     p #{energy_charged}
         .card.mt-3
             .card-content
                 p#chart_data(hidden) #{chart_data}
                 canvas#history_chart
-
-        //- .title.is-3.mt-6 Hourly view - Gas
-        //- .card
-        //-     .card-content
-        //-         .columns
-        //-             .column.has-text-weight-bold
-        //-                 p #{gas_used}
-        //-             .column.has-text-right.has-text-weight-bold
-        //-                 p #{gas_charged}
-        //- .card.mt-3.mb-6
-        //-     .card-content
-        //-         p#gas_chart_data(hidden) #{gas_chart_data}
-        //-         canvas#gas_history_chart

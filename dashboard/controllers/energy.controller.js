@@ -39,74 +39,20 @@ exports.getViewHourly = async (req, res, next) => {
     endDate.setDate(startDate.getDate() + 1);
   }
 
-  let entries;
+  let mode = "";
   if (req.query.mode) {
-    if (req.query.mode.toLowerCase() === "electric")
-      entries = await model.selectElectricityEntry(startDate, endDate);
-  } else {
-    entries = await model.selectGasEntry(startDate, endDate);
-    req.query.mode = "gas";
-  }
+    mode = req.query.mode.toLowerCase() === "electric" ? "electric" : "gas";
+  } else mode = "gas";
 
-  const dataPoint = [];
-  const labels = [];
+  const chartData = await energy.getDataBetweenDates(startDate, endDate, mode);
 
-  entries.forEach((entry) => {
-    const usage = parseFloat(entry.usage_kwh);
-
-    if (dataPoint.length === 0) {
-      dataPoint.push(parseFloat(usage.toFixed(5)));
-    } else {
-      dataPoint.push(parseFloat((dataPoint[dataPoint.length - 1] + usage).toFixed(5)));
-    }
-
-    const start_range_time = entry.start_date.toUTCString().split(" ")[4].split(":");
-    const end_range_time = entry.end_date.toUTCString().split(" ")[4].split(":");
-
-    const label = `${start_range_time[0]}:${start_range_time[1]}-${end_range_time[0]}:${end_range_time[1]}`;
-    labels.push(label);
-  });
-
-  options.chart_data = JSON.stringify({
-    data: {
-      labels: labels,
-      datasets: [
-        {
-          pointRadius: 4,
-          pointBackgroundColor: "rgb(0,0,255)",
-          data: dataPoint,
-        },
-      ],
-    },
-    options: {
-      legend: { display: false },
-      scales: {
-        yAxes: [
-          {
-            display: true,
-          },
-        ],
-      },
-      title: {
-        display: true,
-        text: `${startDate.toLocaleDateString("en-GB")} kWh`,
-      },
-    },
-  });
-
-  options.energy_used = `${dataPoint[dataPoint.length - 1]} kWh`;
-  const meta = await model.selectLatestElectricityRateAndCharge();
-
-  let charge = dataPoint[dataPoint.length - 1] * parseFloat(meta.rate_kwh);
-  charge += parseFloat(meta.standing_order_rate);
-
-  options.charged = "£" + (charge / 100).toFixed(2);
   options.date = startDate.toISOString().split("T")[0];
-
-  options.hasData = dataPoint[dataPoint.length - 1] == undefined ? false : true;
-  options.mode = req.query.mode[0].toUpperCase() + req.query.mode.slice(1);
+  options.mode = mode[0].toUpperCase() + mode.slice(1);
   options.otherMode = options.mode === "Electric" ? "Gas" : "Electric";
-
+  options.hasData = chartData.data[chartData.data.length - 1] == undefined ? false : true;
+  options.chart_data = JSON.stringify(chartData.chart);
+  options.energy_used = chartData.energyUsed;
+  options.energy_charged = chartData.charged;
   res.render("energy/view_hourly", { ...options });
 };
 
@@ -277,13 +223,35 @@ exports.getViewMonthly = async (req, res, next) => {
   const options = {};
   options.username = req.username;
 
-  let mode = "electric";
-  if (req.query.mode.toLowerCase() === "gas") mode = "gas";
+  await energy.updateReadings();
 
-  let month = new Date();
-  if (req.query.date) {
-    month = new Date(req.query.date);
-  }
+  let mode = "";
+  if (req.query.mode) {
+    mode = req.query.mode.toLowerCase() === "electric" ? "electric" : "gas";
+  } else mode = "gas";
+
+  let startDate;
+  let endDate;
+
+  let selectedDate = req.query.daily_rate
+    ? req.query.daily_rate
+    : await model.selectLatestElectricityBillDate();
+
+  const billingDates = await model.selectStartEndBillDatesFromDate(selectedDate);
+
+  const timezoneOffset = new Date(selectedDate).getTimezoneOffset() * 60000;
+  startDate = new Date(new Date(billingDates.billing_start) - timezoneOffset);
+  endDate = new Date(billingDates.billing_end.toISOString());
+
+  const chartData = await energy.getDataBetweenDates(startDate, endDate, mode);
+
+  options.date = endDate.toISOString().split("T")[0];
+  options.mode = mode[0].toUpperCase() + mode.slice(1);
+  options.otherMode = options.mode === "Electric" ? "Gas" : "Electric";
+  options.hasData = chartData.data[chartData.data.length - 1] == undefined ? false : true;
+  options.chart_data = JSON.stringify(chartData.chart);
+  options.energy_used = chartData.energyUsed;
+  options.energy_charged = chartData.charged;
 
   res.render("energy/view_monthly", { ...options });
 };

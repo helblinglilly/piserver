@@ -101,13 +101,24 @@ exports.insertElectricityEntry = async (startDate, endDate, usage) => {
 };
 
 exports.selectElectricityEntry = async (startDate, endDate) => {
+  console.log(
+    format(
+      `SELECT usage_kwh, start_date, end_date 
+  FROM electricity_usage 
+  WHERE start_date <= %L::date 
+  AND end_date >= %L::date 
+  ORDER BY start_date ASC`,
+      startDate.toISOString().split("T")[0] + "T00:00:00Z",
+      endDate.toISOString().split("T")[0] + "T00:00:00Z",
+    ),
+  );
   return db
     .query(
       format(
         `SELECT usage_kwh, start_date, end_date 
       FROM electricity_usage 
-      WHERE start_date >= %L::date 
-      AND end_date <= %L::date 
+      WHERE start_date <= %L::date 
+      AND end_date >= %L::date 
       ORDER BY start_date ASC`,
         startDate.toISOString().split("T")[0] + "T00:00:00Z",
         endDate.toISOString().split("T")[0] + "T00:00:00Z",
@@ -189,5 +200,37 @@ exports.selectLatestElectricityRateAndCharge = async () => {
         };
       }
       return result.rows[0];
+    });
+};
+
+exports.selectStartEndBillDatesFromDate = async (providedDate) => {
+  return db
+    .query(
+      format(
+        `SELECT billing_start, billing_end 
+    FROM electricity_bill
+    WHERE billing_start <= %L::date
+    AND billing_end >= %L::date
+    `,
+        providedDate.toISOString(),
+        providedDate.toISOString(),
+      ),
+    )
+    .then((result) => {
+      return {
+        billing_start: result.rows[0].billing_start,
+        billing_end: result.rows[0].billing_end,
+      };
+    });
+};
+
+exports.selectLatestElectricityBillDate = async () => {
+  return db
+    .query(format(`SELECT MAX(billing_end) FROM electricity_bill`))
+    .then((result) => {
+      if (result.rows[0].max == null) {
+        return new Date(process.env.MOVE_IN_DATE);
+      }
+      return new Date(result.rows[0].max);
     });
 };

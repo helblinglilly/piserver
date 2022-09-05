@@ -110,3 +110,69 @@ const genericRequest = async (requestURL) => {
 
   return response.data.results;
 };
+
+exports.getDataBetweenDates = async (startDate, endDate, mode) => {
+  let entries;
+
+  if (mode.toLowerCase() === "electric")
+    entries = await model.selectElectricityEntry(startDate, endDate);
+  else entries = await model.selectGasEntry(startDate, endDate);
+
+  const dataPoint = [];
+  const labels = [];
+
+  entries.forEach((entry) => {
+    const usage = parseFloat(entry.usage_kwh);
+
+    if (dataPoint.length === 0) {
+      dataPoint.push(parseFloat(usage.toFixed(5)));
+    } else {
+      dataPoint.push(parseFloat((dataPoint[dataPoint.length - 1] + usage).toFixed(5)));
+    }
+
+    const start_range_time = entry.start_date.toUTCString().split(" ")[4].split(":");
+    const end_range_time = entry.end_date.toUTCString().split(" ")[4].split(":");
+
+    const label = `${start_range_time[0]}:${start_range_time[1]}-${end_range_time[0]}:${end_range_time[1]}`;
+    labels.push(label);
+  });
+
+  const chart = {
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          pointRadius: 4,
+          pointBackgroundColor: "rgb(0,0,255)",
+          data: dataPoint,
+        },
+      ],
+    },
+    options: {
+      legend: { display: false },
+      scales: {
+        yAxes: [
+          {
+            display: true,
+          },
+        ],
+      },
+      title: {
+        display: true,
+        text: `${startDate.toLocaleDateString("en-GB")} kWh`,
+      },
+    },
+  };
+
+  const meta = await model.selectLatestElectricityRateAndCharge();
+  let charge = dataPoint[dataPoint.length - 1] * parseFloat(meta.rate_kwh);
+  charge += parseFloat(meta.standing_order_rate);
+
+  return {
+    data: dataPoint,
+    labels: labels,
+    chart: chart,
+    energyUsed: `${dataPoint[dataPoint.length - 1]} kWh`,
+    charged: "£" + (charge / 100).toFixed(2),
+  };
+};

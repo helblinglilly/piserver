@@ -6,7 +6,7 @@ block append head
     title View Monthly Energy
 
 block append body
-    .container.pl-3.pr-3
+    .container.is-max-desktop.pl-6.pr-6
         nav.breadcrumb(aria-label="breadcrumbs")
             ul
                 li
@@ -16,15 +16,35 @@ block append body
                 li.is-active
                     a(href="", aria-current="page") View Monthly
        
+        .columns
+            .column
+                .title.is-3 #{mode} billing cycle view
+            .column(style="text-align: right")
+                button.button(onclick=`location.href='/energy/view_monthly?mode=${otherMode}'`) Switch to #{otherMode}
+
+        .columns    
+            .column
+                .card.mt-3
+                    .card-content
+                        form(action=`/energy/view_monthly`, method="get", id="electric")
+                            input(id="mode", name="mode", value=`${mode}` hidden)
+                            input(id="view_date" type="date", name="daily_date", value=`${date}` required).input.mb-2
+                            button(type="submit").button.is-fullwidth#submit_button Submit
+
+            .column
+                if hasData === false
+                    .card.mt-3
+                        .card-content
+                            p No data
+                else 
+                    .card.mt-3
+                        .card-content
+                            .columns
+                                .column.has-text-weight-bold
+                                    p #{energy_used}
+                                .column.has-text-right.has-text-weight-bold
+                                    p #{energy_charged}
         .card.mt-3
             .card-content
-                .columns
-                    .column.has-text-weight-bold
-                        p #{date}
-                        p #{energy_used}
-                    .column.has-text-right.has-text-weight-bold
-                        p #{energy_charged}
-        .card.mt-3
-            .card-content
-                p#energy_chart_data(hidden) #{energy_chart_data}
-                canvas#electric_history_chart
+                p#chart_data(hidden) #{chart_data}
+                canvas#history_chart
