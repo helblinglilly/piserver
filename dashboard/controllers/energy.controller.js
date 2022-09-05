@@ -9,82 +9,72 @@ exports.getRoot = async (req, res, next) => {
 
   await energy.updateReadings();
 
+  res.render("energy/index", { ...options });
+};
+
+exports.getViewHourly = async (req, res, next) => {
+  const options = {};
+  options.username = req.username;
+
+  await energy.updateReadings();
+
   let startDate;
   let endDate;
+
   if (req.query.daily_date) {
-    startDate = new Date(req.query.daily_date);
+    const timezoneOffset = new Date(req.query.daily_date).getTimezoneOffset() * 60000;
+
+    startDate = new Date(new Date(req.query.daily_date) - timezoneOffset);
     startDate.setDate(startDate.getDate());
-    startDate.setHours(0, 0, 0, 0);
 
     endDate = new Date(startDate.toISOString());
-    endDate.setDate(endDate.getDate() + 1);
-    endDate.setHours(0, 0, 0, 0);
+    endDate.setDate(startDate.getDate() + 1);
   } else {
-    startDate = new Date();
-    startDate.setDate(startDate.getDate() - 1);
-    startDate.setHours(0, 0, 0, 0);
+    const timezoneOffset = new Date().getTimezoneOffset() * 60000;
 
-    endDate = new Date();
-    endDate.setHours(0, 0, 0, 0);
+    startDate = new Date(new Date() - timezoneOffset);
+    startDate.setDate(startDate.getDate());
+
+    endDate = new Date(startDate.toISOString());
+    endDate.setDate(startDate.getDate() + 1);
   }
 
-  const electricity_entries = await model.selectElectricityEntry(startDate, endDate);
-  const gas_entries = await model.selectGasEntry(startDate, endDate);
+  let entries;
+  if (req.query.mode) {
+    if (req.query.mode.toLowerCase() === "electric")
+      entries = await model.selectElectricityEntry(startDate, endDate);
+  } else {
+    entries = await model.selectGasEntry(startDate, endDate);
+    req.query.mode = "gas";
+  }
 
-  const electricityDataPoint = [];
-  const electricityLabels = [];
+  const dataPoint = [];
+  const labels = [];
 
-  const gasDataPoint = [];
-  const gasLabels = [];
-
-  electricity_entries.forEach((entry) => {
+  entries.forEach((entry) => {
     const usage = parseFloat(entry.usage_kwh);
 
-    if (electricityDataPoint.length === 0) {
-      electricityDataPoint.push(parseFloat(usage.toFixed(5)));
-      aggregate = true;
+    if (dataPoint.length === 0) {
+      dataPoint.push(parseFloat(usage.toFixed(5)));
     } else {
-      electricityDataPoint.push(
-        parseFloat(
-          (electricityDataPoint[electricityDataPoint.length - 1] + usage).toFixed(5),
-        ),
-      );
+      dataPoint.push(parseFloat((dataPoint[dataPoint.length - 1] + usage).toFixed(5)));
     }
 
     const start_range_time = entry.start_date.toUTCString().split(" ")[4].split(":");
     const end_range_time = entry.end_date.toUTCString().split(" ")[4].split(":");
 
     const label = `${start_range_time[0]}:${start_range_time[1]}-${end_range_time[0]}:${end_range_time[1]}`;
-    electricityLabels.push(label);
+    labels.push(label);
   });
 
-  gas_entries.forEach((entry) => {
-    const usage = parseFloat(entry.usage_kwh);
-
-    if (gasDataPoint.length === 0) {
-      gasDataPoint.push(parseFloat(usage.toFixed(5)));
-      aggregate = true;
-    } else {
-      gasDataPoint.push(
-        parseFloat((gasDataPoint[gasDataPoint.length - 1] + usage).toFixed(5)),
-      );
-    }
-
-    const start_range_time = entry.start_date.toUTCString().split(" ")[4].split(":");
-    const end_range_time = entry.end_date.toUTCString().split(" ")[4].split(":");
-
-    const label = `${start_range_time[0]}:${start_range_time[1]}-${end_range_time[0]}:${end_range_time[1]}`;
-    gasLabels.push(label);
-  });
-
-  options.energy_chart_data = JSON.stringify({
+  options.chart_data = JSON.stringify({
     data: {
-      labels: electricityLabels,
+      labels: labels,
       datasets: [
         {
           pointRadius: 4,
           pointBackgroundColor: "rgb(0,0,255)",
-          data: electricityDataPoint,
+          data: dataPoint,
         },
       ],
     },
@@ -104,53 +94,20 @@ exports.getRoot = async (req, res, next) => {
     },
   });
 
-  options.gas_chart_data = JSON.stringify({
-    data: {
-      labels: gasLabels,
-      datasets: [
-        {
-          pointRadius: 4,
-          pointBackgroundColor: "rgb(0,0,255)",
-          data: gasDataPoint,
-        },
-      ],
-    },
-    options: {
-      legend: { display: false },
-      scales: {
-        yAxes: [
-          {
-            display: true,
-          },
-        ],
-      },
-      title: {
-        display: true,
-        text: `${startDate.toLocaleDateString("en-GB")} kWh`,
-      },
-    },
-  });
+  options.energy_used = `${dataPoint[dataPoint.length - 1]} kWh`;
+  const meta = await model.selectLatestElectricityRateAndCharge();
 
-  options.energy_used = `${electricityDataPoint[electricityDataPoint.length - 1]} kWh`;
-  const electricityMeta = await model.selectLatestElectricityRateAndCharge();
+  let charge = dataPoint[dataPoint.length - 1] * parseFloat(meta.rate_kwh);
+  charge += parseFloat(meta.standing_order_rate);
 
-  options.gas_used = `${gasDataPoint[gasDataPoint.length - 1]} kWh`;
-  const gasMeta = await model.selectLatestElectricityRateAndCharge();
+  options.charged = "£" + (charge / 100).toFixed(2);
+  options.date = startDate.toISOString().split("T")[0];
 
-  let electricityCharge =
-    electricityDataPoint[electricityDataPoint.length - 1] *
-    parseFloat(electricityMeta.rate_kwh);
-  electricityCharge += parseFloat(electricityMeta.standing_order_rate);
+  options.hasData = dataPoint[dataPoint.length - 1] == undefined ? false : true;
+  options.mode = req.query.mode[0].toUpperCase() + req.query.mode.slice(1);
+  options.otherMode = options.mode === "Electric" ? "Gas" : "Electric";
 
-  let gasCharge = gasDataPoint[gasDataPoint.length - 1] * parseFloat(gasMeta.rate_kwh);
-  gasCharge += parseFloat(gasMeta.standing_order_rate);
-
-  options.energy_charged = "£" + electricityCharge / 100;
-  options.gas_charged = "£" + parseFloat((gasCharge / 100).toFixed(5));
-
-  options.date = endDate.toISOString().split("T")[0];
-
-  res.render("energy/index", { ...options });
+  res.render("energy/view_hourly", { ...options });
 };
 
 exports.getBills = async (req, res, next) => {
@@ -316,7 +273,7 @@ exports.getBills = async (req, res, next) => {
   res.render("energy/bills", { ...options });
 };
 
-exports.getView = async (req, res, next) => {
+exports.getViewMonthly = async (req, res, next) => {
   const options = {};
   options.username = req.username;
 
@@ -328,7 +285,7 @@ exports.getView = async (req, res, next) => {
     month = new Date(req.query.date);
   }
 
-  res.render("energy/view", { ...options });
+  res.render("energy/view_monthly", { ...options });
 };
 
 exports.getInsertElectric = async (req, res, next) => {

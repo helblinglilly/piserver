@@ -19,8 +19,6 @@ exports.updateReadings = async () => {
   const todaysDate = new Date(new Date().toISOString().split("T")[0]);
   let latestGasDate = await model.selectLatestGasEntry();
   let latestElectricityDate = await model.selectLatestElectricityEntry();
-  console.log(typeof latestElectricityDate);
-  console.log(latestElectricityDate);
 
   if (
     latestElectricityDate.toLocaleDateString("en-GB") ==

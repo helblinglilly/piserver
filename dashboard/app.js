@@ -26,6 +26,7 @@ app.use("/energy", energyRouter);
 
 app.get("/", userSelection, async (req, res, next) => {
   await energyUtils.updateReadings();
+  // Get electricity and gas charges since the last bill was entered
   res.render("home/index", { host: ``, username: req.username });
 });
 

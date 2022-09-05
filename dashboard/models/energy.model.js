@@ -101,7 +101,6 @@ exports.insertElectricityEntry = async (startDate, endDate, usage) => {
 };
 
 exports.selectElectricityEntry = async (startDate, endDate) => {
-  // select * from electricity_usage where start_date >= '2021-10-01'::date and end_date < '2021-10-05'::date ORDER BY start_date ASC;
   return db
     .query(
       format(
@@ -110,8 +109,8 @@ exports.selectElectricityEntry = async (startDate, endDate) => {
       WHERE start_date >= %L::date 
       AND end_date <= %L::date 
       ORDER BY start_date ASC`,
-        startDate.toISOString(),
-        endDate.toISOString(),
+        startDate.toISOString().split("T")[0] + "T00:00:00Z",
+        endDate.toISOString().split("T")[0] + "T00:00:00Z",
       ),
     )
     .then((result) => {
