@@ -201,14 +201,14 @@ exports.chartDataForDay = async (startDate, endDate, mode) => {
   });
 
   const chart = generateChart(title, dataPoints, labels);
-  let charge = dataPoints[dataPoints.length - 1] * parseFloat(meta.rate_kwh);
+  let charge = energyUsed * parseFloat(meta.rate_kwh / 100);
 
   return {
     data: dataPoints,
     labels: labels,
     chart: chart,
     energyUsed: `${energyUsed.toFixed(2)} kWh`,
-    charged: "£" + (charge / 100).toFixed(2),
+    charged: "£" + charge.toFixed(2),
     rate: `@${meta.rate_kwh}p/kWh`,
   };
 };
