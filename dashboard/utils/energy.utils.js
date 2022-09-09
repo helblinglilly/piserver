@@ -156,7 +156,7 @@ exports.chartDataForDateRange = async (startDate, endDate, mode) => {
     }
   });
 
-  const chart = generateChart(title, dataPoints, labels, highestValue);
+  const chart = generateChart(title, dataPoints, labels, highestValue, "kWh");
   let totalUsage = dataPoints.reduce((rolling, val) => rolling + val, 0);
   let charge = totalUsage * parseFloat(meta.rate_kwh);
 
@@ -206,7 +206,7 @@ exports.chartDataForDay = async (startDate, endDate, mode) => {
     labels.push(label);
   });
 
-  const chart = generateChart(title, dataPoints, labels, highestValue);
+  const chart = generateChart(title, dataPoints, labels, highestValue, "kWh");
   let charge = energyUsed * parseFloat(meta.rate_kwh / 100);
 
   return {
@@ -219,7 +219,7 @@ exports.chartDataForDay = async (startDate, endDate, mode) => {
   };
 };
 
-const generateChart = (title, data, labels, max) => {
+const generateChart = (title, data, labels, max, yName) => {
   return {
     data: {
       labels: labels,
@@ -240,6 +240,10 @@ const generateChart = (title, data, labels, max) => {
             ticks: {
               max: max,
               min: 0,
+            },
+            scaleLabel: {
+              display: true,
+              labelString: yName,
             },
           },
         ],
