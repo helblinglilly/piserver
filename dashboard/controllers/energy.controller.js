@@ -239,11 +239,17 @@ exports.getViewMonthly = async (req, res, next) => {
 
   const billingDates = await model.selectStartEndBillDatesFromDate(selectedDate);
 
+  const dayMilliseconds = 86400000;
   const timezoneOffset = new Date(selectedDate).getTimezoneOffset() * 60000;
+
   startDate = new Date(new Date(billingDates.billing_start) - timezoneOffset);
-  endDate = new Date(billingDates.billing_end.toISOString());
+  endDate = new Date(
+    new Date(billingDates.billing_end) - timezoneOffset + dayMilliseconds * 2,
+  );
 
   const chartData = await energy.chartDataForDateRange(startDate, endDate, mode);
+
+  endDate = new Date(new Date(endDate) - dayMilliseconds);
 
   options.date = endDate.toISOString().split("T")[0];
   options.mode = mode[0].toUpperCase() + mode.slice(1);
@@ -252,6 +258,7 @@ exports.getViewMonthly = async (req, res, next) => {
   options.chart_data = JSON.stringify(chartData.chart);
   options.energy_used = chartData.energyUsed;
   options.energy_charged = chartData.charged;
+  options.rate = chartData.rate;
 
   res.render("energy/view_monthly", { ...options });
 };

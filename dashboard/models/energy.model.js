@@ -122,7 +122,7 @@ exports.selectElectricityEntry = async (startDate, endDate) => {
     .query(
       format(
         `SELECT usage_kwh, start_date, end_date 
-    FROM gas_usage 
+    FROM electricity_usage 
     WHERE start_date >= %L::date 
     AND end_date <= %L::date 
     ORDER BY start_date ASC`,
@@ -209,6 +209,26 @@ exports.selectLatestElectricityRateAndCharge = async () => {
     .query(
       format(`SELECT standing_order_rate, rate_kwh
   FROM electricity_bill
+  ORDER BY billing_end DESC
+  LIMIT 1
+  `),
+    )
+    .then((result) => {
+      if (result.rows.length === 0) {
+        return {
+          standing_order_rate: 45.96,
+          rate_kwh: 26.05,
+        };
+      }
+      return result.rows[0];
+    });
+};
+
+exports.selectLatestGasRateAndCharge = async () => {
+  return db
+    .query(
+      format(`SELECT standing_order_rate, rate_kwh
+  FROM gas_bill
   ORDER BY billing_end DESC
   LIMIT 1
   `),

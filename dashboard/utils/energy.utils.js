@@ -4,7 +4,7 @@ const model = require("../models/energy.model");
 const utils = require("../utils");
 
 const baseURL = "https://api.octopus.energy/";
-const defaultPageSize = 100;
+const defaultPageSize = 500;
 const maximumPageSize = 20000;
 
 const getAppropriatePageSize = (daysToFetch) => {
@@ -18,9 +18,8 @@ const getAppropriatePageSize = (daysToFetch) => {
 exports.updateReadings = async () => {
   const todaysDate = new Date(new Date().toISOString().split("T")[0]);
   let latestGasDate = await model.selectLatestGasEntry();
+  // Gas entries are usually a bit delayed
   let latestElectricityDate = await model.selectLatestElectricityEntry();
-
-  console.log(latestElectricityDate);
 
   if (
     latestElectricityDate.toLocaleDateString("en-GB") ==
@@ -56,7 +55,8 @@ exports.updateReadings = async () => {
     await model.insertGasEntry(
       entry.interval_start,
       entry.interval_end,
-      entry.consumption,
+      // Gas comes in m^3, we need to convert it to kWh
+      (entry.consumption * 1.02264 * 40.1) / 3.6,
     );
   });
 };
@@ -116,10 +116,15 @@ const genericRequest = async (requestURL) => {
 exports.chartDataForDateRange = async (startDate, endDate, mode) => {
   let entries;
   let title = `${startDate.toLocaleDateString()}-${endDate.toLocaleDateString()}`;
+  let meta;
 
-  if (mode.toLowerCase() === "electric")
+  if (mode.toLowerCase() === "electric") {
     entries = await model.selectElectricityEntry(startDate, endDate);
-  else entries = await model.selectGasEntry(startDate, endDate);
+    meta = await model.selectLatestElectricityRateAndCharge();
+  } else {
+    entries = await model.selectGasEntry(startDate, endDate);
+    meta = await model.selectLatestGasRateAndCharge();
+  }
 
   const dataPoints = [];
   const labels = [];
@@ -128,7 +133,7 @@ exports.chartDataForDateRange = async (startDate, endDate, mode) => {
   let dailyUsage = 0.0;
 
   entries.forEach((entry, i) => {
-    const day = utils.weekdays.short[entry.start_date.getDay()];
+    const day = utils.weekdays.short[entry.start_date.getUTCDay()];
     const date = entry.start_date.getUTCDate();
     const month = entry.start_date.getUTCMonth() + 1;
     const entryDate = `${day} ${date}/${month}`;
@@ -143,23 +148,22 @@ exports.chartDataForDateRange = async (startDate, endDate, mode) => {
       currentDateString = entryDate;
     } else {
       dailyUsage += parseFloat(entry.usage_kwh);
-      // console.log(entryDate, dailyUsage, entry.usage_kwh);
     }
   });
 
-  console.log(dataPoints, labels);
   const chart = generateChart(title, dataPoints, labels);
 
-  const meta = await model.selectLatestElectricityRateAndCharge();
-  let charge = dataPoints[dataPoints.length - 1] * parseFloat(meta.rate_kwh);
-  charge += parseFloat(meta.standing_order_rate);
+  let totalUsage = dataPoints.reduce((rolling, val) => rolling + val, 0);
+
+  let charge = totalUsage * parseFloat(meta.rate_kwh);
 
   return {
     data: dataPoints,
     labels: labels,
     chart: chart,
-    energyUsed: `${dataPoints[dataPoints.length - 1]} kWh`,
+    energyUsed: `${totalUsage.toFixed(2)} kWh`,
     charged: "£" + (charge / 100).toFixed(2),
+    rate: `@${meta.rate_kwh}p/kWh`,
   };
 };
 

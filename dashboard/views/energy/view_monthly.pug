@@ -42,8 +42,12 @@ block append body
                             .columns
                                 .column.has-text-weight-bold
                                     p #{energy_used}
+                                .column
+                                    p #{rate}
                                 .column.has-text-right.has-text-weight-bold
                                     p #{energy_charged}
+                            .has-text-centered
+                                p Does not include tax or standing charge
         .card.mt-3
             .card-content
                 p#chart_data(hidden) #{chart_data}
