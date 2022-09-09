@@ -44,7 +44,7 @@ exports.getViewHourly = async (req, res, next) => {
     mode = req.query.mode.toLowerCase() === "electric" ? "electric" : "gas";
   } else mode = "gas";
 
-  const chartData = await energy.getDataBetweenDates(startDate, endDate, mode, "time");
+  const chartData = await energy.chartDataForDay(startDate, endDate, mode);
 
   options.date = startDate.toISOString().split("T")[0];
   options.mode = mode[0].toUpperCase() + mode.slice(1);
@@ -233,8 +233,8 @@ exports.getViewMonthly = async (req, res, next) => {
   let startDate;
   let endDate;
 
-  let selectedDate = req.query.daily_rate
-    ? req.query.daily_rate
+  let selectedDate = req.query.daily_date
+    ? new Date(req.query.daily_date)
     : await model.selectLatestElectricityBillDate();
 
   const billingDates = await model.selectStartEndBillDatesFromDate(selectedDate);
@@ -243,7 +243,7 @@ exports.getViewMonthly = async (req, res, next) => {
   startDate = new Date(new Date(billingDates.billing_start) - timezoneOffset);
   endDate = new Date(billingDates.billing_end.toISOString());
 
-  const chartData = await energy.getDataBetweenDates(startDate, endDate, mode, "date");
+  const chartData = await energy.chartDataForDateRange(startDate, endDate, mode);
 
   options.date = endDate.toISOString().split("T")[0];
   options.mode = mode[0].toUpperCase() + mode.slice(1);

@@ -1,6 +1,10 @@
 const fs = require("fs");
 const axios = require("axios");
 
+exports.weekdays = {
+  short: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+  long: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+};
 weekday = () => {
   const dayNames = [
     "Sunday",

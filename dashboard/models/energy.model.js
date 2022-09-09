@@ -11,6 +11,7 @@ exports.insertElectricityBill = async (
   pre_tax,
   after_tax,
 ) => {
+  console.log("Insert");
   return db.query(
     format(
       `INSERT INTO electricity_bill 
@@ -86,42 +87,47 @@ exports.selectGasBill = async () => {
 };
 
 exports.insertElectricityEntry = async (startDate, endDate, usage) => {
-  return db.query(
-    format(
-      `INSERT INTO electricity_usage
-      (start_date, end_date, usage_kwh, entry_created)
-      VALUES
-      (%L, %L, %L, %L)`,
-      startDate,
-      endDate,
-      usage,
-      new Date(),
-    ),
-  );
+  const createdDate = new Date();
+  try {
+    await db.query(
+      format(
+        `INSERT INTO electricity_usage
+        (start_date, end_date, usage_kwh, entry_created)
+        VALUES
+        (%L, %L, %L, %L)`,
+        startDate,
+        endDate,
+        usage,
+        createdDate,
+      ),
+    );
+  } catch (exception) {
+    console.log(exception);
+    await db.query(
+      format(
+        `DELETE FROM electricity_usage 
+        WHERE (start_date=%L, end_date=%L, usage_kwh=%L, entry_created=%L)`,
+        startDate,
+        endDate,
+        usage,
+        createdDate,
+      ),
+    );
+    await this.insertElectricityEntry(startDate, endDate, usage);
+  }
 };
 
 exports.selectElectricityEntry = async (startDate, endDate) => {
-  console.log(
-    format(
-      `SELECT usage_kwh, start_date, end_date 
-  FROM electricity_usage 
-  WHERE start_date <= %L::date 
-  AND end_date >= %L::date 
-  ORDER BY start_date ASC`,
-      startDate.toISOString().split("T")[0] + "T00:00:00Z",
-      endDate.toISOString().split("T")[0] + "T00:00:00Z",
-    ),
-  );
   return db
     .query(
       format(
         `SELECT usage_kwh, start_date, end_date 
-      FROM electricity_usage 
-      WHERE start_date <= %L::date 
-      AND end_date >= %L::date 
-      ORDER BY start_date ASC`,
-        startDate.toISOString().split("T")[0] + "T00:00:00Z",
-        endDate.toISOString().split("T")[0] + "T00:00:00Z",
+    FROM gas_usage 
+    WHERE start_date >= %L::date 
+    AND end_date <= %L::date 
+    ORDER BY start_date ASC`,
+        startDate.toISOString(),
+        endDate.toISOString(),
       ),
     )
     .then((result) => {
@@ -130,7 +136,6 @@ exports.selectElectricityEntry = async (startDate, endDate) => {
 };
 
 exports.selectGasEntry = async (startDate, endDate) => {
-  // select * from electricity_usage where start_date >= '2021-10-01'::date and end_date < '2021-10-05'::date ORDER BY start_date ASC;
   return db
     .query(
       format(
@@ -149,18 +154,34 @@ exports.selectGasEntry = async (startDate, endDate) => {
 };
 
 exports.insertGasEntry = async (startDate, endDate, usage) => {
-  return db.query(
-    format(
-      `INSERT INTO gas_usage
-      (start_date, end_date, usage_kwh, entry_created)
-      VALUES
-      (%L, %L, %L, %L)`,
-      startDate,
-      endDate,
-      usage,
-      new Date(),
-    ),
-  );
+  const createdDate = new Date();
+  try {
+    await db.query(
+      format(
+        `INSERT INTO gas_usage
+        (start_date, end_date, usage_kwh, entry_created)
+        VALUES
+        (%L, %L, %L, %L)`,
+        startDate,
+        endDate,
+        usage,
+        createdDate,
+      ),
+    );
+  } catch (exception) {
+    console.log(exception);
+    await db.query(
+      format(
+        `DELETE FROM gas_usage 
+        WHERE (start_date=%L, end_date=%L, usage_kwh=%L, entry_created=%L)`,
+        startDate,
+        endDate,
+        usage,
+        createdDate,
+      ),
+    );
+    await this.insertGasEntry(startDate, endDate, usage);
+  }
 };
 
 exports.selectLatestElectricityEntry = async () => {
@@ -211,6 +232,7 @@ exports.selectStartEndBillDatesFromDate = async (providedDate) => {
     FROM electricity_bill
     WHERE billing_start <= %L::date
     AND billing_end >= %L::date
+    ORDER BY billing_start
     `,
         providedDate.toISOString(),
         providedDate.toISOString(),

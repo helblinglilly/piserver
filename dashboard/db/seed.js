@@ -40,7 +40,7 @@ exports.seed = async () => {
   )`;
 
   const createElectricityUsage = `CREATE TABLE IF NOT EXISTS electricity_usage(
-    usage_kwh DECIMAL NOT NULL,
+    usage_kwh REAL NOT NULL,
     start_date TIMESTAMP WITH TIME ZONE NOT NULL,
     end_date TIMESTAMP WITH TIME ZONE NOT NULL,
     entry_created DATE NOT NULL,
@@ -48,7 +48,7 @@ exports.seed = async () => {
   )`;
 
   const createGasUsage = `CREATE TABLE IF NOT EXISTS gas_usage(
-    usage_kwh DECIMAL NOT NULL,
+    usage_kwh REAL NOT NULL,
     start_date TIMESTAMP WITH TIME ZONE NOT NULL,
     end_date TIMESTAMP WITH TIME ZONE NOT NULL,
     entry_created DATE NOT NULL,

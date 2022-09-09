@@ -13,6 +13,9 @@ module.exports.initialise = () => {
         password: process.env.POSTGRES_PASSWORD,
       });
 
+      var types = require("pg").types;
+      types.setTypeParser(1700, "text", parseFloat);
+
       await dbClient.connect();
       const dbQuery = await dbClient.query(`SELECT FROM pg_database WHERE datname = $1`, [
         `${process.env.POSTGRES_DATABASE}_${env}`,
