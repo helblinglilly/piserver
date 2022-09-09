@@ -115,7 +115,9 @@ const genericRequest = async (requestURL) => {
 
 exports.chartDataForDateRange = async (startDate, endDate, mode) => {
   let entries;
-  let title = `${startDate.toLocaleDateString()}-${endDate.toLocaleDateString()}`;
+  let title = `${startDate.toLocaleDateString("en-GB")}-${endDate.toLocaleDateString(
+    "en-GB",
+  )}`;
   let meta;
 
   if (mode.toLowerCase() === "electric") {

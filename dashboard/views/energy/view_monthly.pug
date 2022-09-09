@@ -20,7 +20,7 @@ block append body
             .column
                 .title.is-3 #{mode} billing cycle view
             .column(style="text-align: right")
-                button.button(onclick=`location.href='/energy/view_monthly?mode=${otherMode}'`) Switch to #{otherMode}
+                button.button(onclick=`location.href='/energy/view_monthly?mode=${otherMode}&daily_date=${new Date(new Date(date) - 86400000)}'`) Switch to #{otherMode}
 
         .columns    
             .column

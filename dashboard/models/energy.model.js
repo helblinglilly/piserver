@@ -259,9 +259,12 @@ exports.selectStartEndBillDatesFromDate = async (providedDate) => {
       ),
     )
     .then((result) => {
+      const start =
+        result.rows[0] != undefined ? result.rows[0].billing_start : new Date();
+      const end = result.rows[0] != undefined ? result.rows[0].billing_end : new Date();
       return {
-        billing_start: result.rows[0].billing_start,
-        billing_end: result.rows[0].billing_end,
+        billing_start: start,
+        billing_end: end,
       };
     });
 };
