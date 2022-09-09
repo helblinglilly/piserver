@@ -17,9 +17,9 @@ const getAppropriatePageSize = (daysToFetch) => {
 
 exports.updateReadings = async () => {
   const todaysDate = new Date(new Date().toISOString().split("T")[0]);
-  let latestGasDate = await model.selectLatestGasEntry();
+  let latestGasDate = await model.selectLatestGasEntryInsert();
   // Gas entries are usually a bit delayed
-  let latestElectricityDate = await model.selectLatestElectricityEntry();
+  let latestElectricityDate = await model.selectLatestElectricityEntryInsert();
 
   if (
     latestElectricityDate.toLocaleDateString("en-GB") ==
@@ -154,9 +154,7 @@ exports.chartDataForDateRange = async (startDate, endDate, mode) => {
   });
 
   const chart = generateChart(title, dataPoints, labels);
-
   let totalUsage = dataPoints.reduce((rolling, val) => rolling + val, 0);
-
   let charge = totalUsage * parseFloat(meta.rate_kwh);
 
   return {
@@ -171,21 +169,28 @@ exports.chartDataForDateRange = async (startDate, endDate, mode) => {
 
 exports.chartDataForDay = async (startDate, endDate, mode) => {
   let entries;
+  let title = `${startDate.toLocaleDateString("en-GB")}`;
+  let meta;
 
-  if (mode.toLowerCase() === "electric")
+  if (mode.toLowerCase() === "electric") {
     entries = await model.selectElectricityEntry(startDate, endDate);
-  else entries = await model.selectGasEntry(startDate, endDate);
+    meta = await model.selectLatestElectricityRateAndCharge();
+  } else {
+    entries = await model.selectGasEntry(startDate, endDate);
+    meta = await model.selectLatestGasRateAndCharge();
+  }
 
-  const dataPoint = [];
+  const dataPoints = [];
   const labels = [];
+  let energyUsed = 0.0;
 
-  entries.forEach((entry) => {
+  entries.forEach((entry, i) => {
     const usage = parseFloat(entry.usage_kwh);
 
-    if (dataPoint.length === 0) {
-      dataPoint.push(parseFloat(usage.toFixed(5)));
-    } else {
-      dataPoint.push(parseFloat((dataPoint[dataPoint.length - 1] + usage).toFixed(5)));
+    if (i === 0) dataPoints.push(parseFloat(usage.toFixed(5)));
+    else {
+      dataPoints.push(parseFloat((dataPoints[dataPoints.length - 1] + usage).toFixed(5)));
+      energyUsed += usage;
     }
 
     const start_range_time = entry.start_date.toUTCString().split(" ")[4].split(":");
@@ -195,22 +200,16 @@ exports.chartDataForDay = async (startDate, endDate, mode) => {
     labels.push(label);
   });
 
-  const chart = generateChart(
-    `${startDate.toLocaleDateString("en-GB")} kWh`,
-    dataPoint,
-    labels,
-  );
-
-  const meta = await model.selectLatestElectricityRateAndCharge();
-  let charge = dataPoint[dataPoint.length - 1] * parseFloat(meta.rate_kwh);
-  charge += parseFloat(meta.standing_order_rate);
+  const chart = generateChart(title, dataPoints, labels);
+  let charge = dataPoints[dataPoints.length - 1] * parseFloat(meta.rate_kwh);
 
   return {
-    data: dataPoint,
+    data: dataPoints,
     labels: labels,
     chart: chart,
-    energyUsed: `${dataPoint[dataPoint.length - 1]} kWh`,
+    energyUsed: `${energyUsed.toFixed(2)} kWh`,
     charged: "£" + (charge / 100).toFixed(2),
+    rate: `@${meta.rate_kwh}p/kWh`,
   };
 };
 

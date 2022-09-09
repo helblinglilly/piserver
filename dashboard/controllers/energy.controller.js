@@ -18,6 +18,11 @@ exports.getViewHourly = async (req, res, next) => {
 
   await energy.updateReadings();
 
+  let mode = "";
+  if (req.query.mode) {
+    mode = req.query.mode.toLowerCase() === "electric" ? "electric" : "gas";
+  } else mode = "gas";
+
   let startDate;
   let endDate;
 
@@ -30,19 +35,12 @@ exports.getViewHourly = async (req, res, next) => {
     endDate = new Date(startDate.toISOString());
     endDate.setDate(startDate.getDate() + 1);
   } else {
-    const timezoneOffset = new Date().getTimezoneOffset() * 60000;
-
-    startDate = new Date(new Date() - timezoneOffset);
-    startDate.setDate(startDate.getDate());
+    if (mode === "gas") startDate = await model.selectLatestGasEntry();
+    else startDate = await model.selectLatestElectricityEntry();
 
     endDate = new Date(startDate.toISOString());
     endDate.setDate(startDate.getDate() + 1);
   }
-
-  let mode = "";
-  if (req.query.mode) {
-    mode = req.query.mode.toLowerCase() === "electric" ? "electric" : "gas";
-  } else mode = "gas";
 
   const chartData = await energy.chartDataForDay(startDate, endDate, mode);
 
@@ -53,6 +51,7 @@ exports.getViewHourly = async (req, res, next) => {
   options.chart_data = JSON.stringify(chartData.chart);
   options.energy_used = chartData.energyUsed;
   options.energy_charged = chartData.charged;
+  options.rate = chartData.rate;
   res.render("energy/view_hourly", { ...options });
 };
 

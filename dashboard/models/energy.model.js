@@ -184,7 +184,7 @@ exports.insertGasEntry = async (startDate, endDate, usage) => {
   }
 };
 
-exports.selectLatestElectricityEntry = async () => {
+exports.selectLatestElectricityEntryInsert = async () => {
   return db
     .query(format(`SELECT MAX(entry_created) FROM electricity_usage`))
     .then((result) => {
@@ -195,13 +195,33 @@ exports.selectLatestElectricityEntry = async () => {
     });
 };
 
-exports.selectLatestGasEntry = async () => {
+exports.selectLatestGasEntryInsert = async () => {
   return db.query(format(`SELECT MAX(entry_created) FROM gas_usage`)).then((result) => {
     if (result.rows[0].max == null) {
       return new Date(process.env.MOVE_IN_DATE);
     }
     return new Date(result.rows[0].max);
   });
+};
+
+exports.selectLatestGasEntry = async () => {
+  return db.query(format(`SELECT MAX(start_date) FROM gas_usage`)).then((result) => {
+    if (result.rows[0].max == null) {
+      return new Date(process.env.MOVE_IN_DATE);
+    }
+    return new Date(result.rows[0].max);
+  });
+};
+
+exports.selectLatestElectricityEntry = async () => {
+  return db
+    .query(format(`SELECT MAX(start_date) FROM electricity_usage`))
+    .then((result) => {
+      if (result.rows[0].max == null) {
+        return new Date(process.env.MOVE_IN_DATE);
+      }
+      return new Date(result.rows[0].max);
+    });
 };
 
 exports.selectLatestElectricityRateAndCharge = async () => {
