@@ -115,6 +115,7 @@ const genericRequest = async (requestURL) => {
 
 exports.chartDataForDateRange = async (startDate, endDate, mode) => {
   let entries;
+  let highestValue;
   let title = `${startDate.toLocaleDateString("en-GB")}-${endDate.toLocaleDateString(
     "en-GB",
   )}`;
@@ -123,9 +124,11 @@ exports.chartDataForDateRange = async (startDate, endDate, mode) => {
   if (mode.toLowerCase() === "electric") {
     entries = await model.selectElectricityEntry(startDate, endDate);
     meta = await model.selectLatestElectricityRateAndCharge();
+    highestValue = 5;
   } else {
     entries = await model.selectGasEntry(startDate, endDate);
     meta = await model.selectLatestGasRateAndCharge();
+    highestValue = 90;
   }
 
   const dataPoints = [];
@@ -153,7 +156,7 @@ exports.chartDataForDateRange = async (startDate, endDate, mode) => {
     }
   });
 
-  const chart = generateChart(title, dataPoints, labels);
+  const chart = generateChart(title, dataPoints, labels, highestValue);
   let totalUsage = dataPoints.reduce((rolling, val) => rolling + val, 0);
   let charge = totalUsage * parseFloat(meta.rate_kwh);
 
@@ -171,13 +174,16 @@ exports.chartDataForDay = async (startDate, endDate, mode) => {
   let entries;
   let title = `${startDate.toLocaleDateString("en-GB")}`;
   let meta;
+  let highestValue = 0;
 
   if (mode.toLowerCase() === "electric") {
     entries = await model.selectElectricityEntry(startDate, endDate);
     meta = await model.selectLatestElectricityRateAndCharge();
+    highestValue = 5;
   } else {
     entries = await model.selectGasEntry(startDate, endDate);
     meta = await model.selectLatestGasRateAndCharge();
+    highestValue = 90;
   }
 
   const dataPoints = [];
@@ -200,7 +206,7 @@ exports.chartDataForDay = async (startDate, endDate, mode) => {
     labels.push(label);
   });
 
-  const chart = generateChart(title, dataPoints, labels);
+  const chart = generateChart(title, dataPoints, labels, highestValue);
   let charge = energyUsed * parseFloat(meta.rate_kwh / 100);
 
   return {
@@ -213,7 +219,7 @@ exports.chartDataForDay = async (startDate, endDate, mode) => {
   };
 };
 
-const generateChart = (title, data, labels) => {
+const generateChart = (title, data, labels, max) => {
   return {
     data: {
       labels: labels,
@@ -231,6 +237,10 @@ const generateChart = (title, data, labels) => {
         yAxes: [
           {
             display: true,
+            ticks: {
+              max: max,
+              min: 0,
+            },
           },
         ],
       },
