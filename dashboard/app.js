@@ -9,7 +9,6 @@ const energyRouter = require("./routers/energy.router");
 const userSelection = require("./middleware/user.middleware");
 const energyUtils = require("./utils/energy.utils");
 const binUtils = require("./utils/bin.utils");
-const utils = require("./utils");
 
 const app = express();
 app.set("view engine", "pug");
@@ -42,7 +41,7 @@ app.get("/", userSelection, async (req, res, next) => {
   options.greenBinDay = binDates.GreenDay;
   options.greenBinDate = binDates.GreenDate;
 
-  res.render("home/index", { ...options });
+  res.render(`home/${req.username}`, { ...options });
 });
 
 app.all("/", error.methodNotAllowed);

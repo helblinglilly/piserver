@@ -46,26 +46,26 @@ block append body
 
       .columns
         .column
-          .card(onclick="location.href='http://192.168.0.10:81/admin';")
+          .card(onclick="window.open('http://192.168.0.10:81/admin');")
             .card-content
               figure.container(style="display: flex; align-items: center;")
                 img.icon(src='/static/assets/pihole.svg', alt='Pi Hole Icon').mr-1
-                a.card-text Pi Hole
-          .card.mt-6(onclick="location.href='http://192.168.0.10:5000/files/'")
+                a.card-text(href='http://192.168.0.10:81/admin' target="_blank") Pi Hole
+          .card.mt-6(onclick="window.open('http://192.168.0.10:5000/files/login')")
             .card-content
               figure.container(style="display: flex; align-items: center;")
                 img.icon(src='/static/assets/files.png', alt='Files Icon').mr-1
-                a.card-text(href='http://192.168.0.10:5000/files/') Files
-          .card.mt-6(onclick="location.href='http://192.168.0.10:32400/web/'")
+                a.card-text(href='http://192.168.0.10:5000/files/login?redirect=%2Ffiles%2F' target="_blank") Files
+          .card.mt-6(onclick="window.open('http://192.168.0.10:32400/web/')")
             .card-content
               figure.container(style="display: flex; align-items: center;")
                 img.icon(src='/static/assets/plex.png', alt='Plex Logo').mr-1
-                a.card-text(href='http://192.168.0.10:32400/web') Plex
-          .card.mt-6(onclick="location.href='https://192.168.0.10:1234'")
+                a.card-text(href='http://192.168.0.10:32400/web' target="_blank") Plex
+          .card.mt-6(onclick="window.open('https://192.168.0.10:1234')")
             .card-content
               figure.container(style="display: flex; align-items: center;")
                 img.icon(src='/static/assets/docker.png', alt='Portainer Icon').mr-1
-                a.card-text(href='https://192.168.0.10:1234') Portainer
+                a.card-text(href='https://192.168.0.10:1234' target="_blank") Portainer
 
 
         .spacer.mt-4.is-hidden-tablet
