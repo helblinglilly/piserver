@@ -244,10 +244,6 @@ exports.selectLatestElectricityRateAndCharge = async () => {
     });
 };
 
-exports.selectHighestGasUsage = async () => {
-  return db.query(format(`SELECT `));
-};
-
 exports.selectLatestGasRateAndCharge = async () => {
   return db
     .query(

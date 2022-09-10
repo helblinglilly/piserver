@@ -8,6 +8,8 @@ const apiRouter = require("./routers/api.router");
 const energyRouter = require("./routers/energy.router");
 const userSelection = require("./middleware/user.middleware");
 const energyUtils = require("./utils/energy.utils");
+const binUtils = require("./utils/bin.utils");
+const utils = require("./utils");
 
 const app = express();
 app.set("view engine", "pug");
@@ -25,9 +27,22 @@ app.use("/api", apiRouter);
 app.use("/energy", energyRouter);
 
 app.get("/", userSelection, async (req, res, next) => {
+  const options = {};
+  options.host = ``;
+  options.username = req.username;
+
   await energyUtils.updateReadings();
-  // Get electricity and gas charges since the last bill was entered
-  res.render("home/index", { host: ``, username: req.username });
+  const energyInfo = await energyUtils.fetchLatestDay();
+  options.energyInfo = energyInfo;
+
+  const binDates = await binUtils.getBinDates();
+
+  options.blackBinDay = binDates.BlackDay;
+  options.blackBinDate = binDates.BlackDate;
+  options.greenBinDay = binDates.GreenDay;
+  options.greenBinDate = binDates.GreenDate;
+
+  res.render("home/index", { ...options });
 });
 
 app.all("/", error.methodNotAllowed);

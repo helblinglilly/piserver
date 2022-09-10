@@ -15,6 +15,8 @@
     "axios-cache-plugin": "^0.1.0",
     "dotenv": "^10.0.0",
     "express": "^4.17.2",
+    "fast-csv": "^4.3.6",
+    "form-data": "^4.0.0",
     "pg": "^8.7.1",
     "pg-format": "^1.0.4",
     "pgtools": "^0.1.1",

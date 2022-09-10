@@ -255,3 +255,38 @@ const generateChart = (title, data, labels, max, yName) => {
     },
   };
 };
+
+exports.fetchLatestDay = async () => {
+  const timezoneOffset = new Date().getTimezoneOffset() * 60000;
+  let startDate = new Date();
+  startDate.setDate(startDate.getDate() - 1);
+  startDate.setHours(0);
+  startDate.setMinutes(0);
+  startDate.setSeconds(0);
+  startDate.setMilliseconds(0);
+  startDate = new Date(startDate - timezoneOffset);
+
+  let endDate = new Date(startDate);
+  endDate.setDate(startDate.getDate() + 1);
+
+  const electricity = await model.selectElectricityEntry(startDate, endDate);
+  const gas = await model.selectGasEntry(startDate, endDate);
+
+  const electricityUsed = electricity.reduce(
+    (partialSum, a) => partialSum + a.usage_kwh,
+    0,
+  );
+  const gasUsed = gas.reduce((partialSum, a) => partialSum + a.usage_kwh, 0);
+
+  const electricityRate = await model.selectLatestElectricityRateAndCharge();
+  const gasRate = await model.selectLatestGasRateAndCharge();
+
+  // console.log(electricityRate);
+  return {
+    electricityUsage: electricityUsed.toFixed(3) + "kWh",
+    gasUsage: gasUsed.toFixed(3) + "kWh",
+    electricityPrice:
+      "£" + ((electricityUsed * electricityRate.rate_kwh) / 100).toFixed(2),
+    gasPrice: "£" + ((gasUsed * gasRate.rate_kwh) / 100).toFixed(2),
+  };
+};

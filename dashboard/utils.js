@@ -259,6 +259,7 @@ exports.generationLanguage = (version_group_name) => {
 };
 
 exports.downloadFile = (fileUrl, outputLocationPath) => {
+  if (!fs.existsSync("./cache/")) fs.mkdirSync("./cache/");
   return new Promise(async (resolve, reject) => {
     try {
       const response = await axios({

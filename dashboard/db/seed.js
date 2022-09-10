@@ -5,9 +5,15 @@ const env = require("../environment");
 
 exports.seed = async () => {
   const createUsertable = `CREATE TABLE IF NOT EXISTS usertable (
-        ip varchar(255) NOT NULL PRIMARY KEY,
-        username varchar(255) NOT NULL
-        );`;
+    ip varchar(255) NOT NULL PRIMARY KEY,
+    username varchar(255) NOT NULL
+    );`;
+
+  const createBinDates = `CREATE TABLE IF NOT EXISTS bin_dates (
+    bin_type varchar(12) NOT NULL,
+    collection_date DATE NOT NULL,
+    PRIMARY KEY(bin_type, collection_date)
+  )`;
 
   const createTimesheet = `CREATE TABLE IF NOT EXISTS timesheet (
     id SERIAL PRIMARY KEY,
@@ -105,6 +111,19 @@ exports.seed = async () => {
   ('2022-07-24', '2022-08-23', 31, 25.92, 60, 6.93, 12.18, 12.70)
   `;
 
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const insertBinDates = format(
+    `INSERT INTO bin_dates
+  (bin_type, collection_date)
+  VALUES
+  ('GREEN', %L),
+  ('BLACK', %L)
+  `,
+    new Date(),
+    tomorrow,
+  );
+
   const insertTimsheet = [
     `INSERT INTO timesheet (username, day_date, clock_in, break_in, break_out, clock_out) VALUES ('joel', '2022-01-01', '09:00:00', '13:00:00', '14:00:00', '17:30:00');`,
     `INSERT INTO timesheet (username, day_date, clock_in, break_in, break_out, clock_out) VALUES ('joel', '2022-01-02', '09:00:00', '13:15:00', '14:15:00', '18:00:00');`,
@@ -145,11 +164,13 @@ exports.seed = async () => {
     await db.query(`DROP TABLE IF EXISTS usertable;`);
     await db.query(`DROP TABLE IF EXISTS electricity_bill`);
     await db.query(`DROP TABLE IF EXISTS gas_bill`);
+    await db.query(`DROP TABLE IF EXISTS bin_dates`);
     // await db.query(`DROP TABLE IF EXISTS electricity_usage`);
     // await db.query(`DROP TABLE IF EXISTS gas_usage`);
   }
 
   await db.query(createUsertable);
+  await db.query(createBinDates);
   await db.query(createStopwatch);
   await db.query(createTimesheet);
   await db.query(createElectricBill);
@@ -166,6 +187,7 @@ exports.seed = async () => {
       await db.query(query);
     }
 
+    await db.query(insertBinDates);
     await db.query(insertElectricBills);
     await db.query(insertGasBills);
 

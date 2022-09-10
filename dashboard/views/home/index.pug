@@ -7,6 +7,44 @@ block append body
     .container.is-max-desktop.p-6
       .columns
         .column
+          .columns
+            .column
+              .card
+                .card-header-title.pb-1
+                  figure.container(style="display: flex; align-items: center;")
+                    img.icon(src='/static/assets/black_bin.svg', alt='Green Bin Icon').mr-1
+                    p Black Bin
+                .card-content.pt-1.pb-3
+                  p #{blackBinDay}
+                  p #{blackBinDate}
+            .column
+              .card
+                .card-header-title.pb-1
+                  figure.container(style="display: flex; align-items: center;")
+                    img.icon(src='/static/assets/green_bin.svg', alt='Green Bin Icon').mr-1
+                    p Green Bin
+                .card-content.pt-1.pb-3
+                  p #{greenBinDay}
+                  p #{greenBinDate}
+        .column
+          .columns
+            .column
+              .card
+                .card-header-title.pb-1
+                  p 🔥 Gas
+                .card-content.pt-1.pb-3
+                  p #{energyInfo.gasUsage}
+                  p #{energyInfo.gasPrice}
+            .column
+              .card
+                .card-header-title.pb-1
+                  p ⚡️ Electric
+                .card-content.pt-1.pb-3
+                  p #{energyInfo.electricityUsage}
+                  p #{energyInfo.electricityPrice}
+
+      .columns
+        .column
           .card(onclick="location.href='http://192.168.0.10:81/admin';")
             .card-content
               figure.container(style="display: flex; align-items: center;")
