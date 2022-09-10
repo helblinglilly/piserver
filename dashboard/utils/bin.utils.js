@@ -61,6 +61,10 @@ const fetchFreshBinDates = async () => {
     const stream = fs.createReadStream(filepath);
     csv
       .parseStream(stream, { headers: false })
+      .on("error", (error) => {
+        console.log("Encountered error downloading bin data");
+        console.log(error);
+      })
       .on("data", function (data) {
         if (data[0] == process.env.ADDRESS_CODE) {
           if (data[1] === "BLACK") {
