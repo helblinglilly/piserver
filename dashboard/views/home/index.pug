@@ -2,6 +2,7 @@ extend  ../components/header.pug
 
 block append head
   title Raspberry Pi
+  script(src="/static/scripts/home.js")
 
 block append body
     .container.is-max-desktop.p-6
@@ -9,24 +10,24 @@ block append body
         .column
           .columns
             .column
-              .card
+              .card#blackBinCard.is-hidden-mobile
                 .card-header-title.pb-1
                   figure.container(style="display: flex; align-items: center;")
                     img.icon(src='/static/assets/black_bin.svg', alt='Green Bin Icon').mr-1
                     p Black Bin
                 .card-content.pt-1.pb-3
                   p #{blackBinDay}
-                  p #{blackBinDate}
-            .column
-              .card
+                  p#blackBinDate #{blackBinDate}
+            .column.is-hidden-mobile
+              .card#greenBinCard
                 .card-header-title.pb-1
                   figure.container(style="display: flex; align-items: center;")
                     img.icon(src='/static/assets/green_bin.svg', alt='Green Bin Icon').mr-1
                     p Green Bin
                 .card-content.pt-1.pb-3
                   p #{greenBinDay}
-                  p #{greenBinDate}
-        .column
+                  p#greenBinDate #{greenBinDate}
+        .column.is-hidden-mobile
           .columns
             .column
               .card
@@ -65,6 +66,10 @@ block append body
               figure.container(style="display: flex; align-items: center;")
                 img.icon(src='/static/assets/docker.png', alt='Portainer Icon').mr-1
                 a.card-text(href='https://192.168.0.10:1234') Portainer
+
+
+        .spacer.mt-4.is-hidden-tablet
+
         .column
           .card(onclick="location.href='/timesheet'")
             .card-content
