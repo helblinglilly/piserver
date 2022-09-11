@@ -1,6 +1,10 @@
 const fs = require("fs");
 const axios = require("axios");
 
+exports.weekdays = {
+  short: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+  long: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+};
 weekday = () => {
   const dayNames = [
     "Sunday",
@@ -12,6 +16,14 @@ weekday = () => {
     "Saturday",
   ];
   return dayNames[new Date().getDay()];
+};
+
+exports.daysBetweenTwoDates = (a, b) => {
+  const _MS_PER_DAY = 1000 * 60 * 60 * 24;
+  const utc1 = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
+  const utc2 = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate());
+
+  return Math.floor((utc2 - utc1) / _MS_PER_DAY);
 };
 
 exports.today = () => {
@@ -247,6 +259,7 @@ exports.generationLanguage = (version_group_name) => {
 };
 
 exports.downloadFile = (fileUrl, outputLocationPath) => {
+  if (!fs.existsSync("./cache/")) fs.mkdirSync("./cache/");
   return new Promise(async (resolve, reject) => {
     try {
       const response = await axios({

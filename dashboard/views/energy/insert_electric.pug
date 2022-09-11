@@ -1,0 +1,83 @@
+extend  ../components/header.pug
+
+block append head 
+    style.
+        .input-group-addon{
+            padding: 6px;
+            text-align: center;
+            width: 1%;
+            vertical-align: middle;
+            display: table-cell;
+        }
+        .input-group {
+            position: relative;
+            display: table;
+            border-collapse: separate;
+        }
+        #submit_button {
+            background-color: #3488ce;
+            color: #fff;
+        }
+
+
+block append body
+    .container.is-max-desktop.pl-6.pr-6
+        nav.breadcrumb(aria-label="breadcrumbs")
+            ul
+                li
+                    a(href="/") Home
+                li
+                    a(href="/energy") Energy
+                li.is-active
+                    a(href="", aria-current="page") Add electricity bill
+
+        form(action="/energy/insert_electric", method="post", id="electric").mb-6
+            input(name="kind", value="electric" hidden)
+            .title.is-3 Add electricity bill
+            
+            .columns
+                .column
+                    .card
+                        .card-header-title Billing Start
+                        .card-content
+                            input(id="start_date_picker" type="date", name="start_date", value=date_start required).input
+
+                .column
+                    .card
+                        .card-header-title Billing End
+                        .card-content
+                            input(id="end_date_picker" type="date", name="end_date", value=date_end required).input
+            
+            .columns
+                .column
+                    .card
+                        .card-header-title Standing Charge Days
+                        .card-content
+                            .input-group
+                                input(id="standing_charge_days" type="number", name="standing_charge_days", value=sc_days, placeholder="31" required).input
+                                span.input-group-addon days
+                .column
+                    .card
+                        .card-header-title Standing Charge Rate
+                        .card-content
+                            .input-group
+                                input(id="standing_charge_rate" type="number", name="standing_charge_rate", value=sc_rate, step="0.01", placeholder="@ 45.96" required).input
+                                span.input-group-addon p/day
+
+            .columns
+                .column
+                    .card
+                        .card-header-title kWh used
+                        .card-content
+                            .input-group
+                                input(id="standing_charge_days" type="number", name="units_used", value=units_used, step="0.01", placeholder="89.51" required).input
+                                span.input-group-addon kWh
+                .column
+                    .card
+                        .card-header-title kWh rate
+                        .card-content
+                            .input-group
+                                input(id="standing_charge_rate" type="number", name="unit_price", value=unit_price, step="0.01", placeholder="@ 26.06" required).input
+                                span.input-group-addon p/kWh
+            button(type="submit").button.is-fullwidth#submit_button Submit
+        

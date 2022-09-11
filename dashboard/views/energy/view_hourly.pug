@@ -1,0 +1,52 @@
+extend  ../components/header.pug
+
+block append head
+    script(src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js')
+    script(src='/static/scripts/energy/yesterdayHistoryChart.js')
+    title View Hourly Energy
+
+block append body
+    .container.is-max-desktop.pl-6.pr-6
+        nav.breadcrumb(aria-label="breadcrumbs")
+            ul
+                li
+                    a(href="/") Home
+                li
+                    a(href="/energy") Energy
+                li.is-active
+                    a(href="", aria-current="page") View Hourly
+
+        .columns
+            .column
+                .title.is-3 #{mode} Hourly view
+            .column(style="text-align: right")
+                button.button(onclick=`location.href='/energy/view_hourly?mode=${otherMode}&daily_date=${new Date(date).toISOString().split("T")[0]}'`) Switch to #{otherMode}
+        .columns    
+            .column
+                .card.mt-3
+                    .card-content
+                        form(action="/energy/view_hourly", method="get", id="electric")
+                            input(id="view_date" type="date", name="daily_date", value=`${date}` required).input.mb-2
+                            button(type="submit").button.is-fullwidth#submit_button Submit
+
+            .column
+                if hasData === false
+                    .card.mt-3
+                        .card-content
+                            p No data for that day
+                else 
+                    .card.mt-3
+                        .card-content
+                            .columns
+                                .column.has-text-weight-bold
+                                    p #{energy_used}
+                                .column
+                                    p #{rate}
+                                .column.has-text-right.has-text-weight-bold
+                                    p #{energy_charged}
+                            .has-text-centered
+                                p Does not include tax or standing charge
+        .card.mt-3
+            .card-content
+                p#chart_data(hidden) #{chart_data}
+                canvas#history_chart

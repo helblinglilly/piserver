@@ -1,7 +1,6 @@
 const fs = require("fs");
 const axios = require("axios");
 const utils = require("../utils");
-const { cache } = require("pug/lib");
 
 const cachePath = `${__dirname}/../cache/`;
 const spriteCachePath = `${__dirname}/../public/assets/pokemon/cache/`;
