@@ -5,18 +5,6 @@ exports.weekdays = {
   short: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
   long: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
 };
-weekday = () => {
-  const dayNames = [
-    "Sunday",
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-  ];
-  return dayNames[new Date().getDay()];
-};
 
 exports.daysBetweenTwoDates = (a, b) => {
   const _MS_PER_DAY = 1000 * 60 * 60 * 24;

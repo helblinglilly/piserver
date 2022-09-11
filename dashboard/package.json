@@ -5,7 +5,7 @@
   "main": "setup.js",
   "scripts": {
     "test": "jest test --detectOpenHandles",
-    "dev": "nodemon setup.js --ignore cache/ --ignore public/assets/pokemon/cache/",
+    "dev": "npx tsc && nodemon dist/setup.js",
     "lint": "prettier --write '**/*.js'"
   },
   "author": "",
@@ -24,11 +24,15 @@
     "pug": "^3.0.2"
   },
   "devDependencies": {
+    "@types/express": "^4.17.13",
+    "@types/node": "^18.7.16",
     "jest": "^27.4.5",
     "lint-staged": "^12.1.7",
     "nodemon": "^2.0.15",
     "prettier": "^2.5.1",
-    "supertest": "^6.2.2"
+    "supertest": "^6.2.2",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.8.3"
   },
   "lint-staged": {
     "*.{js,css,md}": "prettier --write"

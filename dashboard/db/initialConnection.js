@@ -3,7 +3,6 @@ const env = require("../environment");
 
 require("dotenv").config();
 
-OCTOPUS_ELECTRIC_MPAN = 2340313769017;
 const requiredEnvVars = [
   "POSTGRES_USER",
   "POSTGRES_HOST",

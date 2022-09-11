@@ -8,5 +8,6 @@ COPY ./dashboard/package.json package.json
 COPY ./dashboard/package-lock.json package-lock.json
 RUN npm ci
 COPY ./dashboard/. .
+RUN npx tsc
 EXPOSE 8080
-CMD ["node", "."]
+CMD ["node", "dist/setup.js"]

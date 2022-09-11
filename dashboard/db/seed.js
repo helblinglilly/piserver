@@ -179,11 +179,11 @@ exports.seed = async () => {
   await db.query(createGasUsage);
 
   if (env !== "production") {
-    for (query of insertTimsheet) {
+    for (const query of insertTimsheet) {
       await db.query(query);
     }
 
-    for (query of insertStopwatch) {
+    for (const query of insertStopwatch) {
       await db.query(query);
     }
 
