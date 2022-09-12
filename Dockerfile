@@ -10,4 +10,4 @@ RUN npm ci
 COPY ./dashboard/. .
 RUN npx tsc
 EXPOSE 8080
-CMD ["node", "dist/setup.js"]
+CMD ["node", "src/setup.js"]

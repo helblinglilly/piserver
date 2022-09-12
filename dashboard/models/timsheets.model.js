@@ -1,6 +1,7 @@
 const db = require("../db");
 const utils = require("../utils/timesheet.utils");
 const format = require("pg-format");
+const dateUtils = require("../utils/date.utils");
 
 exports.selectDay = async (day, username) => {
   return db
@@ -13,10 +14,22 @@ exports.selectDay = async (day, username) => {
     )
     .then(({ rows }) => {
       if (rows.length === 0) return null;
-      rows[0].clock_in = utils.constructUTCDateTime(rows[0].day_date, rows[0].clock_in);
-      rows[0].break_in = utils.constructUTCDateTime(rows[0].day_date, rows[0].break_in);
-      rows[0].break_out = utils.constructUTCDateTime(rows[0].day_date, rows[0].break_out);
-      rows[0].clock_out = utils.constructUTCDateTime(rows[0].day_date, rows[0].clock_out);
+      rows[0].clock_in = dateUtils.constructUTCDateFromLocal(
+        rows[0].day_date,
+        rows[0].clock_in,
+      );
+      rows[0].break_in = dateUtils.constructUTCDateFromLocal(
+        rows[0].day_date,
+        rows[0].break_in,
+      );
+      rows[0].break_out = dateUtils.constructUTCDateFromLocal(
+        rows[0].day_date,
+        rows[0].break_out,
+      );
+      rows[0].clock_out = dateUtils.constructUTCDateFromLocal(
+        rows[0].day_date,
+        rows[0].clock_out,
+      );
       return rows[0];
     });
 };

@@ -2,6 +2,7 @@ const db = require("./index");
 const utils = require("../utils");
 const format = require("pg-format");
 const env = require("../environment");
+const dateUtils = require("../utils/date.utils");
 
 exports.seed = async () => {
   const createUsertable = `CREATE TABLE IF NOT EXISTS usertable (
@@ -141,11 +142,11 @@ exports.seed = async () => {
 
     format(
       `INSERT INTO "timesheet" (username, day_date, clock_in, break_in, break_out, clock_out) VALUES ('joel', %L, '11:30', '13:00', '14:00', null);`,
-      utils.todayIso(),
+      dateUtils.todayISOUTC(),
     ),
     format(
       `INSERT INTO "timesheet" (username, day_date, clock_in, break_in, break_out, clock_out) VALUES ('harry', %L, '09:45', null, null, null);`,
-      utils.todayIso(),
+      dateUtils.todayISOUTC(),
     ),
   ];
 

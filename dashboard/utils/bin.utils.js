@@ -2,6 +2,7 @@ const utils = require("../utils");
 const fs = require("fs");
 const csv = require("fast-csv");
 const model = require("../models/bin.model");
+const dateUtils = require("../utils/date.utils");
 
 let isDownloadingNewFile = false;
 exports.getBinDates = async () => {
@@ -20,12 +21,12 @@ exports.getBinDates = async () => {
   for (let i = 0; i < entries.length; i++) {
     if (latestDates.BlackDate === undefined && entries[i].bin_type === "BLACK") {
       latestDates.BlackDate = entries[i].collection_date.toLocaleDateString("en-GB");
-      latestDates.BlackDay = utils.weekdays.long[entries[i].collection_date.getDay()];
+      latestDates.BlackDay = dateUtils.weekdays.long[entries[i].collection_date.getDay()];
     }
 
     if (latestDates.GreenDate === undefined && entries[i].bin_type === "GREEN") {
       latestDates.GreenDate = entries[i].collection_date.toLocaleDateString("en-GB");
-      latestDates.GreenDay = utils.weekdays.long[entries[i].collection_date.getDay()];
+      latestDates.GreenDay = dateUtils.weekdays.long[entries[i].collection_date.getDay()];
     }
 
     // Always at least one entry should be found first

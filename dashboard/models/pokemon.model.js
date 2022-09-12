@@ -3,7 +3,7 @@ const axios = require("axios");
 const utils = require("../utils");
 
 const cachePath = `${__dirname}/../cache/`;
-const spriteCachePath = `${__dirname}/../public/assets/pokemon/cache/`;
+let spriteCachePath = `${__dirname}/../public/assets/pokemon/cache/`;
 
 let dictionaryData;
 
@@ -12,8 +12,8 @@ exports.receivePokemonItemData = (id) => {
   if (!fs.existsSync(`${cachePath}/item`)) fs.mkdirSync(`${cachePath}/item`);
 
   return new Promise((resolve, reject) => {
-    if (fs.existsSync(cachePath + `item/${id}.json`)) {
-      item = fs.readFileSync(cachePath + `item/${id}.json`, "utf-8");
+    if (fs.existsSync(`${cachePath}item/${id}.json`)) {
+      const item = fs.readFileSync(`${cachePath}item/${id}.json`, "utf-8");
       resolve(JSON.parse(item));
     } else {
       axios
@@ -463,8 +463,8 @@ exports.receiveGamesPresent = (moves) => {
       if (!games.some((entry) => entry.name === gameName)) {
         games.push({
           name: gameName,
-          generation: utils.generationLanguage(gameName).generation,
-          details: utils.generationLanguage(gameName),
+          generation: pokemonUtils.generationLanguage(gameName).generation,
+          details: pokemonUtils.generationLanguage(gameName),
         });
       }
     }

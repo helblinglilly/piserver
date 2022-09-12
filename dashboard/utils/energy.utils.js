@@ -2,6 +2,7 @@ const dotenv = require("dotenv").config();
 const axios = require("axios").default;
 const model = require("../models/energy.model");
 const utils = require("../utils");
+const dateUtils = require("../utils/date.utils");
 
 const baseURL = "https://api.octopus.energy/";
 const defaultPageSize = 500;
@@ -28,13 +29,16 @@ exports.updateReadings = async () => {
     return;
   }
 
-  const electricityDaysToFetch = utils.daysBetweenTwoDates(
+  const electricityDaysToFetch = dateUtils.daysBetweenTwoDates(
     latestElectricityDate,
     new Date(),
   );
   const electricityPageSize = getAppropriatePageSize(electricityDaysToFetch);
 
-  const gasDaysToFetch = utils.daysBetweenTwoDates(new Date(latestGasDate), new Date());
+  const gasDaysToFetch = dateUtils.daysBetweenTwoDates(
+    new Date(latestGasDate),
+    new Date(),
+  );
   const gasPageSize = getAppropriatePageSize(gasDaysToFetch);
 
   const electricityData = await fetchElectricityReading(
@@ -138,7 +142,7 @@ exports.chartDataForDateRange = async (startDate, endDate, mode) => {
   let dailyUsage = 0.0;
 
   entries.forEach((entry, i) => {
-    const day = utils.weekdays.short[entry.start_date.getUTCDay()];
+    const day = dateUtils.weekdays.short[entry.start_date.getUTCDay()];
     const date = entry.start_date.getUTCDate();
     const month = entry.start_date.getUTCMonth() + 1;
     const entryDate = `${day} ${date}/${month}`;

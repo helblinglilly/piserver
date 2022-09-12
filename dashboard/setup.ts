@@ -11,12 +11,15 @@ dbInit
       global.port = 8080;
       global.host = "127.0.0.1";
     } else {
+      if (process.env.DEBUGGER === "VSCODE") {
+        process.env.ROOTDIR = __dirname + "/..";
+      }
       global.port = 9090;
       global.host = "127.0.0.1";
     }
     await seed.seed();
-    app.listen(port, "0.0.0.0", () => {
-      console.log(`Listening on http://${host}:${port}`);
+    app.listen(global.port, "0.0.0.0", () => {
+      console.log(`Listening on http://127.0.0.1:${global.port}`);
     });
   })
   .catch((err) => {

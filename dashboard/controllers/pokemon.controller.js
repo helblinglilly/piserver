@@ -1,6 +1,7 @@
 const utils = require("../utils");
 const model = require("../models/pokemon.model");
 const error = require("./error.controller");
+const pokemonUtils = require("../utils/pokemon.utils");
 
 exports.getRoot = (req, res, next) => {
   res.render("pokemon", { username: req.username });
@@ -14,7 +15,7 @@ exports.getPokemon = async (req, res, next) => {
   // 404
   if (
     req.params.id <= 0 ||
-    req.params.id > utils.highestPokedexEntry ||
+    req.params.id > pokemonUtils.highestPokedexEntry ||
     options.id == "undefined"
   ) {
     error.pageNotFound(req, res);
@@ -24,8 +25,8 @@ exports.getPokemon = async (req, res, next) => {
   const species = await model.receivePokemonSpeciesData(options.id);
   const pokemon = await model.receivePokemonData(options.id);
 
-  options.germanName = utils.pokemonNameLanguage(species, "de");
-  options.englishName = utils.pokemonNameLanguage(species, "en");
+  options.germanName = pokemonUtils.pokemonNameLanguage(species, "de");
+  options.englishName = pokemonUtils.pokemonNameLanguage(species, "en");
 
   options.spriteFront = await model.receivePokemonSpriteFront(options.id);
   options.spriteBack = await model.receivePokemonSpriteBack(options.id);
@@ -43,11 +44,11 @@ exports.getPokemon = async (req, res, next) => {
 
   options.growth = species.growth_rate.name;
 
-  if (utils.generationLanguage(req.query.game)) {
+  if (pokemonUtils.generationLanguage(req.query.game)) {
     options.game = {
       name: req.query.game,
-      german: utils.generationLanguage(req.query.game).de,
-      english: utils.generationLanguage(req.query.game).en,
+      german: pokemonUtils.generationLanguage(req.query.game).de,
+      english: pokemonUtils.generationLanguage(req.query.game).en,
     };
   }
 
@@ -87,8 +88,8 @@ exports.getPokemon = async (req, res, next) => {
           else if (move.attackType === "status")
             move.attackTypeSprite = "https://i.stack.imgur.com/LWKMo.png";
 
-          move.moveNameGerman = utils.itemNameLanguage(moveData, "de");
-          move.moveNameEnglish = utils.itemNameLanguage(moveData, "en");
+          move.moveNameGerman = pokemonUtils.itemNameLanguage(moveData, "de");
+          move.moveNameEnglish = pokemonUtils.itemNameLanguage(moveData, "en");
 
           if (learnMethod.method === "level-up") move.method = learnMethod.level;
           else if (learnMethod.method === "machine") move.method = "TM/VM";
@@ -116,17 +117,17 @@ exports.getItem = async (req, res, next) => {
   options.item = item;
   options.held_by_summaries = [];
 
-  options.germanName = utils.itemNameLanguage(item, "de");
-  options.englishName = utils.itemNameLanguage(item, "en");
-  options.germanFlavourTexts = utils.itemFlavourTextLanguage(item, "de");
-  options.englishFlavourTexts = utils.itemFlavourTextLanguage(item, "en");
+  options.germanName = pokemonUtils.itemNameLanguage(item, "de");
+  options.englishName = pokemonUtils.itemNameLanguage(item, "en");
+  options.germanFlavourTexts = pokemonUtils.itemFlavourTextLanguage(item, "de");
+  options.englishFlavourTexts = pokemonUtils.itemFlavourTextLanguage(item, "en");
 
   // Set up for pokemon that hold this item
   const pkmnSpeciesPromises = [];
   if (item.held_by_pokemon.length > 0) {
     item.held_by_pokemon.forEach((pkmn) => {
       const id = pkmn.pokemon.url.split("/")[6];
-      if (id > 0 && id <= utils.highestPokedexEntry) {
+      if (id > 0 && id <= pokemonUtils.highestPokedexEntry) {
         pkmnSpeciesPromises.push(model.receivePokemonSpeciesData(id));
       }
     });
@@ -153,8 +154,8 @@ exports.getItem = async (req, res, next) => {
           details.id = pkmn.id;
           details.sprite = sprite;
 
-          details.german = utils.pokemonNameLanguage(pkmn, "de");
-          const english = utils.pokemonNameLanguage(pkmn, "en");
+          details.german = pokemonUtils.pokemonNameLanguage(pkmn, "de");
+          const english = pokemonUtils.pokemonNameLanguage(pkmn, "en");
           details.english = english !== details.german ? english : "";
 
           options.held_by_summaries.push(details);

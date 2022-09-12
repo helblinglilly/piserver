@@ -12,7 +12,7 @@ const binUtils = require("./utils/bin.utils");
 
 const app = express();
 app.set("view engine", "pug");
-app.use("/static", express.static("public"));
+app.use("/static", express.static(`${__dirname}/public`));
 app.set("views", "./views");
 
 app.use(express.json());

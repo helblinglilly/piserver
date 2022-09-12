@@ -1,6 +1,7 @@
 const timesheetsModel = require("../models/timsheets.model");
 const timesheetUtils = require("../utils/timesheet.utils");
 const generalUtils = require("../utils.js");
+const dateUtils = require("../utils/date.utils");
 
 const indexObject = (
   day,
@@ -126,8 +127,8 @@ const viewDone = (rows) => {
 
   const sign = minutesLeft <= 0 ? "+" : "-";
   const displayHours = hoursLeft > 0 ? true : false;
-  const overtime = (overtimeWorked =
-    sign + `${displayHours ? Math.abs(hoursLeft) + "h" : ""}${Math.abs(minutesLeft)}min`);
+  const overtime =
+    sign + `${displayHours ? Math.abs(hoursLeft) + "h" : ""}${Math.abs(minutesLeft)}min`;
 
   return indexObject(new Date(), "Done for the day :)", clockOut, breakEnd, overtime);
 };
@@ -209,7 +210,7 @@ exports.getView = async (req, res, next) => {
   const options = {};
   options.username = req.username;
   options.date = req.query.date
-    ? timesheetUtils.constructUTCDateTime(new Date(req.query.date), "12:00:00")
+    ? dateUtils.constructUTCDateFromLocal(new Date(req.query.date), "12:00")
     : new Date();
 
   const entry = await timesheetsModel.selectDay(options.date, req.username);
@@ -267,7 +268,7 @@ exports.postEdit = async (req, res, next) => {
 
   // Using update when no entry exists yet will just not write - use insert instead
   if (!hasEntryYet && args.clock_in) {
-    if (generalUtils.isShortTime(args.clock_in)) {
+    if (dateUtils.isShortTime(args.clock_in)) {
       const insertClockInTime = new Date(args.date);
       insertClockInTime.setHours(args.clock_in.split(":")[0]);
       insertClockInTime.setMinutes(args.clock_in.split(":")[1]);
@@ -294,7 +295,7 @@ exports.postEdit = async (req, res, next) => {
 
   // Validation complete - just update values
   if (args.clock_in) {
-    if (generalUtils.isShortTime(args.clock_in)) {
+    if (dateUtils.isShortTime(args.clock_in)) {
       const updateClockInTime = new Date(args.date);
       updateClockInTime.setHours(args.clock_in.split(":")[0]);
       updateClockInTime.setMinutes(args.clock_in.split(":")[1]);
@@ -305,7 +306,7 @@ exports.postEdit = async (req, res, next) => {
       return;
     }
   } else if (args.break_in)
-    if (generalUtils.isShortTime(args.break_in)) {
+    if (dateUtils.isShortTime(args.break_in)) {
       const updateBreakStartTime = new Date(args.date);
       updateBreakStartTime.setHours(args.break_in.split(":")[0]);
       updateBreakStartTime.setMinutes(args.break_in.split(":")[1]);
@@ -316,7 +317,7 @@ exports.postEdit = async (req, res, next) => {
       return;
     }
   else if (args.break_out)
-    if (generalUtils.isShortTime(args.break_out)) {
+    if (dateUtils.isShortTime(args.break_out)) {
       const updateBreakOutTime = new Date(args.date);
       updateBreakOutTime.setHours(args.break_out.split(":")[0]);
       updateBreakOutTime.setMinutes(args.break_out.split(":")[1]);
@@ -326,7 +327,7 @@ exports.postEdit = async (req, res, next) => {
       return;
     }
   else if (args.clock_out) {
-    if (generalUtils.isShortTime(args.clock_out)) {
+    if (dateUtils.isShortTime(args.clock_out)) {
       const updateClockOut = new Date(args.date);
       updateClockOut.setHours(args.clock_out.split(":")[0]);
       updateClockOut.setMinutes(args.clock_out.split(":")[1]);

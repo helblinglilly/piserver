@@ -5,8 +5,9 @@
   "main": "setup.js",
   "scripts": {
     "test": "jest test --detectOpenHandles",
-    "dev": "npx tsc && nodemon dist/setup.js",
-    "lint": "prettier --write '**/*.js'"
+    "dev": "npx ts-node setup.js",
+    "lint": "prettier --write '**/*.js'",
+    "compile": "npx tsc && rm -fr out"
   },
   "author": "",
   "license": "ISC",
