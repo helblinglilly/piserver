@@ -5,7 +5,7 @@
   "main": "setup.js",
   "scripts": {
     "test": "jest test --detectOpenHandles",
-    "dev": "npx ts-node setup.js",
+    "dev": "cp -R ./public ./out/public && npx ts-node out/setup.js",
     "lint": "prettier --write '**/*.js'",
     "compile": "npx tsc && rm -fr out"
   },
