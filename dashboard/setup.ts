@@ -1,7 +1,8 @@
-const app = require("./app");
-const seed = require("./db/seed");
-const dbInit = require("./db/initialConnection");
-const env = require("./environment");
+import app from "./app";
+import seed from "./db/seed";
+import dbInit from "./db/initialConnection";
+import env from "./environment";
+import log from "loglevel";
 
 dbInit
   .initialise()
@@ -10,12 +11,11 @@ dbInit
     if (env === "production") {
       global.port = 8080;
       global.host = "127.0.0.1";
+      log.setLevel("ERROR");
     } else {
-      if (process.env.DEBUGGER === "VSCODE") {
-        process.env.ROOTDIR = __dirname + "/..";
-      }
       global.port = 9090;
       global.host = "127.0.0.1";
+      log.setLevel("DEBUG");
     }
     await seed.seed();
     app.listen(global.port, "0.0.0.0", () => {
@@ -23,6 +23,5 @@ dbInit
     });
   })
   .catch((err) => {
-    console.log("Failed to initialise DB");
-    console.log(err);
+    log.error(`Failed to initialise database\n${err}`);
   });

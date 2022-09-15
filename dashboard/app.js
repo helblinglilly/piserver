@@ -1,3 +1,4 @@
+require("./utils/log.utils");
 const express = require("express");
 const error = require("./controllers/error.controller");
 const timesheetRouter = require("./routers/timesheets.router.js");
