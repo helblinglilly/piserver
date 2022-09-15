@@ -1,3 +1,5 @@
+import generalUtils from "./general.utils";
+
 export const weekdays = {
   short: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
   long: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
@@ -12,9 +14,13 @@ export const daysBetweenTwoDates = (a: Date, b: Date): number => {
 };
 
 export const toUserFriendlyStringNoYearLocal = (date: Date): string => {
-  const day = weekdays.short[date.getDay()];
-  const dayDate = date.getDate();
-  const month = date.getMonth();
+  const day: string = weekdays.short[date.getDay()];
+  const dayDate: string = generalUtils.padWithLeadingCharacters(date.getDate(), 2, "0");
+  const month: string = generalUtils.padWithLeadingCharacters(
+    date.getMonth() + 1,
+    2,
+    "0",
+  );
 
   return `${day}, ${dayDate}/${month}`;
 };
@@ -54,8 +60,8 @@ export const dateToHHMMLocal = (date: Date): string => {
 };
 
 export const dateToHHMMUTC = (date: Date): string => {
-  const hours = date.toTimeString().split(":")[0];
-  const minutes = date.toTimeString().split(":")[1];
+  const hours = date.toUTCString().split(" ")[4].split(":")[0];
+  const minutes = date.toUTCString().split(" ")[4].split(":")[1];
   return `${hours}:${minutes}`;
 };
 
@@ -65,5 +71,17 @@ export const constructUTCDateFromLocal = (date: Date, timeString?: string): Date
 
   return new Date(
     Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), hour, minute, 0),
+  );
+};
+
+export const copyTimeObject = (date: Date): Date => {
+  return new Date(
+    date.getFullYear(),
+    date.getMonth(),
+    date.getDate(),
+    date.getHours(),
+    date.getMinutes(),
+    date.getSeconds(),
+    date.getMilliseconds(),
   );
 };

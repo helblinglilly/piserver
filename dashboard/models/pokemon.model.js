@@ -1,6 +1,8 @@
 const fs = require("fs");
 const axios = require("axios");
 const utils = require("../utils");
+const pokemonUtils = require("../utils/pokemon.utils");
+const networkUtils = require("../utils/network.utils");
 
 const cachePath = `${__dirname}/../cache/`;
 let spriteCachePath = `${__dirname}/../public/assets/pokemon/cache/`;
@@ -107,7 +109,7 @@ exports.receivePokemonItemSprite = (item_name) => {
     if (fs.existsSync(`${spriteCachePath}item/${item_name}.png`)) {
       resolve(`/static/assets/pokemon/cache/item/${item_name}.png`);
     } else {
-      utils
+      networkUtils
         .downloadFile(
           `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/${item_name}.png`,
           `${spriteCachePath}item/${item_name}.png`,
@@ -138,7 +140,7 @@ exports.receivePokemonSpriteFront = (id) => {
       resolve(`/static/assets/pokemon/cache/pokemon/${id}.png`);
     } else {
       console.log(`sprite/${id}`);
-      utils
+      networkUtils
         .downloadFile(
           `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`,
           `${spriteCachePath}pokemon/${id}.png`,
@@ -164,7 +166,7 @@ exports.receivePokemonSpriteShinyFront = (id) => {
       resolve(`/static/assets/pokemon/cache/pokemon/${id}-shiny.png`);
     } else {
       console.log(`sprite/${id}-shiny-front`);
-      utils
+      networkUtils
         .downloadFile(
           `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${id}.png`,
           `${spriteCachePath}pokemon/${id}-shiny.png`,
@@ -190,7 +192,7 @@ exports.receivePokemonSpriteBack = (id) => {
       resolve(`/static/assets/pokemon/cache/pokemon/${id}-back.png`);
     } else {
       console.log(`sprite/${id}-back`);
-      utils
+      networkUtils
         .downloadFile(
           `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/${id}.png`,
           `${spriteCachePath}pokemon/${id}-back.png`,
@@ -216,7 +218,7 @@ exports.receivePokemonSpriteShinyBack = (id) => {
       resolve(`/static/assets/pokemon/cache/pokemon/${id}-shiny-back.png`);
     } else {
       console.log(`sprite/${id}-shiny-back`);
-      utils
+      networkUtils
         .downloadFile(
           `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/${id}.png`,
           `${spriteCachePath}pokemon/${id}-shiny-back.png`,
