@@ -1,11 +1,7 @@
-const padWithLeadingCharacters = (
+export const padWithLeadingCharacters = (
   input: any,
-  length: number,
+  desiredTotalLength: number,
   character: string,
 ): string => {
-  return String(input).padStart(length, character);
-};
-
-export default {
-  padWithLeadingCharacters: padWithLeadingCharacters,
+  return String(input).padStart(desiredTotalLength, character);
 };

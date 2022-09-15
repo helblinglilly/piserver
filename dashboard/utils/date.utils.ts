@@ -1,4 +1,4 @@
-import generalUtils from "./general.utils";
+const generalUtils = require("./general.utils");
 
 export const weekdays = {
   short: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
