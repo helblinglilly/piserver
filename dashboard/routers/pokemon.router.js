@@ -18,7 +18,6 @@ pokemonRouter.all("/pkmn/:id", userSelection, error.methodNotAllowed);
 pokemonRouter.get("/item/:id", userSelection, pc.getItem);
 pokemonRouter.all("/item/:id", userSelection, error.methodNotAllowed);
 
-pokemonRouter.post("/", userSelection);
 pokemonRouter.all("/*", userSelection, error.pageNotFound);
 
 module.exports = pokemonRouter;

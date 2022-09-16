@@ -9,12 +9,19 @@ export const createFolderForFile = (path: string): boolean => {
   const filename = outputPathParts.pop();
   const outputFolder = outputPathParts.join("/");
 
+  const split = filename.split(".");
+
+  if (split[0].length === filename.length) {
+    logger.error(`Been supplied a folder location rather than a file location: ${path}`);
+    return false;
+  }
+
   if (!fs.existsSync(outputFolder)) {
     try {
-      fs.mkdirSync(outputFolder);
+      fs.mkdirSync(outputFolder, { recursive: true });
       logger.info(`Created folder ${outputFolder} for file ${filename}`);
     } catch {
-      logger.error(`Failed to create directory ${outputFolder} for file ${filename}`);
+      logger.error(`Failed to create directory '${outputFolder}' for file ${filename}`);
       return false;
     }
   }
@@ -24,8 +31,9 @@ export const createFolderForFile = (path: string): boolean => {
 export const downloadFile = async (url: string, output: string) => {
   logger.debug(`Downloading ${url} into ${output}`);
   return new Promise(async (resolve, reject) => {
-    if (createFolderForFile(output) === false)
+    if (createFolderForFile(output) === false) {
       reject(`Failed to create folder for file ${output}`);
+    }
     try {
       const response = await axios({
         method: "GET",

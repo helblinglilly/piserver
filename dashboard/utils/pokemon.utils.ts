@@ -227,27 +227,36 @@ export const generationLanguage = (version_group_name: keyof GenerationLookup): 
 };
 
 interface MoveSet {
-  method: "string";
+  id: string;
+  type: string;
+  typeSprite: string;
+  attachType: string;
+  attachTypeSprite: string;
+  moveNameGerman: string;
+  moveNameEnglish: string;
+  method: "Erlernt - Tutor" | "Ei - Egg" | "TM/VM" | number;
 }
 
 export const sortMoves = (moves: Array<MoveSet>): Array<MoveSet> => {
-  const level = [];
-  const tvm = [];
-  const tutor = [];
-  const egg = [];
-  const result: Array<MoveSet> = [];
+  const level: Array<MoveSet> = [];
+  const tvm: Array<MoveSet> = [];
+  const tutor: Array<MoveSet> = [];
+  const egg: Array<MoveSet> = [];
+  const result: Array<Array<MoveSet>> = [];
 
-  for (const move of moves) {
-    if (move.method.toString() === "TM/VM") tvm.push(move);
-    else if (move.method.toString() === "Elernt - Tutor") tutor.push(move);
-    else if (move.method.toString() === "Ei - Egg") egg.push(move);
+  moves.forEach((move) => {
+    if (move.method === "Ei - Egg") egg.push(move);
+    else if (move.method === "TM/VM") tvm.push(move);
+    else if (move.method === "Erlernt - Tutor") tutor.push(move);
     else level.push(move);
-  }
+  });
 
-  // if (level !== undefined) level.sort((a, b) => );
-
-  console.log(level);
-  console.log(tvm);
-
+  result.push(egg);
+  level.sort((a, b) => {
+    return parseInt(a.method.toString()) - parseInt(b.method.toString());
+  });
+  result.push(level);
+  result.push(tvm);
+  result.push(tutor);
   return result.flat();
 };

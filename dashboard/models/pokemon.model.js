@@ -409,9 +409,13 @@ exports.receiveEvolutionChain = (url) => {
 
     const chainSource = await getChain(url);
     const results = await buildEvolutions(chainSource);
-    const unique = utils.getUniqueListBy(results, "species", "target");
+    // console.log(results);
+    // export const getUniqueListBy = (arr, key1): any => {
+    // return [...new Map(arr.map((item) => [item[key1], item])).values()];
+    // };
+    // const unique = utils.getUniqueListBy(results, "species", "target");
 
-    resolve(unique);
+    resolve(results);
   });
 };
 exports.dictionaryData = () => {
@@ -471,6 +475,9 @@ exports.receiveGamesPresent = (moves) => {
       }
     }
   }
-  games = games.sort((a, b) => utils.compare(a, b, "generation"));
+  games = games.sort((a, b) =>
+    pokemonUtils.compareObjectsOnAttribute(a, b, "generation"),
+  );
+  console.log(games);
   return games;
 };

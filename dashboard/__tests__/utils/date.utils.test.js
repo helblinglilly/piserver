@@ -1,3 +1,6 @@
+const log = require("loglevel");
+log.disableAll();
+
 const date = require("../../utils/date.utils");
 
 describe("daysBetweenTwoDates", () => {
@@ -69,7 +72,6 @@ describe("isShortTime", () => {
 describe("dateToHHMMLocal", () => {
   test("Does convert time to local timezone - Summertime", () => {
     const input = new Date("2020-04-13T12:00:00.000+08:00");
-    console.log(input);
     const output = date.dateToHHMMLocal(input);
 
     expect(output).toBe("05:00");
@@ -90,6 +92,13 @@ describe("dateToHHMMUTC", () => {
     const output = date.dateToHHMMUTC(input);
 
     expect(output).toBe("04:00");
+  });
+});
+
+describe("todayISOUTC", () => {
+  test("Returns a string", () => {
+    const output = date.todayISOUTC();
+    expect(output.length).toBe(10);
   });
 });
 

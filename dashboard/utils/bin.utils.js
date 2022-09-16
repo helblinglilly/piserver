@@ -3,6 +3,7 @@ const fs = require("fs");
 const csv = require("fast-csv");
 const model = require("../models/bin.model");
 const dateUtils = require("../utils/date.utils");
+const networkUtils = require("../utils/network.utils");
 
 let isDownloadingNewFile = false;
 exports.getBinDates = async () => {
@@ -56,7 +57,7 @@ const fetchFreshBinDates = async () => {
 
     // Grab a fresh file
     const binDates = [];
-    await utils.downloadFile(url, filepath);
+    await networkUtils.downloadFile(url, filepath);
 
     // Process it only for our address
     const stream = fs.createReadStream(filepath);

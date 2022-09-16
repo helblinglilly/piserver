@@ -1,3 +1,6 @@
+const log = require("loglevel");
+log.disableAll();
+
 const network = require("../../utils/network.utils");
 const fs = require("fs");
 
@@ -16,7 +19,7 @@ describe("createFolderForFile", () => {
   });
   afterEach(() => {
     try {
-      fs.rmdirSync(testFolder);
+      fs.rmSync(testFolder, { recursive: true });
     } catch {
       return;
     }
@@ -35,6 +38,20 @@ describe("createFolderForFile", () => {
       return;
     }
     expect(network.createFolderForFile(testFilePath)).toBe(true);
+  });
+
+  test("Can created nested folder structure", () => {
+    expect(network.createFolderForFile(testFolder + "/another/layer/deep.txt")).toBe(
+      true,
+    );
+  });
+
+  test("Will fail gracefully for root dir", () => {
+    expect(network.createFolderForFile("/root.txt")).toBe(false);
+  });
+
+  test("Will fail when a folder is supplies, and not a file", () => {
+    expect(network.createFolderForFile(testFolder)).toBe(false);
   });
 });
 
@@ -63,5 +80,21 @@ describe("downloadFile", () => {
 
     fs.rmSync(filepath);
     fs.rmdirSync(testFolder);
+  });
+
+  test("Will fail gracefully if proposed file location is not valid", async () => {
+    try {
+      await network.downloadFile(url, "/some/folder");
+    } catch (err) {
+      expect(err).toBe("Failed to create folder for file /some/folder");
+    }
+  });
+
+  test("Will reject if http request fails", async () => {
+    try {
+      await network.downloadFile("coolstuff", filepath);
+    } catch (err) {
+      expect(err.code).toBe("ECONNREFUSED");
+    }
   });
 });

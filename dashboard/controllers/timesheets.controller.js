@@ -1,6 +1,5 @@
 const timesheetsModel = require("../models/timsheets.model");
 const timesheetUtils = require("../utils/timesheet.utils");
-const generalUtils = require("../utils.js");
 const dateUtils = require("../utils/date.utils");
 
 const indexObject = (
@@ -34,7 +33,7 @@ const viewClockIn = () => {
 
 const viewBreakIn = (rows) => {
   const now = new Date();
-  const proposedEndTime = timesheetUtils.copyDate(rows.clock_in);
+  const proposedEndTime = dateUtils.copyDate(rows.clock_in);
   proposedEndTime.setHours(proposedEndTime.getHours() + 8);
   proposedEndTime.setMinutes(proposedEndTime.getMinutes() + 30);
   let overtimeWorked = false;
@@ -56,9 +55,9 @@ const viewBreakEnd = (rows) => {
 
   let overtimeWorked = false;
 
-  const proposedBreakEndTime = timesheetUtils.copyDate(breakIn);
+  const proposedBreakEndTime = dateUtils.copyDate(breakIn);
   proposedBreakEndTime.setHours(breakIn.getHours() + 1);
-  const proposedEndTime = timesheetUtils.copyDate(proposedBreakEndTime);
+  const proposedEndTime = dateUtils.copyDate(proposedBreakEndTime);
 
   proposedEndTime.setHours(proposedEndTime.getHours() + (6 - hoursWorked));
   proposedEndTime.setMinutes(proposedEndTime.getMinutes() + (30 - minutesWorked));

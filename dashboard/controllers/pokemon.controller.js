@@ -100,7 +100,7 @@ exports.getPokemon = async (req, res, next) => {
         }
       }
     }
-    options.moves = utils.sortmoves(options.moves);
+    options.moves = pokemonUtils.sortmoves(options.moves);
   }
   res.render("pokemon/pkmn", { ...options });
   return;

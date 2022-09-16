@@ -50,7 +50,7 @@ export const addTime = (
 };
 
 export const isShortTime = (allegedTime: string): boolean => {
-  return allegedTime.match("/^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/") === null;
+  return /^([0-1][0-9]|2[0-3]):[0-5][0-9]$/.test(allegedTime);
 };
 
 export const dateToHHMMLocal = (date: Date): string => {
