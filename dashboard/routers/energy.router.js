@@ -4,6 +4,7 @@ const ec = require("../controllers/energy.controller");
 const userSelection = require("../middleware/user.middleware");
 
 energyRouter.get("/", userSelection, ec.getRoot);
+energyRouter.all("/", error.methodNotAllowed);
 
 energyRouter.get("/bills", userSelection, ec.getBills);
 energyRouter.all("/bills", error.methodNotAllowed);

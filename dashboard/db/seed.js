@@ -1,5 +1,4 @@
 const db = require("./index");
-const utils = require("../utils");
 const format = require("pg-format");
 const env = require("../environment");
 const dateUtils = require("../utils/date.utils");

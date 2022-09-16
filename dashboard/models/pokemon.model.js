@@ -1,6 +1,5 @@
 const fs = require("fs");
 const axios = require("axios");
-const utils = require("../utils");
 const pokemonUtils = require("../utils/pokemon.utils");
 const networkUtils = require("../utils/network.utils");
 

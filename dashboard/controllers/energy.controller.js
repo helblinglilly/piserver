@@ -1,4 +1,3 @@
-const utils = require("../utils");
 const model = require("../models/energy.model");
 const error = require("./error.controller");
 const energy = require("../utils/energy.utils");

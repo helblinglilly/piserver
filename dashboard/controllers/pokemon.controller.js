@@ -1,4 +1,3 @@
-const utils = require("../utils");
 const model = require("../models/pokemon.model");
 const error = require("./error.controller");
 const pokemonUtils = require("../utils/pokemon.utils");

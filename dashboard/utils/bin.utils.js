@@ -1,4 +1,3 @@
-const utils = require("../utils");
 const fs = require("fs");
 const csv = require("fast-csv");
 const model = require("../models/bin.model");

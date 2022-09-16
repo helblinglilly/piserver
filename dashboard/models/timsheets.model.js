@@ -1,5 +1,4 @@
 const db = require("../db");
-const utils = require("../utils/timesheet.utils");
 const format = require("pg-format");
 const dateUtils = require("../utils/date.utils");
 
