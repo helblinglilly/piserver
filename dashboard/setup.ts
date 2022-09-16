@@ -12,6 +12,8 @@ dbInit
       global.port = 8080;
       global.host = "127.0.0.1";
       log.setLevel("ERROR");
+    } else if (env === "test") {
+      log.disableAll();
     } else {
       global.port = 9090;
       global.host = "127.0.0.1";
