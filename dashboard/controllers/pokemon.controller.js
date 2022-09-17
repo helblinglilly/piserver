@@ -2,8 +2,8 @@ const model = require("../models/pokemon.model");
 const error = require("./error.controller");
 const pokemonUtils = require("../utils/pokemon.utils");
 
-exports.getRoot = (req, res, next) => {
-  res.render("pokemon", { username: req.username });
+exports.getRoot = async (req, res, next) => {
+  res.render("pokemon/index", { username: req.username });
 };
 
 exports.getPokemon = async (req, res, next) => {

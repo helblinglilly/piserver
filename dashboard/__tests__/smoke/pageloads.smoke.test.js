@@ -1,29 +1,35 @@
 const request = require("supertest");
 const app = require("../../app");
+const db = require("../../db/");
+const seed = require("../../db/seed");
+
+beforeEach(async () => {
+  await seed.seed();
+  //   app.listen(() => {});
+});
+afterAll(() => {
+  if (db.end) db.end();
+});
 
 describe("/", () => {
-  //   test("root", () => {
-  //     return request(app).get("/").expect(200);
-  //   });
+  describe("/stopwatch", () => {
+    test("/", () => {
+      return request(app).get("/stopwatch").expect(200);
+    });
+    test("/view", () => {
+      return request(app).get("/stopwatch/view").expect(200);
+    });
+  });
 
-  describe("/energy", () => {
-    test("root", async () => {
-      await request(app).get("/energy").expect(200);
+  describe("/timesheet", () => {
+    test("/", () => {
+      return request(app).get("/timesheet").expect(200);
     });
-    test("/bill", () => {
-      return request(app).get("/energy/bills").expect(200);
+    test("/view", () => {
+      return request(app).get("/timesheet/view").expect(200);
     });
-    test("/insert_electric", () => {
-      return request(app).get("/energy/insert_electric").expect(200);
-    });
-    test("/insert_gas", () => {
-      return request(app).get("/energy/insert_gas").expect(200);
-    });
-    test("/view_monthly", () => {
-      return request(app).get("/energy/view_monthly").expect(200);
-    });
-    test("/view_hourly", () => {
-      return request(app).get("/energy/view_hourly").expect(200);
+    test("/edit", () => {
+      return request(app).get("/timesheet/edit").expect(200);
     });
   });
 
@@ -45,24 +51,28 @@ describe("/", () => {
     });
   });
 
-  describe("/stopwatch", () => {
-    test("/", () => {
-      return request(app).get("/stopwatch").expect(200);
-    });
-    test("/view", () => {
-      return request(app).get("/stopwatch/view").expect(200);
-    });
+  test("root", () => {
+    return request(app).get("/").expect(200);
   });
 
-  describe("/timesheet", () => {
-    test("/", () => {
-      return request(app).get("/timesheet").expect(200);
+  describe("/energy", () => {
+    test("root", () => {
+      return request(app).get("/energy").expect(200);
     });
-    test("/view", () => {
-      return request(app).get("/timesheet/view").expect(200);
+    test("/bill", () => {
+      return request(app).get("/energy/bills").expect(200);
     });
-    test("/edit", () => {
-      return request(app).get("/timesheet/edit").expect(200);
+    test("/insert_electric", () => {
+      return request(app).get("/energy/insert_electric").expect(200);
+    });
+    test("/insert_gas", () => {
+      return request(app).get("/energy/insert_gas").expect(200);
+    });
+    test("/view_monthly", () => {
+      return request(app).get("/energy/view_monthly").expect(200);
+    });
+    test("/view_hourly", () => {
+      return request(app).get("/energy/view_hourly").expect(200);
     });
   });
 });
