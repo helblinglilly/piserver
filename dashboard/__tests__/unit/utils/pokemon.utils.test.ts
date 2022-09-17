@@ -1,7 +1,7 @@
-const log = require("loglevel");
+import log from "loglevel";
 log.disableAll();
 
-const pokemon = require("../../utils/pokemon.utils");
+import PokemonUtils, { Item, MoveSet } from "../../../utils/pokemon.utils";
 
 describe("pokemonNameLanguage", () => {
   test("Can return the name correctly", () => {
@@ -16,13 +16,13 @@ describe("pokemonNameLanguage", () => {
       ],
     };
 
-    expect(pokemon.pokemonNameLanguage(input, "de")).toBe("Found");
+    expect(PokemonUtils.pokemonNameLanguage(input, "de")).toBe("Found");
   });
 });
 
 describe("itemNameLanguage", () => {
   test("Can retrieve item name correctly", () => {
-    const input = {
+    const input: Item = {
       names: [
         {
           name: "Found",
@@ -31,15 +31,17 @@ describe("itemNameLanguage", () => {
           },
         },
       ],
+      flavor_text_entries: [],
     };
 
-    expect(pokemon.itemNameLanguage(input, "de")).toEqual("Found");
+    expect(PokemonUtils.itemNameLanguage(input, "de")).toEqual("Found");
   });
 });
 
 describe("itemFlavourTextLanguage", () => {
   test("Can return the name correctly", () => {
-    const input = {
+    const input: Item = {
+      names: ["something"],
       flavor_text_entries: [
         {
           text: "- - -",
@@ -57,7 +59,7 @@ describe("itemFlavourTextLanguage", () => {
         },
       ],
     };
-    const output = pokemon.itemFlavourTextLanguage(input, "de");
+    const output = PokemonUtils.itemFlavourTextLanguage(input, "de");
     expect(output).toEqual([
       {
         generation: 3,
@@ -74,7 +76,7 @@ describe("itemFlavourTextLanguage", () => {
 });
 
 describe("sortMoves", () => {
-  const completeMoves = [
+  const completeMoves: Array<MoveSet> = [
     {
       id: "574",
       type: "fairy",
@@ -127,12 +129,74 @@ describe("sortMoves", () => {
     },
   ];
   test("Sorts level only moves correctly", () => {
-    const input = [{ method: 5 }, { method: 6 }, { method: 3 }];
-    const output = pokemon.sortMoves(input);
-    expect(output).toStrictEqual([{ method: 3 }, { method: 5 }, { method: 6 }]);
+    const input: Array<MoveSet> = [
+      {
+        id: "id",
+        type: "type",
+        typeSprite: "typeSprite",
+        attackType: "attackType",
+        attackTypeSprite: "attackTypeSprite",
+        moveNameGerman: "moveNameGerman",
+        moveNameEnglish: "moveNameEnglish",
+        method: 5,
+      },
+      {
+        id: "id",
+        type: "type",
+        typeSprite: "typeSprite",
+        attackType: "attackType",
+        attackTypeSprite: "attackTypeSprite",
+        moveNameGerman: "moveNameGerman",
+        moveNameEnglish: "moveNameEnglish",
+        method: 6,
+      },
+      {
+        id: "id",
+        type: "type",
+        typeSprite: "typeSprite",
+        attackType: "attackType",
+        attackTypeSprite: "attackTypeSprite",
+        moveNameGerman: "moveNameGerman",
+        moveNameEnglish: "moveNameEnglish",
+        method: 3,
+      },
+    ];
+    const output = PokemonUtils.sortMoves(input);
+    expect(output).toStrictEqual([
+      {
+        id: "id",
+        type: "type",
+        typeSprite: "typeSprite",
+        attackType: "attackType",
+        attackTypeSprite: "attackTypeSprite",
+        moveNameGerman: "moveNameGerman",
+        moveNameEnglish: "moveNameEnglish",
+        method: 3,
+      },
+      {
+        id: "id",
+        type: "type",
+        typeSprite: "typeSprite",
+        attackType: "attackType",
+        attackTypeSprite: "attackTypeSprite",
+        moveNameGerman: "moveNameGerman",
+        moveNameEnglish: "moveNameEnglish",
+        method: 5,
+      },
+      {
+        id: "id",
+        type: "type",
+        typeSprite: "typeSprite",
+        attackType: "attackType",
+        attackTypeSprite: "attackTypeSprite",
+        moveNameGerman: "moveNameGerman",
+        moveNameEnglish: "moveNameEnglish",
+        method: 6,
+      },
+    ]);
   });
   test("Sorts mixed moves correctly", () => {
-    const output = pokemon.sortMoves(completeMoves);
+    const output = PokemonUtils.sortMoves(completeMoves);
     expect(output).toStrictEqual([
       {
         id: "195",

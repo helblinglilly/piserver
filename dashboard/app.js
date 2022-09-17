@@ -1,11 +1,10 @@
 require("./utils/log.utils");
 const express = require("express");
 const error = require("./controllers/error.controller");
-const timesheetRouter = require("./routers/timesheets.router.js");
+const timesheetRouter = require("./routers/timesheet.router");
 const stopwatchRouter = require("./routers/stopwatch.router.js");
 const pokemonRouter = require("./routers/pokemon.router.js");
 const userRouter = require("./routers/user.router");
-const apiRouter = require("./routers/api.router");
 const energyRouter = require("./routers/energy.router");
 const userSelection = require("./middleware/user.middleware");
 const energyUtils = require("./utils/energy.utils");
@@ -23,7 +22,6 @@ app.use("/timesheet", timesheetRouter);
 app.use("/stopwatch", stopwatchRouter);
 app.use("/pokemon", pokemonRouter);
 app.use("/user", userRouter);
-app.use("/api", apiRouter);
 app.use("/energy", energyRouter);
 
 app.get("/", userSelection, async (req, res, next) => {

@@ -1,9 +1,13 @@
-const { Pool } = require("pg");
-const env = require("../environment");
+import { Pool } from "pg";
+import env from "../environment";
+
+import Seed from "../db/seed";
+const seed = new Seed();
+seed.usertable();
 
 require("dotenv").config();
 
-module.exports = new Pool({
+export default new Pool({
   user: process.env.POSTGRES_USER,
   host: process.env.POSTGRES_HOST,
   database: `${process.env.POSTGRES_DATABASE}_${env}`,

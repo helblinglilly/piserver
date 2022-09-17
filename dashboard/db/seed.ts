@@ -1,33 +1,105 @@
-const db = require("./index");
-const format = require("pg-format");
-const env = require("../environment");
+import Client from "pg";
+import env from "../environment";
+import format from "pg-format";
+import GeneralUtils from "../utils/general.utils";
 
+export interface UsertableData {
+  ip: string;
+  username: string;
+}
+
+export interface TimesheetData {}
+
+export class Seed {
+  private client: Client.Client;
+  private clearTables: boolean;
+
+  constructor(clearTables: boolean) {
+    this.client = new Client.Client({
+      user: process.env.POSTGRES_USER,
+      password: process.env.POSTGRES_PASSWORD,
+      host: process.env.POSTGRES_HOST,
+      database: `${process.env.POSTGRES_DATABASE}_${env}`,
+    });
+
+    this.client.connect();
+    this.clearTables = clearTables;
+  }
+
+  usertable = async (
+    data: Array<UsertableData> = [{ ip: "127.0.0.1", username: "joel" }],
+  ) => {
+    if (this.clearTables) await this.client.query(`DROP TABLE IF EXISTS usertable`);
+
+    await this.client.query(
+      `CREATE TABLE IF NOT EXISTS usertable (ip varchar(255) NOT NULL PRIMARY KEY, username varchar(255) NOT NULL)`,
+    );
+
+    for (const entry of data) {
+      await this.client.query(
+        format(
+          `INSERT INTO usertable (ip, username) VALUES (%L, %L)`,
+          entry.ip,
+          entry.username,
+        ),
+      );
+    }
+  };
+
+  timesheet = async (data: Array<TimesheetData> = [{}]) => {
+    if (this.clearTables) await this.client.query(`DROP TABLE IF EXISTS timesheet`);
+
+    const createQuery = `CREATE TABLE IF NOT EXISTS timesheet (
+        id SERIAL PRIMARY KEY, 
+        username VARCHAR NOT NULL, 
+        day_date DATE NOT NULL, 
+        clock_in TIME NOT NULL, 
+        break_in TIME, 
+        break_out TIME, 
+        clock_out TIME 
+        );`;
+
+    await this.client.query(GeneralUtils.replaceNewlineTabWithSpace(createQuery));
+
+    const today = new Date();
+    const insertQuery = format(
+      `INSERT INTO timesheet
+    (username, day_date, clock_in, break_in, break_out, clock_out)
+    VALUES
+    ('joel', %L, '09:00:00', NULL, NULL, NULL),
+    ('joel', %L, '09:00:00', '13:15:00', NULL, NULL),
+    ('joel', %L, '09:15:00', '13:00:00', '14:00:00', NULL),
+    ('joel', %L, '09:45:00', '13:00:00', '13:45:00', '16:15:00'),
+    ('joel', %L, '09:00:00', '13:00:00', '14:00:00', '17:00:00'),
+    ('joel', %L, '09:00:00', '13:00:00', '14:00:00', '18:00:00')
+    `,
+      today,
+      new Date(today.getDate() - 1),
+      new Date(today.getDate() - 2),
+      new Date(today.getDate() - 3),
+      new Date(today.getDate() - 4),
+      new Date(today.getDate() - 5),
+    );
+
+    console.log(insertQuery);
+
+    await this.client.query(insertQuery);
+  };
+}
+
+export default Seed;
+/*
 const today = new Date();
 
 const tomorrow = new Date();
 tomorrow.setDate(tomorrow.getDate() + 1);
 
-exports.seed = async () => {
-  const createUsertable = `CREATE TABLE IF NOT EXISTS usertable (
-    ip varchar(255) NOT NULL PRIMARY KEY,
-    username varchar(255) NOT NULL
-    );`;
-
+export async function seed() {
   const createBinDates = `CREATE TABLE IF NOT EXISTS bin_dates (
     bin_type varchar(12) NOT NULL,
     collection_date DATE NOT NULL,
     PRIMARY KEY(bin_type, collection_date)
   )`;
-
-  const createTimesheet = `CREATE TABLE IF NOT EXISTS timesheet (
-    id SERIAL PRIMARY KEY,
-    username VARCHAR NOT NULL,
-    day_date DATE NOT NULL,
-    clock_in TIME NOT NULL,
-    break_in TIME,
-    break_out TIME,
-    clock_out TIME
-    );`;
 
   const createStopwatch = `CREATE TABLE IF NOT EXISTS stopwatch (
     id SERIAL PRIMARY KEY,
@@ -193,33 +265,31 @@ exports.seed = async () => {
   );
 
   if (env !== "production") {
-    await db.query(`DROP TABLE IF EXISTS timesheet;`);
-    await db.query(`DROP TABLE IF EXISTS stopwatch;`);
-    await db.query(`DROP TABLE IF EXISTS usertable;`);
-    await db.query(`DROP TABLE IF EXISTS electricity_bill`);
-    await db.query(`DROP TABLE IF EXISTS gas_bill`);
-    await db.query(`DROP TABLE IF EXISTS bin_dates`);
-    await db.query(`DROP TABLE IF EXISTS electricity_usage`);
-    await db.query(`DROP TABLE IF EXISTS gas_usage`);
+    await query(`DROP TABLE IF EXISTS timesheet;`);
+    await query(`DROP TABLE IF EXISTS stopwatch;`);
+    await query(`DROP TABLE IF EXISTS electricity_bill`);
+    await query(`DROP TABLE IF EXISTS gas_bill`);
+    await query(`DROP TABLE IF EXISTS bin_dates`);
+    await query(`DROP TABLE IF EXISTS electricity_usage`);
+    await query(`DROP TABLE IF EXISTS gas_usage`);
   }
 
-  await db.query(createUsertable);
-  await db.query(createBinDates);
-  await db.query(createStopwatch);
-  await db.query(createTimesheet);
-  await db.query(createElectricBill);
-  await db.query(createGasBill);
-  await db.query(createElectricityUsage);
-  await db.query(createGasUsage);
+  await query(createBinDates);
+  await query(createStopwatch);
+  await query(createTimesheet);
+  await query(createElectricBill);
+  await query(createGasBill);
+  await query(createElectricityUsage);
+  await query(createGasUsage);
 
   if (env !== "production") {
-    await db.query("INSERT INTO usertable (ip, username) VALUES ('127.0.0.1', 'joel');");
-    await db.query(insertTimsheet);
-    await db.query(insertStopwatch);
-    await db.query(insertBinDates);
-    await db.query(insertElectricBills);
-    await db.query(insertGasBills);
-    await db.query(insertGasEntry);
-    await db.query(insertElectricityEntry);
+    await query(insertTimsheet);
+    await query(insertStopwatch);
+    await query(insertBinDates);
+    await query(insertElectricBills);
+    await query(insertGasBills);
+    await query(insertGasEntry);
+    await query(insertElectricityEntry);
   }
-};
+}
+*/

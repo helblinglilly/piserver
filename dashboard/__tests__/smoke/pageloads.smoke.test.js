@@ -3,6 +3,9 @@ const app = require("../../app");
 const db = require("../../db/");
 const seed = require("../../db/seed");
 
+const log = require("loglevel");
+log.disableAll();
+
 beforeAll(async () => {
   await seed.seed();
 });
@@ -11,7 +14,7 @@ afterAll(() => {
 });
 
 describe("/", () => {
-  test.skip("root", () => {
+  test("root", () => {
     return request(app).get("/").expect(200);
   });
 

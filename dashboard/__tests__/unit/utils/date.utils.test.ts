@@ -1,7 +1,9 @@
+import { describe, expect, test } from "@jest/globals";
+
 const log = require("loglevel");
 log.disableAll();
 
-const date = require("../../utils/date.utils");
+import date from "../../../utils/date.utils";
 
 describe("daysBetweenTwoDates", () => {
   test("Returns 1 for exact date inputs", () => {
