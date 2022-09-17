@@ -105,15 +105,18 @@ exports.insertElectricityEntry = async (startDate, endDate, usage) => {
     console.log(exception);
     await db.query(
       format(
-        `DELETE FROM electricity_usage 
-        WHERE (start_date=%L, end_date=%L, usage_kwh=%L, entry_created=%L)`,
+        `UPDATE electricity_usage 
+        SET start_date=%L, end_date=%L, usage_kwh=%L, entry_created=%L
+        WHERE usage_kwh=%L AND start_date=%L AND end_date=%L`,
         startDate,
         endDate,
         usage,
         createdDate,
+        usage,
+        startDate,
+        endDate,
       ),
     );
-    await this.insertElectricityEntry(startDate, endDate, usage);
   }
 };
 
@@ -172,15 +175,18 @@ exports.insertGasEntry = async (startDate, endDate, usage) => {
     console.log(exception);
     await db.query(
       format(
-        `DELETE FROM gas_usage 
-        WHERE (start_date=%L, end_date=%L, usage_kwh=%L, entry_created=%L)`,
+        `UPDATE gas_usage 
+        SET start_date=%L, end_date=%L, usage_kwh=%L, entry_created=%L
+        WHERE usage_kwh=%L AND start_date=%L AND end_date=%L`,
         startDate,
         endDate,
         usage,
         createdDate,
+        usage,
+        startDate,
+        endDate,
       ),
     );
-    await this.insertGasEntry(startDate, endDate, usage);
   }
 };
 

@@ -1,7 +1,11 @@
 const db = require("./index");
 const format = require("pg-format");
 const env = require("../environment");
-const dateUtils = require("../utils/date.utils");
+
+const today = new Date();
+
+const tomorrow = new Date();
+tomorrow.setDate(tomorrow.getDate() + 1);
 
 exports.seed = async () => {
   const createUsertable = `CREATE TABLE IF NOT EXISTS usertable (
@@ -61,6 +65,46 @@ exports.seed = async () => {
     PRIMARY KEY(usage_kwh, start_date, end_date)
   )`;
 
+  const createGasBill = `CREATE TABLE IF NOT EXISTS gas_bill(
+    id SERIAL PRIMARY KEY,
+    billing_start DATE NOT NULL,
+    billing_end DATE NOT NULL,
+    standing_order_charge_days INTEGER NOT NULL,
+    standing_order_rate DECIMAL NOT NULL,
+    usage_kwh DECIMAL NOT NULL,
+    rate_kwh DECIMAL NOT NULL,
+    pre_tax DECIMAL NOT NULL,
+    after_tax DECIMAL NOT NULL
+  )`;
+
+  const insertGasEntry = format(
+    `INSERT INTO gas_usage
+  (start_date, end_date, usage_kwh, entry_created)
+  VALUES
+  (%L, %L, 1, %L),
+  (%L, %L, 1, %L)`,
+    today,
+    new Date(today.getMinutes() + 30),
+    today,
+    new Date(today.getMinutes() + 30),
+    new Date(today.getHours() + 1),
+    today,
+  );
+
+  const insertElectricityEntry = format(
+    `INSERT INTO electricity_usage
+  (start_date, end_date, usage_kwh, entry_created)
+  VALUES
+  (%L, %L, 1, %L),
+  (%L, %L, 1, %L)`,
+    today,
+    new Date(today.getMinutes() + 30),
+    today,
+    new Date(today.getMinutes() + 30),
+    new Date(today.getHours() + 1),
+    today,
+  );
+
   const insertElectricBills = `INSERT INTO electricity_bill
     (billing_start, billing_end, standing_order_charge_days, standing_order_rate, usage_kwh, rate_kwh, pre_tax, after_tax)
     VALUES
@@ -81,18 +125,6 @@ exports.seed = async () => {
     ('2022-08-24', '2022-09-23', 31, 45.96, 89.4, 26.05, 37.54, 39.41)
     `;
 
-  const createGasBill = `CREATE TABLE IF NOT EXISTS gas_bill(
-    id SERIAL PRIMARY KEY,
-    billing_start DATE NOT NULL,
-    billing_end DATE NOT NULL,
-    standing_order_charge_days INTEGER NOT NULL,
-    standing_order_rate DECIMAL NOT NULL,
-    usage_kwh DECIMAL NOT NULL,
-    rate_kwh DECIMAL NOT NULL,
-    pre_tax DECIMAL NOT NULL,
-    after_tax DECIMAL NOT NULL
-  )`;
-
   const insertGasBills = `INSERT INTO gas_bill
   (billing_start, billing_end, standing_order_charge_days, standing_order_rate, usage_kwh, rate_kwh, pre_tax, after_tax)
   VALUES
@@ -111,8 +143,6 @@ exports.seed = async () => {
   ('2022-07-24', '2022-08-23', 31, 25.92, 60, 6.93, 12.18, 12.70)
   `;
 
-  const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
   const insertBinDates = format(
     `INSERT INTO bin_dates
   (bin_type, collection_date)
@@ -124,39 +154,43 @@ exports.seed = async () => {
     tomorrow,
   );
 
-  const insertTimsheet = [
-    `INSERT INTO timesheet (username, day_date, clock_in, break_in, break_out, clock_out) VALUES ('joel', '2022-01-01', '09:00:00', '13:00:00', '14:00:00', '17:30:00');`,
-    `INSERT INTO timesheet (username, day_date, clock_in, break_in, break_out, clock_out) VALUES ('joel', '2022-01-02', '09:00:00', '13:15:00', '14:15:00', '18:00:00');`,
-    `INSERT INTO timesheet (username, day_date, clock_in, break_in, break_out, clock_out) VALUES ('joel', '2022-01-03', '009:00:00', '13:15:00', '14:15:00', '18:45:00');`,
-    `INSERT INTO timesheet (username, day_date, clock_in, break_in, break_out, clock_out) VALUES ('joel', '2022-01-04', '09:15:00', '13:00:00', '14:00:00', '20:30:00');`,
-    `INSERT INTO timesheet (username, day_date, clock_in, break_in, break_out, clock_out) VALUES ('joel', '2022-01-05', '09:45:00', '13:00:00', '13:45:00', '16:15:00');`,
-    `INSERT INTO timesheet (username, day_date, clock_in, break_in, break_out, clock_out) VALUES ('joel', '2022-01-06', '09:00:00', '13:00:00', '14:00:00', '17:00:00');`,
-    `INSERT INTO timesheet (username, day_date, clock_in, break_in, break_out, clock_out) VALUES ('joel', '2022-01-07', '09:00:00', null, null, '17:00:00');`,
-    `INSERT INTO timesheet (username, day_date, clock_in, break_in, break_out, clock_out) VALUES ('joel', '2022-01-08', '09:00:00', '13:00:00', '14:00:00', null);`,
-    `INSERT INTO timesheet (username, day_date, clock_in, break_in, break_out, clock_out) VALUES ('harry', '2022-01-01', '09:00:00', '13:00:00', '14:00:00', '17:30:00');`,
-    `INSERT INTO timesheet (username, day_date, clock_in, break_in, break_out, clock_out) VALUES ('harry', '2022-01-02', '09:00:00', NULL, NULL, '18:00:00');`,
-    `INSERT INTO timesheet (username, day_date, clock_in, break_in, break_out, clock_out) VALUES ('harry', '2022-01-03', '08:30:00', NULL, NULL, '17:00:00');`,
-    `INSERT INTO timesheet (username, day_date, clock_in, break_in, break_out, clock_out) VALUES ('harry', '2022-01-04', '09:15:00', '13:00:00', '14:00:00', '17:30:00');`,
-    `INSERT INTO timesheet (username, day_date, clock_in, break_in, break_out, clock_out) VALUES ('harry', '2022-01-04', '09:45:00', '13:00:00', '14:00:00', '18:15:00');`,
+  const insertTimsheet = format(
+    `INSERT INTO timesheet
+  (username, day_date, clock_in, break_in, break_out, clock_out)
+  VALUES
+  ('joel', %L, '09:00:00', NULL, NULL, NULL),
+  ('joel', %L, '09:00:00', '13:15:00', NULL, NULL),
+  ('joel', %L, '09:15:00', '13:00:00', '14:00:00', NULL),
+  ('joel', %L, '09:45:00', '13:00:00', '13:45:00', '16:15:00'),
+  ('joel', %L, '09:00:00', '13:00:00', '14:00:00', '17:00:00'),
+  ('joel', %L, '09:00:00', '13:00:00', '14:00:00', '18:00:00')
+  `,
+    today,
+    new Date(today.getDate() - 1),
+    new Date(today.getDate() - 2),
+    new Date(today.getDate() - 3),
+    new Date(today.getDate() - 4),
+    new Date(today.getDate() - 5),
+  );
 
-    format(
-      `INSERT INTO "timesheet" (username, day_date, clock_in, break_in, break_out, clock_out) VALUES ('joel', %L, '11:30', '13:00', '14:00', null);`,
-      dateUtils.todayISOUTC(),
-    ),
-    format(
-      `INSERT INTO "timesheet" (username, day_date, clock_in, break_in, break_out, clock_out) VALUES ('harry', %L, '09:45', null, null, null);`,
-      dateUtils.todayISOUTC(),
-    ),
-  ];
-
-  const insertStopwatch = [
-    `INSERT INTO stopwatch (username, day_date, timestamp, action) VALUES ('joel', '2022-01-01', '09:00:00', 'START');`,
-    `INSERT INTO stopwatch (username, day_date, timestamp, action) VALUES ('joel', '2022-01-01', '09:30:00', 'STOP');`,
-    `INSERT INTO stopwatch (username, day_date, timestamp, action) VALUES ('joel', '2022-01-01', '09:35:00', 'CONT');`,
-    `INSERT INTO stopwatch (username, day_date, timestamp, action) VALUES ('joel', '2022-01-01', '13:00:00', 'STOP');`,
-    `INSERT INTO stopwatch (username, day_date, timestamp, action) VALUES ('joel', '2022-01-01', '14:00:00', 'CONT');`,
-    `INSERT INTO stopwatch (username, day_date, timestamp, action) VALUES ('joel', '2022-01-01', '15:00:00', 'END');`,
-  ];
+  const insertStopwatch = format(
+    `INSERT INTO stopwatch
+  (username, day_date, timestamp, action)
+  VALUES
+  ('joel', %L, '09:00:00', 'START'),
+  ('joel', %L, '09:30:00', 'STOP'),
+  ('joel', %L, '09:35:00', 'CONT'),
+  ('joel', %L, '13:00:00', 'STOP'),
+  ('joel', %L, '14:00:00', 'CONT'),
+  ('joel', %L, '15:00:00', 'END')
+  `,
+    today,
+    today,
+    today,
+    today,
+    today,
+    today,
+  );
 
   if (env !== "production") {
     await db.query(`DROP TABLE IF EXISTS timesheet;`);
@@ -165,8 +199,8 @@ exports.seed = async () => {
     await db.query(`DROP TABLE IF EXISTS electricity_bill`);
     await db.query(`DROP TABLE IF EXISTS gas_bill`);
     await db.query(`DROP TABLE IF EXISTS bin_dates`);
-    // await db.query(`DROP TABLE IF EXISTS electricity_usage`);
-    // await db.query(`DROP TABLE IF EXISTS gas_usage`);
+    await db.query(`DROP TABLE IF EXISTS electricity_usage`);
+    await db.query(`DROP TABLE IF EXISTS gas_usage`);
   }
 
   await db.query(createUsertable);
@@ -179,18 +213,13 @@ exports.seed = async () => {
   await db.query(createGasUsage);
 
   if (env !== "production") {
-    for (const query of insertTimsheet) {
-      await db.query(query);
-    }
-
-    for (const query of insertStopwatch) {
-      await db.query(query);
-    }
-
+    await db.query("INSERT INTO usertable (ip, username) VALUES ('127.0.0.1', 'joel');");
+    await db.query(insertTimsheet);
+    await db.query(insertStopwatch);
     await db.query(insertBinDates);
     await db.query(insertElectricBills);
     await db.query(insertGasBills);
-
-    await db.query("INSERT INTO usertable (ip, username) VALUES ('127.0.0.1', 'joel');");
+    await db.query(insertGasEntry);
+    await db.query(insertElectricityEntry);
   }
 };

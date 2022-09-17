@@ -3,15 +3,18 @@ const app = require("../../app");
 const db = require("../../db/");
 const seed = require("../../db/seed");
 
-beforeEach(async () => {
+beforeAll(async () => {
   await seed.seed();
-  //   app.listen(() => {});
 });
 afterAll(() => {
   if (db.end) db.end();
 });
 
 describe("/", () => {
+  test.skip("root", () => {
+    return request(app).get("/").expect(200);
+  });
+
   describe("/stopwatch", () => {
     test("/", () => {
       return request(app).get("/stopwatch").expect(200);
@@ -49,10 +52,6 @@ describe("/", () => {
     test("/item/1", () => {
       return request(app).get("/pokemon/item/1").expect(200);
     });
-  });
-
-  test("root", () => {
-    return request(app).get("/").expect(200);
   });
 
   describe("/energy", () => {
