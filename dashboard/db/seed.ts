@@ -1,20 +1,64 @@
+import log, { setDefaultLevel } from "loglevel";
 import Client from "pg";
 import env from "../environment";
 import format from "pg-format";
 import GeneralUtils from "../utils/general.utils";
+import DateUtils from "../utils/date.utils";
+
+const logger = log.getLogger("seed");
 
 export interface UsertableData {
   ip: string;
   username: string;
 }
 
-export interface TimesheetData {}
+export interface TimesheetData {
+  username: string;
+  day_date: Date;
+  clock_in: Date;
+  break_in: Date;
+  break_out: Date;
+  clock_out: Date;
+}
+
+export interface StopwatchData {
+  username: string;
+  day_date: Date;
+  timestamp: Date;
+  action: "START" | "STOP" | "CONT" | "END";
+}
+
+export interface EnergyBillData {
+  billing_start: Date;
+  billing_end: Date;
+  standing_order_charge_days: number;
+  standing_order_rate: number;
+  usage_kwh: number;
+  rate_kwh: number;
+  pre_tax: number;
+  after_tax: number;
+}
+
+export interface EnergyData {
+  start_date: Date;
+  end_date: Date;
+  usage_kwh: number;
+}
+
+export interface BinDatesData {
+  bin_type: "GREEN" | "BLACK";
+  collection_date: Date;
+}
 
 export class Seed {
   private client: Client.Client;
   private clearTables: boolean;
+  private populateTables: boolean;
+  private tomorrow: Date;
 
-  constructor(clearTables: boolean) {
+  private defaultTimesheetEntry: Array<TimesheetData> = [];
+
+  constructor(clearTables: boolean, populateTables: boolean) {
     this.client = new Client.Client({
       user: process.env.POSTGRES_USER,
       password: process.env.POSTGRES_PASSWORD,
@@ -24,6 +68,19 @@ export class Seed {
 
     this.client.connect();
     this.clearTables = clearTables;
+    this.populateTables = populateTables;
+
+    this.tomorrow = new Date();
+    this.tomorrow.setDate(new Date().getDate() + 1);
+
+    this.defaultTimesheetEntry.push({
+      username: "joel",
+      day_date: new Date(),
+      clock_in: DateUtils.setTime(new Date(), 9, 0, 0),
+      break_in: DateUtils.setTime(new Date(), 12, 0, 0),
+      break_out: DateUtils.setTime(new Date(), 13, 0, 0),
+      clock_out: DateUtils.setTime(new Date(), 17, 30, 0),
+    });
   }
 
   usertable = async (
@@ -35,18 +92,19 @@ export class Seed {
       `CREATE TABLE IF NOT EXISTS usertable (ip varchar(255) NOT NULL PRIMARY KEY, username varchar(255) NOT NULL)`,
     );
 
-    for (const entry of data) {
-      await this.client.query(
-        format(
-          `INSERT INTO usertable (ip, username) VALUES (%L, %L)`,
-          entry.ip,
-          entry.username,
-        ),
-      );
-    }
+    if (this.populateTables)
+      for (const entry of data) {
+        await this.client.query(
+          format(
+            `INSERT INTO usertable (ip, username) VALUES (%L, %L)`,
+            entry.ip,
+            entry.username,
+          ),
+        );
+      }
   };
 
-  timesheet = async (data: Array<TimesheetData> = [{}]) => {
+  timesheet = async (data: Array<TimesheetData> = this.defaultTimesheetEntry) => {
     if (this.clearTables) await this.client.query(`DROP TABLE IF EXISTS timesheet`);
 
     const createQuery = `CREATE TABLE IF NOT EXISTS timesheet (
@@ -61,65 +119,365 @@ export class Seed {
 
     await this.client.query(GeneralUtils.replaceNewlineTabWithSpace(createQuery));
 
-    const today = new Date();
+    const values: Array<any> = [];
+    data.forEach((entry) => {
+      const row = [];
+      row.push(entry.username);
+      row.push(entry.day_date.toISOString().split("T")[0]);
+      row.push(entry.clock_in.toTimeString().split(" ")[0]);
+      row.push(entry.break_in.toTimeString().split(" ")[0]);
+      row.push(entry.break_out.toTimeString().split(" ")[0]);
+      row.push(entry.clock_out.toTimeString().split(" ")[0]);
+      values.push(row);
+    });
+
     const insertQuery = format(
-      `INSERT INTO timesheet
-    (username, day_date, clock_in, break_in, break_out, clock_out)
-    VALUES
-    ('joel', %L, '09:00:00', NULL, NULL, NULL),
-    ('joel', %L, '09:00:00', '13:15:00', NULL, NULL),
-    ('joel', %L, '09:15:00', '13:00:00', '14:00:00', NULL),
-    ('joel', %L, '09:45:00', '13:00:00', '13:45:00', '16:15:00'),
-    ('joel', %L, '09:00:00', '13:00:00', '14:00:00', '17:00:00'),
-    ('joel', %L, '09:00:00', '13:00:00', '14:00:00', '18:00:00')
+      `INSERT INTO timesheet 
+      (username, day_date, clock_in, break_in, break_out, clock_out) 
+      VALUES 
+      %L
     `,
-      today,
-      new Date(today.getDate() - 1),
-      new Date(today.getDate() - 2),
-      new Date(today.getDate() - 3),
-      new Date(today.getDate() - 4),
-      new Date(today.getDate() - 5),
+      values,
     );
 
-    console.log(insertQuery);
+    if (this.populateTables)
+      await this.client.query(GeneralUtils.replaceNewlineTabWithSpace(insertQuery));
+  };
 
-    await this.client.query(insertQuery);
+  stopwatch = async (data: Array<StopwatchData> = []) => {
+    if (this.clearTables) await this.client.query(`DROP TABLE IF EXISTS stopwatch`);
+
+    await this.client.query(
+      GeneralUtils.replaceNewlineTabWithSpace(`CREATE TABLE IF NOT EXISTS stopwatch (
+      username VARCHAR NOT NULL, 
+      day_date DATE NOT NULL, 
+      timestamp TIME NOT NULL, 
+      action VARCHAR(5) NOT NULL, 
+      PRIMARY KEY(username, day_date, timestamp, action) 
+    );`),
+    );
+
+    const values: Array<any> = [];
+
+    data.forEach((entry) => {
+      const row = [];
+      row.push(entry.username);
+      row.push(entry.day_date.toISOString().split("T")[0]);
+      row.push(entry.timestamp.toTimeString().split(" ")[0]);
+      row.push(entry.action);
+      values.push(row);
+    });
+
+    if (this.populateTables) {
+      await this.client.query(
+        GeneralUtils.replaceNewlineTabWithSpace(
+          format(
+            `INSERT INTO stopwatch
+          (username, day_date, timestamp, action)
+          VALUES
+          %L`,
+            values,
+          ),
+        ),
+      );
+    }
+  };
+
+  binDates = async (
+    data: Array<BinDatesData> = [
+      { bin_type: "GREEN", collection_date: new Date() },
+      { bin_type: "BLACK", collection_date: this.tomorrow },
+    ],
+  ) => {
+    if (this.clearTables) await this.client.query(`DROP TABLE IF EXISTS bin_dates`);
+
+    await this.client.query(
+      GeneralUtils.replaceNewlineTabWithSpace(`CREATE TABLE IF NOT EXISTS bin_dates (
+      bin_type varchar(12) NOT NULL, 
+      collection_date DATE NOT NULL, 
+      PRIMARY KEY(bin_type, collection_date) 
+    )`),
+    );
+
+    const values = [];
+    data.forEach((entry) => {
+      const row = [];
+      row.push(entry.bin_type);
+      row.push(entry.collection_date.toISOString().split("T")[0]);
+      values.push(row);
+    });
+
+    if (this.populateTables) {
+      this.client.query(
+        GeneralUtils.replaceNewlineTabWithSpace(
+          format(
+            `INSERT INTO bin_dates 
+      (bin_type, collection_date) 
+      VALUES 
+      %L`,
+            values,
+          ),
+        ),
+      );
+    }
+  };
+
+  electricityBill = async (
+    data: Array<EnergyBillData> = [
+      {
+        billing_start: new Date(),
+        billing_end: this.tomorrow,
+        standing_order_charge_days: 1,
+        standing_order_rate: 45,
+        usage_kwh: 1.5,
+        rate_kwh: 45,
+        pre_tax: 3.5,
+        after_tax: 3.75,
+      },
+    ],
+  ) => {
+    if (this.clearTables)
+      await this.client.query(`DROP TABLE IF EXISTS electricity_bill`);
+
+    await this.client.query(
+      GeneralUtils.replaceNewlineTabWithSpace(`CREATE TABLE IF NOT EXISTS electricity_bill (
+      billing_start DATE NOT NULL UNIQUE, 
+      billing_end DATE NOT NULL UNIQUE, 
+      standing_order_charge_days INTEGER NOT NULL, 
+      standing_order_rate DECIMAL NOT NULL, 
+      usage_kwh DECIMAL NOT NULL, 
+      rate_kwh DECIMAL NOT NULL, 
+      pre_tax DECIMAL NOT NULL, 
+      after_tax DECIMAL NOT NULL, 
+      PRIMARY KEY(billing_start, billing_end, after_tax)
+    )`),
+    );
+
+    const values = [];
+
+    data.forEach((entry) => {
+      const row = [];
+      row.push(entry.billing_start.toISOString().split("T")[0]);
+      row.push(entry.billing_end.toISOString().split("T")[0]);
+      row.push(entry.standing_order_charge_days);
+      row.push(entry.standing_order_rate);
+      row.push(entry.usage_kwh);
+      row.push(entry.rate_kwh);
+      row.push(entry.pre_tax);
+      row.push(entry.after_tax);
+      values.push(row);
+    });
+
+    if (this.populateTables)
+      await this.client.query(
+        GeneralUtils.replaceNewlineTabWithSpace(
+          format(
+            `INSERT INTO electricity_bill 
+        (billing_start, billing_end, standing_order_charge_days, standing_order_rate, usage_kwh, rate_kwh, pre_tax, after_tax) 
+        VALUES 
+        %L`,
+            values,
+          ),
+        ),
+      );
+  };
+
+  gasBill = async (
+    data: Array<EnergyBillData> = [
+      {
+        billing_start: new Date(),
+        billing_end: this.tomorrow,
+        standing_order_charge_days: 1,
+        standing_order_rate: 45,
+        usage_kwh: 1.5,
+        rate_kwh: 45,
+        pre_tax: 3.5,
+        after_tax: 3.75,
+      },
+    ],
+  ) => {
+    if (this.clearTables) await this.client.query(`DROP TABLE IF EXISTS gas_bill`);
+
+    await this.client.query(
+      GeneralUtils.replaceNewlineTabWithSpace(`CREATE TABLE IF NOT EXISTS gas_bill (
+      billing_start DATE NOT NULL UNIQUE, 
+      billing_end DATE NOT NULL UNIQUE, 
+      standing_order_charge_days INTEGER NOT NULL, 
+      standing_order_rate DECIMAL NOT NULL, 
+      usage_kwh DECIMAL NOT NULL, 
+      rate_kwh DECIMAL NOT NULL, 
+      pre_tax DECIMAL NOT NULL, 
+      after_tax DECIMAL NOT NULL, 
+      PRIMARY KEY(billing_start, billing_end, after_tax)
+    )`),
+    );
+
+    const values = [];
+
+    data.forEach((entry) => {
+      const row = [];
+      row.push(entry.billing_start.toISOString().split("T")[0]);
+      row.push(entry.billing_end.toISOString().split("T")[0]);
+      row.push(entry.standing_order_charge_days);
+      row.push(entry.standing_order_rate);
+      row.push(entry.usage_kwh);
+      row.push(entry.rate_kwh);
+      row.push(entry.pre_tax);
+      row.push(entry.after_tax);
+      values.push(row);
+    });
+
+    if (this.populateTables)
+      await this.client.query(
+        GeneralUtils.replaceNewlineTabWithSpace(
+          format(
+            `INSERT INTO gas_bill 
+        (billing_start, billing_end, standing_order_charge_days, standing_order_rate, usage_kwh, rate_kwh, pre_tax, after_tax) 
+        VALUES 
+        %L`,
+            values,
+          ),
+        ),
+      );
+  };
+
+  electricityUsage = async (
+    data: Array<EnergyData> = [
+      {
+        start_date: new Date(`${new Date().toISOString().split("T")[0]}T00:00:00Z`),
+        end_date: new Date(`${new Date().toISOString().split("T")[0]}T00:30:00Z`),
+        usage_kwh: 0.5,
+      },
+      {
+        start_date: new Date(`${new Date().toISOString().split("T")[0]}T00:30:00Z`),
+        end_date: new Date(`${new Date().toISOString().split("T")[0]}T01:00:00Z`),
+        usage_kwh: 0.5,
+      },
+    ],
+  ) => {
+    if (this.clearTables)
+      await this.client.query(`DROP TABLE IF EXISTS electricity_usage`);
+
+    await this.client.query(
+      GeneralUtils.replaceNewlineTabWithSpace(`CREATE TABLE IF NOT EXISTS electricity_usage (
+        usage_kwh REAL NOT NULL, 
+        start_date TIMESTAMP WITH TIME ZONE NOT NULL, 
+        end_date TIMESTAMP WITH TIME ZONE NOT NULL, 
+        entry_created DATE NOT NULL, 
+        PRIMARY KEY(usage_kwh, start_date, end_date)
+      )`),
+    );
+
+    const values = [];
+
+    data.forEach((entry) => {
+      const row = [];
+      row.push(entry.start_date.toISOString()),
+        row.push(entry.end_date.toISOString()),
+        row.push(entry.usage_kwh);
+      row.push(new Date().toISOString().split("T")[0]);
+      values.push(row);
+    });
+
+    if (this.populateTables)
+      await this.client.query(
+        GeneralUtils.replaceNewlineTabWithSpace(
+          format(
+            `INSERT INTO electricity_usage 
+            (start_date, end_date, usage_kwh, entry_created) 
+            VALUES 
+            %L`,
+            values,
+          ),
+        ),
+      );
+  };
+
+  gasUsage = async (
+    data: Array<EnergyData> = [
+      {
+        start_date: new Date(`${new Date().toISOString().split("T")[0]}T00:00:00Z`),
+        end_date: new Date(`${new Date().toISOString().split("T")[0]}T00:30:00Z`),
+        usage_kwh: 0.5,
+      },
+      {
+        start_date: new Date(`${new Date().toISOString().split("T")[0]}T00:30:00Z`),
+        end_date: new Date(`${new Date().toISOString().split("T")[0]}T01:00:00Z`),
+        usage_kwh: 0.5,
+      },
+    ],
+  ) => {
+    if (this.clearTables) await this.client.query(`DROP TABLE IF EXISTS gas_usage`);
+
+    await this.client.query(
+      GeneralUtils.replaceNewlineTabWithSpace(`CREATE TABLE IF NOT EXISTS gas_usage (
+        usage_kwh REAL NOT NULL, 
+        start_date TIMESTAMP WITH TIME ZONE NOT NULL, 
+        end_date TIMESTAMP WITH TIME ZONE NOT NULL, 
+        entry_created DATE NOT NULL, 
+        PRIMARY KEY(usage_kwh, start_date, end_date)
+      )`),
+    );
+
+    const values = [];
+
+    data.forEach((entry) => {
+      const row = [];
+      row.push(entry.start_date.toISOString()),
+        row.push(entry.end_date.toISOString()),
+        row.push(entry.usage_kwh);
+      row.push(new Date().toISOString().split("T")[0]);
+      values.push(row);
+    });
+
+    if (this.populateTables)
+      await this.client.query(
+        GeneralUtils.replaceNewlineTabWithSpace(
+          format(
+            `INSERT INTO gas_usage 
+            (start_date, end_date, usage_kwh, entry_created) 
+            VALUES 
+            %L`,
+            values,
+          ),
+        ),
+      );
+  };
+
+  static seedForProduction = async () => {
+    logger.info("Seeding for production");
+    const seed = new Seed(false, false);
+    await seed.usertable(null);
+    await seed.timesheet(null);
+    await seed.stopwatch();
+    await seed.binDates(null);
+    await seed.gasBill(null);
+    await seed.electricityBill(null);
+    await seed.gasUsage(null);
+    await seed.electricityUsage(null);
+    logger.info("Copmleted seeding");
+  };
+
+  static seedForDev = async () => {
+    logger.info("Seeding for develop");
+    const seed = new Seed(true, true);
+    await seed.usertable();
+    await seed.timesheet();
+    await seed.stopwatch();
+    await seed.binDates();
+    await seed.gasBill();
+    await seed.electricityBill();
+    await seed.gasUsage();
+    await seed.electricityUsage();
+    logger.info("Completed seeding");
   };
 }
 
 export default Seed;
 /*
-const today = new Date();
 
-const tomorrow = new Date();
-tomorrow.setDate(tomorrow.getDate() + 1);
 
-export async function seed() {
-  const createBinDates = `CREATE TABLE IF NOT EXISTS bin_dates (
-    bin_type varchar(12) NOT NULL,
-    collection_date DATE NOT NULL,
-    PRIMARY KEY(bin_type, collection_date)
-  )`;
 
-  const createStopwatch = `CREATE TABLE IF NOT EXISTS stopwatch (
-    id SERIAL PRIMARY KEY,
-    username VARCHAR NOT NULL,
-    day_date DATE NOT NULL,
-    timestamp TIME NOT NULL,
-    action VARCHAR(5) NOT NULL
-  );`;
-
-  const createElectricBill = `CREATE TABLE IF NOT EXISTS electricity_bill(
-    id SERIAL PRIMARY KEY,
-    billing_start DATE NOT NULL,
-    billing_end DATE NOT NULL,
-    standing_order_charge_days INTEGER NOT NULL,
-    standing_order_rate DECIMAL NOT NULL,
-    usage_kwh DECIMAL NOT NULL,
-    rate_kwh DECIMAL NOT NULL,
-    pre_tax DECIMAL NOT NULL,
-    after_tax DECIMAL NOT NULL
-  )`;
 
   const createElectricityUsage = `CREATE TABLE IF NOT EXISTS electricity_usage(
     usage_kwh REAL NOT NULL,
@@ -215,76 +573,23 @@ export async function seed() {
   ('2022-07-24', '2022-08-23', 31, 25.92, 60, 6.93, 12.18, 12.70)
   `;
 
-  const insertBinDates = format(
-    `INSERT INTO bin_dates
-  (bin_type, collection_date)
-  VALUES
-  ('GREEN', %L),
-  ('BLACK', %L)
-  `,
-    new Date(),
-    tomorrow,
-  );
 
-  const insertTimsheet = format(
-    `INSERT INTO timesheet
-  (username, day_date, clock_in, break_in, break_out, clock_out)
-  VALUES
-  ('joel', %L, '09:00:00', NULL, NULL, NULL),
-  ('joel', %L, '09:00:00', '13:15:00', NULL, NULL),
-  ('joel', %L, '09:15:00', '13:00:00', '14:00:00', NULL),
-  ('joel', %L, '09:45:00', '13:00:00', '13:45:00', '16:15:00'),
-  ('joel', %L, '09:00:00', '13:00:00', '14:00:00', '17:00:00'),
-  ('joel', %L, '09:00:00', '13:00:00', '14:00:00', '18:00:00')
-  `,
-    today,
-    new Date(today.getDate() - 1),
-    new Date(today.getDate() - 2),
-    new Date(today.getDate() - 3),
-    new Date(today.getDate() - 4),
-    new Date(today.getDate() - 5),
-  );
-
-  const insertStopwatch = format(
-    `INSERT INTO stopwatch
-  (username, day_date, timestamp, action)
-  VALUES
-  ('joel', %L, '09:00:00', 'START'),
-  ('joel', %L, '09:30:00', 'STOP'),
-  ('joel', %L, '09:35:00', 'CONT'),
-  ('joel', %L, '13:00:00', 'STOP'),
-  ('joel', %L, '14:00:00', 'CONT'),
-  ('joel', %L, '15:00:00', 'END')
-  `,
-    today,
-    today,
-    today,
-    today,
-    today,
-    today,
-  );
+  
 
   if (env !== "production") {
-    await query(`DROP TABLE IF EXISTS timesheet;`);
-    await query(`DROP TABLE IF EXISTS stopwatch;`);
     await query(`DROP TABLE IF EXISTS electricity_bill`);
     await query(`DROP TABLE IF EXISTS gas_bill`);
-    await query(`DROP TABLE IF EXISTS bin_dates`);
     await query(`DROP TABLE IF EXISTS electricity_usage`);
     await query(`DROP TABLE IF EXISTS gas_usage`);
   }
 
   await query(createBinDates);
-  await query(createStopwatch);
-  await query(createTimesheet);
   await query(createElectricBill);
   await query(createGasBill);
   await query(createElectricityUsage);
   await query(createGasUsage);
 
   if (env !== "production") {
-    await query(insertTimsheet);
-    await query(insertStopwatch);
     await query(insertBinDates);
     await query(insertElectricBills);
     await query(insertGasBills);
