@@ -1,8 +1,8 @@
 const fs = require("fs");
 const csv = require("fast-csv");
 const model = require("../models/bin.model");
-const dateUtils = require("../utils/date.utils");
-const networkUtils = require("../utils/network.utils");
+const dateUtils = require("./date.utils");
+const networkUtils = require("./network.utils");
 
 let isDownloadingNewFile = false;
 exports.getBinDates = async () => {

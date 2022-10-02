@@ -1,4 +1,4 @@
-import log, { setDefaultLevel } from "loglevel";
+import log from "loglevel";
 import Client from "pg";
 import env from "../environment";
 import format from "pg-format";
@@ -147,15 +147,19 @@ export class Seed {
   stopwatch = async (data: Array<StopwatchData> = []) => {
     if (this.clearTables) await this.client.query(`DROP TABLE IF EXISTS stopwatch`);
 
-    await this.client.query(
-      GeneralUtils.replaceNewlineTabWithSpace(`CREATE TABLE IF NOT EXISTS stopwatch (
-      username VARCHAR NOT NULL, 
-      day_date DATE NOT NULL, 
-      timestamp TIME NOT NULL, 
-      action VARCHAR(5) NOT NULL, 
-      PRIMARY KEY(username, day_date, timestamp, action) 
-    );`),
-    );
+    try {
+      await this.client.query(
+        GeneralUtils.replaceNewlineTabWithSpace(`CREATE TABLE IF NOT EXISTS stopwatch (
+        username VARCHAR NOT NULL, 
+        day_date DATE NOT NULL, 
+        timestamp TIME NOT NULL, 
+        action VARCHAR(5) NOT NULL, 
+        PRIMARY KEY(username, day_date, timestamp, action) 
+      );`),
+      );
+    } catch (err) {
+      logger.error(err);
+    }
 
     const values: Array<any> = [];
 
@@ -168,14 +172,14 @@ export class Seed {
       values.push(row);
     });
 
-    if (this.populateTables) {
+    if (this.populateTables && values.length > 0) {
       await this.client.query(
         GeneralUtils.replaceNewlineTabWithSpace(
           format(
             `INSERT INTO stopwatch
-          (username, day_date, timestamp, action)
-          VALUES
-          %L`,
+            (username, day_date, timestamp, action)
+            VALUES
+            %L`,
             values,
           ),
         ),
@@ -200,25 +204,27 @@ export class Seed {
     );
 
     const values = [];
-    data.forEach((entry) => {
-      const row = [];
-      row.push(entry.bin_type);
-      row.push(entry.collection_date.toISOString().split("T")[0]);
-      values.push(row);
-    });
+    if (data !== null) {
+      data.forEach((entry) => {
+        const row = [];
+        row.push(entry.bin_type);
+        row.push(entry.collection_date.toISOString().split("T")[0]);
+        values.push(row);
+      });
 
-    if (this.populateTables) {
-      this.client.query(
-        GeneralUtils.replaceNewlineTabWithSpace(
-          format(
-            `INSERT INTO bin_dates 
-      (bin_type, collection_date) 
-      VALUES 
-      %L`,
-            values,
+      if (this.populateTables) {
+        this.client.query(
+          GeneralUtils.replaceNewlineTabWithSpace(
+            format(
+              `INSERT INTO bin_dates 
+        (bin_type, collection_date) 
+        VALUES 
+        %L`,
+              values,
+            ),
           ),
-        ),
-      );
+        );
+      }
     }
   };
 

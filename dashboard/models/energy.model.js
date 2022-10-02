@@ -1,4 +1,4 @@
-const db = require("../db");
+import db from "../db";
 const format = require("pg-format");
 
 exports.insertElectricityBill = async (

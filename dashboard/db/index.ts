@@ -1,10 +1,6 @@
 import { Pool } from "pg";
 import env from "../environment";
 
-import Seed from "../db/seed";
-const seed = new Seed();
-seed.usertable();
-
 require("dotenv").config();
 
 export default new Pool({

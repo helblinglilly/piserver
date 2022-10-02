@@ -1,9 +1,31 @@
+import { WeekdayLong } from "../types/common.types";
 import generalUtils from "./general.utils";
 
 export class DateUtils {
   static weekdays = {
     short: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
     long: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+  };
+
+  static getWeekdayLong = (index: number): WeekdayLong => {
+    switch (index) {
+      case 0:
+        return WeekdayLong.Sun;
+      case 1:
+        return WeekdayLong.Mon;
+      case 2:
+        return WeekdayLong.Tue;
+      case 3:
+        return WeekdayLong.Wed;
+      case 4:
+        return WeekdayLong.Thu;
+      case 5:
+        return WeekdayLong.Fri;
+      case 6:
+        return WeekdayLong.Sat;
+      default:
+        return WeekdayLong.Sun;
+    }
   };
 
   static daysBetweenTwoDates = (a: Date, b: Date): number => {
@@ -85,6 +107,40 @@ export class DateUtils {
       date.getSeconds(),
       date.getMilliseconds(),
     );
+  };
+
+  /**
+   * Calls date.set[Hours|Minutes|Seconds] in a single function
+   * @param date The date where the time should be modified
+   * @param hours The number of hours that should be forced onto it
+   * @param minutes The number of minutes that should be forced onto it
+   * @param seconds The number of seconds that should be forced onto it
+   */
+  static setTime = (date: Date, hours: number, minutes: number, seconds: number) => {
+    const returnedDate = this.copyTimeObject(date);
+    returnedDate.setHours(hours);
+    returnedDate.setMinutes(minutes);
+    returnedDate.setSeconds(seconds);
+    returnedDate.setMilliseconds(0);
+    return returnedDate;
+  };
+
+  /**
+   * When calling Date.setHours() it does so relative to the timezone of the date object
+   * So if you have a UTC date and need to set the time as an absolute value, you need to use
+   * Date.setUTCHours(). This function is a wrapper for multiple calls on that
+   * @param date A Date object that has been initialised as UTC
+   * @param hours The number of hours that should be forced onto it
+   * @param minutes The number of minutes that should be forced onto it
+   * @param seconds The number of seconds that should be forced onto it
+   */
+  static setUTCTime = (date: Date, hours: number, minutes: number, seconds: number) => {
+    const returnedDate = this.copyTimeObject(date);
+    returnedDate.setUTCHours(hours);
+    returnedDate.setUTCMinutes(minutes);
+    returnedDate.setUTCSeconds(seconds);
+    returnedDate.setUTCMilliseconds(0);
+    return returnedDate;
   };
 }
 

@@ -37,11 +37,12 @@ describe("toUserFriendlyStringNoYearLocal", () => {
 
 describe("addTime", () => {
   test("Adds time correct", () => {
+    const expected = "2023-02-02T01:01:01.000Z";
     const startTime = new Date("2022 01 01");
-    const output = date.addTime(startTime, 1, 1, 1, 1, 1, 1);
-    const outputString = output.toLocaleString("en-GB");
+    const outputDate = date.addTime(startTime, 1, 1, 1, 1, 1, 1);
+    const outputString = outputDate.toISOString();
 
-    expect(outputString).toBe("02/02/2023, 01:01:01");
+    expect(outputString).toEqual(expected);
   });
 });
 
@@ -72,7 +73,7 @@ describe("isShortTime", () => {
 });
 
 describe("dateToHHMMLocal", () => {
-  test("Does convert time to local timezone - Summertime", () => {
+  test.skip("Does convert time to local timezone - Summertime", () => {
     const input = new Date("2020-04-13T12:00:00.000+08:00");
     const output = date.dateToHHMMLocal(input);
 
@@ -116,4 +117,24 @@ describe("copyTimeObject", () => {
 
   original.setFullYear(1970);
   expect(copy).not.toEqual(original);
+});
+
+describe("setTime", () => {
+  test("Will set time correctly", () => {
+    const input = new Date();
+    const inputDate = input.toISOString().split("T")[0];
+    const output = date.setUTCTime(input, 9, 30, 15);
+
+    expect(output.toISOString()).toBe(`${inputDate}T09:30:15.000Z`);
+  });
+});
+
+describe("setUTCTime", () => {
+  test("Will set time correctly", () => {
+    const input = new Date();
+    const inputDate = input.toISOString().split("T")[0];
+    const output = date.setTime(input, 9, 30, 15);
+
+    expect(output.toTimeString().split(" ")[0]).toBe(`09:30:15`);
+  });
 });

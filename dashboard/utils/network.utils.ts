@@ -33,8 +33,9 @@ export class NetworkUtils {
 
   static downloadFile = async (url: string, output: string) => {
     logger.debug(`Downloading ${url} into ${output}`);
+
     return new Promise(async (resolve, reject) => {
-      if (this.createFolderForFile(output) === false) {
+      if (NetworkUtils.createFolderForFile(output) === false) {
         reject(`Failed to create folder for file ${output}`);
       }
       try {

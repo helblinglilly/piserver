@@ -11,6 +11,25 @@
       "program": "${workspaceFolder}/setup.ts",
       "preLaunchTask": "build",
       "outFiles": ["${workspaceFolder}/out/**/*.js"]
+    },
+    {
+      "type": "node",
+      "name": "vscode-jest-tests.v2",
+      "request": "launch",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "disableOptimisticBPs": true,
+      "program": "${workspaceFolder}/jest",
+      "cwd": "${workspaceFolder}",
+      "args": [
+        "test",
+        "--runInBand",
+        "--watchAll=false",
+        "--testNamePattern",
+        "${jest.testNamePattern}",
+        "--runTestsByPath",
+        "${jest.testFile}"
+      ]
     }
   ]
 }

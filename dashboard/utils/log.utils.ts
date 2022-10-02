@@ -3,7 +3,7 @@ import prefix from "loglevel-plugin-prefix";
 import chalk from "chalk";
 
 prefix.reg(log);
-log.enableAll();
+log.setDefaultLevel("TRACE");
 
 const logColors = {
   ERROR: chalk.red,

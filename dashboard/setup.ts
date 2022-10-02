@@ -1,27 +1,35 @@
+import log from "loglevel";
 import app from "./app";
-import seed from "./db/seed";
 import dbInit from "./db/initialConnection";
 import env from "./environment";
-import log from "loglevel";
+import Seed from "./db/seed";
 
 dbInit
   .initialise()
   .then(async () => {
-    console.log(`Initialised for ${env}`);
+    log.info(`Initialised for ${env}`);
+
     if (env === "production") {
       global.port = 8080;
       global.host = "127.0.0.1";
       log.setLevel("ERROR");
-    } else if (env === "test") {
+
+      await Seed.seedForProduction();
+    }
+
+    if (env === "test") {
       log.disableAll();
-    } else {
+    }
+
+    if (env === "dev") {
       global.port = 9090;
       global.host = "127.0.0.1";
-      log.setLevel("DEBUG");
+
+      await Seed.seedForDev();
     }
-    await seed.seed();
+
     app.listen(global.port, "0.0.0.0", () => {
-      console.log(`Listening on http://127.0.0.1:${global.port}`);
+      log.info(`Listening on http://127.0.0.1:${global.port}`);
     });
   })
   .catch((err) => {
