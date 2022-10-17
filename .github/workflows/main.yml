@@ -23,11 +23,13 @@ jobs:
   #       run: npm run test
 
   docker:
-    name: Push Docker Image
-    runs-on: raspberry
     # needs: test
+    name: Push Docker Image
+    runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
     steps:
+    - uses: actions/checkout@v2
+    - uses: pguyot/arm-runner-action@v2
       - name: Extract branch name
         shell: bash
         run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
