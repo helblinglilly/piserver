@@ -8,6 +8,13 @@ jobs:
     name: Push Docker Image
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
+    strategy:
+      matrix:
+        arch: [aarch64]
+        include:
+        - arch: armv6l
+          cpu: cortex-a7
+          base_image: raspios_lite_arm64:latest
     steps:
       - uses: actions/checkout@v2
       - uses: pguyot/arm-runner-action@v2
