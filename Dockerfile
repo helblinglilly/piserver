@@ -1,4 +1,4 @@
-FROM node:latest
+FROM arm64v8/node:latest
 ENV NODE_ENV=production
 ENV POSTGRES_USER=postgres
 ENV POSTGRES_DATABASE=homeserver
