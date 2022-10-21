@@ -41,7 +41,7 @@ exports.insertClockIn = async (dayTime, username) => {
       `INSERT INTO timesheet (day_date, username, clock_in) VALUES (%L, %L, %L)`,
       dayTime.toISOString().split("T")[0],
       username,
-      dayTime.toISOString().split("T")[1],
+      dayTime.toISOString().split("T")[1]
     ),
   ).catch((err) => console.log(err));
 };
