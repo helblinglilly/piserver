@@ -108,8 +108,9 @@ dist
 
 # MacOS and VS Code
 *.DS_Store
-.vscode
 
 # Cache locations
 cache/
 dashboard/public/assets/pokemon/cache/*
+
+dashboard/out
