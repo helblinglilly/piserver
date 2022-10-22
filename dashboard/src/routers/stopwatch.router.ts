@@ -1,7 +1,7 @@
 const stopwatchRouter = require("express").Router();
-const error = require("../controllers/error.controller");
-const controller = require("../controllers/stopwatch.controller");
-const userSelection = require("../middleware/user.middleware");
+import error from "../controllers/error.controller";
+import controller from "../controllers/stopwatch.controller";
+import userSelection from "../middleware/user.middleware";
 
 stopwatchRouter.get("/", userSelection, controller.getRoot);
 stopwatchRouter.all("/", error.methodNotAllowed);
@@ -21,4 +21,4 @@ stopwatchRouter.all("/cont", error.methodNotAllowed);
 stopwatchRouter.post("/end", userSelection, controller.end);
 stopwatchRouter.all("/end", error.methodNotAllowed);
 
-module.exports = stopwatchRouter;
+export default stopwatchRouter;

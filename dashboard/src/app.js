@@ -5,8 +5,8 @@ import validateUser from "./middleware/user.middleware";
 const express = require("express");
 const error = require("./controllers/error.controller");
 const timesheetRouter = require("./routers/timesheet.router");
-const stopwatchRouter = require("./routers/stopwatch.router.js");
-const pokemonRouter = require("./routers/pokemon.router.js");
+const stopwatchRouter = require("./routers/stopwatch.router");
+const pokemonRouter = require("./routers/pokemon.router");
 const userRouter = require("./routers/user.router");
 const energyRouter = require("./routers/energy.router");
 const energyUtils = require("./utils/energy.utils");
@@ -14,21 +14,21 @@ const energyUtils = require("./utils/energy.utils");
 const app = express();
 app.set("view engine", "pug");
 app.use("/static", express.static(`${__dirname}/public`));
-app.set("views", "./views");
+app.set("views", `${__dirname}/views`);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/timesheet", timesheetRouter);
-app.use("/stopwatch", stopwatchRouter);
-app.use("/pokemon", pokemonRouter);
-app.use("/user", userRouter);
-app.use("/energy", energyRouter);
+app.use("/stopwatch", stopwatchRouter.default);
+app.use("/pokemon", pokemonRouter.default);
+app.use("/user", userRouter.default);
+app.use("/energy", energyRouter.default);
 
 app.get("/", validateUser, async (req, res, next) => {
   const options = {};
   options.host = ``;
-  options.username = req.username;
+  options.username = req.headers["x-username"];
 
   await energyUtils.updateReadings();
   const energyInfo = await energyUtils.fetchLatestDay();

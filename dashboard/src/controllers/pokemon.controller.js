@@ -1,14 +1,15 @@
 const model = require("../models/pokemon.model");
 const error = require("./error.controller");
 const pokemonUtils = require("../utils/pokemon.utils");
+const { default: generalUtils } = require("../utils/general.utils");
 
 exports.getRoot = async (req, res, next) => {
-  res.render("pokemon/index", { username: req.username });
+  res.render("pokemon/index", { username: req.headers["x-username"] });
 };
 
 exports.getPokemon = async (req, res, next) => {
   const options = {};
-  options.username = req.username;
+  options.username = req.headers["x-username"];
   options.id = req.params.id;
 
   // 404
@@ -24,8 +25,8 @@ exports.getPokemon = async (req, res, next) => {
   const species = await model.receivePokemonSpeciesData(options.id);
   const pokemon = await model.receivePokemonData(options.id);
 
-  options.germanName = pokemonUtils.pokemonNameLanguage(species, "de");
-  options.englishName = pokemonUtils.pokemonNameLanguage(species, "en");
+  options.germanName = pokemonUtils.default.pokemonNameLanguage(species, "de");
+  options.englishName = pokemonUtils.default.pokemonNameLanguage(species, "en");
 
   options.spriteFront = await model.receivePokemonSpriteFront(options.id);
   options.spriteBack = await model.receivePokemonSpriteBack(options.id);
@@ -43,11 +44,11 @@ exports.getPokemon = async (req, res, next) => {
 
   options.growth = species.growth_rate.name;
 
-  if (pokemonUtils.generationLanguage(req.query.game)) {
+  if (pokemonUtils.default.generationLanguage(req.query.game)) {
     options.game = {
       name: req.query.game,
-      german: pokemonUtils.generationLanguage(req.query.game).de,
-      english: pokemonUtils.generationLanguage(req.query.game).en,
+      german: pokemonUtils.default.generationLanguage(req.query.game).de,
+      english: pokemonUtils.default.generationLanguage(req.query.game).en,
     };
   }
 
@@ -87,8 +88,8 @@ exports.getPokemon = async (req, res, next) => {
           else if (move.attackType === "status")
             move.attackTypeSprite = "https://i.stack.imgur.com/LWKMo.png";
 
-          move.moveNameGerman = pokemonUtils.itemNameLanguage(moveData, "de");
-          move.moveNameEnglish = pokemonUtils.itemNameLanguage(moveData, "en");
+          move.moveNameGerman = pokemonUtils.default.itemNameLanguage(moveData, "de");
+          move.moveNameEnglish = pokemonUtils.default.itemNameLanguage(moveData, "en");
 
           if (learnMethod.method === "level-up") move.method = learnMethod.level;
           else if (learnMethod.method === "machine") move.method = "TM/VM";
@@ -99,7 +100,7 @@ exports.getPokemon = async (req, res, next) => {
         }
       }
     }
-    options.moves = pokemonUtils.sortmoves(options.moves);
+    options.moves = pokemonUtils.default.sortMoves(options.moves);
   }
   res.render("pokemon/pkmn", { ...options });
   return;
@@ -107,7 +108,7 @@ exports.getPokemon = async (req, res, next) => {
 
 exports.getItem = async (req, res, next) => {
   const options = {};
-  options.username = req.username;
+  options.username = req.headers["x-username"];
   const id = req.params.id;
 
   const item = await model.receivePokemonItemData(id);
@@ -116,17 +117,17 @@ exports.getItem = async (req, res, next) => {
   options.item = item;
   options.held_by_summaries = [];
 
-  options.germanName = pokemonUtils.itemNameLanguage(item, "de");
-  options.englishName = pokemonUtils.itemNameLanguage(item, "en");
-  options.germanFlavourTexts = pokemonUtils.itemFlavourTextLanguage(item, "de");
-  options.englishFlavourTexts = pokemonUtils.itemFlavourTextLanguage(item, "en");
+  options.germanName = pokemonUtils.default.itemNameLanguage(item, "de");
+  options.englishName = pokemonUtils.default.itemNameLanguage(item, "en");
+  options.germanFlavourTexts = pokemonUtils.default.itemFlavourTextLanguage(item, "de");
+  options.englishFlavourTexts = pokemonUtils.default.itemFlavourTextLanguage(item, "en");
 
   // Set up for pokemon that hold this item
   const pkmnSpeciesPromises = [];
   if (item.held_by_pokemon.length > 0) {
     item.held_by_pokemon.forEach((pkmn) => {
       const id = pkmn.pokemon.url.split("/")[6];
-      if (id > 0 && id <= pokemonUtils.highestPokedexEntry) {
+      if (id > 0 && id <= pokemonUtils.default.highestPokedexEntry) {
         pkmnSpeciesPromises.push(model.receivePokemonSpeciesData(id));
       }
     });
@@ -153,8 +154,8 @@ exports.getItem = async (req, res, next) => {
           details.id = pkmn.id;
           details.sprite = sprite;
 
-          details.german = pokemonUtils.pokemonNameLanguage(pkmn, "de");
-          const english = pokemonUtils.pokemonNameLanguage(pkmn, "en");
+          details.german = pokemonUtils.default.pokemonNameLanguage(pkmn, "de");
+          const english = pokemonUtils.default.pokemonNameLanguage(pkmn, "en");
           details.english = english !== details.german ? english : "";
 
           options.held_by_summaries.push(details);
@@ -174,12 +175,12 @@ exports.getItem = async (req, res, next) => {
 exports.getBlackWhite = (req, res, next) => {
   const lowestPokedexId = 494;
   const highestPokedexId = 649;
-  res.render("pokemon/blackwhite", { username: req.username });
+  res.render("pokemon/blackwhite", { username: req.headers["x-username"] });
 };
 
 exports.getSearch = async (req, res, next) => {
   const options = {};
-  options.username = req.username;
+  options.username = req.headers["x-username"];
 
   // Referer
   if (req.headers.referer) {

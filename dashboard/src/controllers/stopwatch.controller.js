@@ -1,13 +1,13 @@
-const stopwatchModel = require("../models/stopwatch.model.js");
-const timesheetUtils = require("../utils/timesheet.utils");
+const { default: dateUtils } = require("../utils/date.utils");
+const stopwatchModel = require("../models/stopwatch.model");
 
 exports.getRoot = async (req, res, next) => {
   const options = {};
-  options.username = req.username;
+  options.username = req.headers["x-username"];
 
   const existingEntry = await stopwatchModel.readByDate(
-    req.username,
-    timesheetUtils.constructUTCDate(new Date()),
+    req.headers["x-username"],
+    dateUtils.constructUTCDateFromLocal(new Date()),
   );
 
   if (existingEntry.length === 0) {
@@ -50,22 +50,22 @@ exports.getView = async (req, res, next) => {
 };
 
 exports.start = async (req, res, next) => {
-  await stopwatchModel.insert(req.username, new Date(), "START");
+  await stopwatchModel.insert(req.headers["x-username"], new Date(), "START");
   res.redirect("/stopwatch");
 };
 
 exports.stop = async (req, res, next) => {
-  await stopwatchModel.insert(req.username, new Date(), "STOP");
+  await stopwatchModel.insert(req.headers["x-username"], new Date(), "STOP");
   res.redirect("/stopwatch");
 };
 
 exports.cont = async (req, res, next) => {
-  await stopwatchModel.insert(req.username, new Date(), "CONT");
+  await stopwatchModel.insert(req.headers["x-username"], new Date(), "CONT");
   res.redirect("/stopwatch");
 };
 
 exports.end = async (req, res, next) => {
-  await stopwatchModel.insert(req.username, new Date(), "END");
+  await stopwatchModel.insert(req.headers["x-username"], new Date(), "END");
   res.redirect("/stopwatch");
 };
 

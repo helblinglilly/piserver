@@ -1,10 +1,9 @@
 const energyRouter = require("express").Router();
-const error = require("../controllers/error.controller");
-const ec = require("../controllers/energy.controller");
-const userSelection = require("../middleware/user.middleware");
+import error from "../controllers/error.controller";
+import ec from "../controllers/energy.controller";
+import userSelection from "../middleware/user.middleware";
 
 energyRouter.get("/", userSelection, ec.getRoot);
-energyRouter.all("/", error.methodNotAllowed);
 
 energyRouter.get("/bills", userSelection, ec.getBills);
 energyRouter.all("/bills", error.methodNotAllowed);
@@ -25,4 +24,4 @@ energyRouter.all("/view_hourly", error.methodNotAllowed);
 
 energyRouter.all("/*", error.pageNotFound);
 
-module.exports = energyRouter;
+export default energyRouter;

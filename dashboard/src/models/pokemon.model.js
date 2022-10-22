@@ -2,8 +2,9 @@ const fs = require("fs");
 const axios = require("axios");
 const pokemonUtils = require("../utils/pokemon.utils");
 const networkUtils = require("../utils/network.utils");
+const { default: generalUtils } = require("../utils/general.utils");
 
-const cachePath = `${__dirname}/../cache/`;
+const cachePath = `${__dirname}/../../cache/`;
 let spriteCachePath = `${__dirname}/../public/assets/pokemon/cache/`;
 
 let dictionaryData;
@@ -101,14 +102,15 @@ exports.receivePokemonSpeciesData = (id) => {
 };
 
 exports.receivePokemonItemSprite = (item_name) => {
-  if (!fs.existsSync(`${spriteCachePath}`)) fs.mkdirSync(`${spriteCachePath}`);
-  if (!fs.existsSync(`${spriteCachePath}/item`)) fs.mkdirSync(`${spriteCachePath}item/`);
+  if (!fs.existsSync(spriteCachePath)) fs.mkdirSync(spriteCachePath);
+  if (!fs.existsSync(`${spriteCachePath}/item`)) fs.mkdirSync(`${spriteCachePath}/item`);
 
   return new Promise((resolve, reject) => {
     if (fs.existsSync(`${spriteCachePath}item/${item_name}.png`)) {
       resolve(`/static/assets/pokemon/cache/item/${item_name}.png`);
     } else {
-      networkUtils
+      console.log(`${spriteCachePath}item/${item_name}.png`);
+      networkUtils.default
         .downloadFile(
           `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/${item_name}.png`,
           `${spriteCachePath}item/${item_name}.png`,
@@ -139,7 +141,7 @@ exports.receivePokemonSpriteFront = (id) => {
       resolve(`/static/assets/pokemon/cache/pokemon/${id}.png`);
     } else {
       console.log(`sprite/${id}`);
-      networkUtils
+      networkUtils.default
         .downloadFile(
           `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`,
           `${spriteCachePath}pokemon/${id}.png`,
@@ -165,7 +167,7 @@ exports.receivePokemonSpriteShinyFront = (id) => {
       resolve(`/static/assets/pokemon/cache/pokemon/${id}-shiny.png`);
     } else {
       console.log(`sprite/${id}-shiny-front`);
-      networkUtils
+      networkUtils.default
         .downloadFile(
           `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${id}.png`,
           `${spriteCachePath}pokemon/${id}-shiny.png`,
@@ -191,7 +193,7 @@ exports.receivePokemonSpriteBack = (id) => {
       resolve(`/static/assets/pokemon/cache/pokemon/${id}-back.png`);
     } else {
       console.log(`sprite/${id}-back`);
-      networkUtils
+      networkUtils.default
         .downloadFile(
           `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/${id}.png`,
           `${spriteCachePath}pokemon/${id}-back.png`,
@@ -217,7 +219,7 @@ exports.receivePokemonSpriteShinyBack = (id) => {
       resolve(`/static/assets/pokemon/cache/pokemon/${id}-shiny-back.png`);
     } else {
       console.log(`sprite/${id}-shiny-back`);
-      networkUtils
+      networkUtils.default
         .downloadFile(
           `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/${id}.png`,
           `${spriteCachePath}pokemon/${id}-shiny-back.png`,
@@ -419,7 +421,9 @@ exports.receiveEvolutionChain = (url) => {
 };
 exports.dictionaryData = () => {
   if (!dictionaryData) {
-    dictionaryData = JSON.parse(fs.readFileSync("./pokedata/data.json", "utf-8"));
+    dictionaryData = JSON.parse(
+      fs.readFileSync(`${__dirname}/../pokedata/data.json`, "utf-8"),
+    );
   }
   return dictionaryData;
 };
@@ -468,14 +472,14 @@ exports.receiveGamesPresent = (moves) => {
       if (!games.some((entry) => entry.name === gameName)) {
         games.push({
           name: gameName,
-          generation: pokemonUtils.generationLanguage(gameName).generation,
-          details: pokemonUtils.generationLanguage(gameName),
+          generation: pokemonUtils.default.generationLanguage(gameName).generation,
+          details: pokemonUtils.default.generationLanguage(gameName),
         });
       }
     }
   }
   games = games.sort((a, b) =>
-    pokemonUtils.compareObjectsOnAttribute(a, b, "generation"),
+    generalUtils.compareObjectsOnAttribute(a, b, "generation"),
   );
   console.log(games);
   return games;

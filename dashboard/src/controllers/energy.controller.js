@@ -4,7 +4,7 @@ const energy = require("../utils/energy.utils");
 
 exports.getRoot = async (req, res, next) => {
   const options = {};
-  options.username = req.username;
+  options.username = req.headers["x-username"];
 
   await energy.updateReadings();
 
@@ -13,7 +13,7 @@ exports.getRoot = async (req, res, next) => {
 
 exports.getViewHourly = async (req, res, next) => {
   const options = {};
-  options.username = req.username;
+  options.username = req.headers["x-username"];
 
   await energy.updateReadings();
 
@@ -56,7 +56,7 @@ exports.getViewHourly = async (req, res, next) => {
 
 exports.getBills = async (req, res, next) => {
   const options = {};
-  options.username = req.username;
+  options.username = req.headers["x-username"];
 
   let mode = "electric";
   if (req.query.mode.toLowerCase() === "gas") mode = "gas";
@@ -219,7 +219,7 @@ exports.getBills = async (req, res, next) => {
 
 exports.getViewMonthly = async (req, res, next) => {
   const options = {};
-  options.username = req.username;
+  options.username = req.headers["x-username"];
 
   await energy.updateReadings();
 
@@ -263,13 +263,13 @@ exports.getViewMonthly = async (req, res, next) => {
 
 exports.getInsertElectric = async (req, res, next) => {
   const options = {};
-  options.username = req.username;
+  options.username = req.headers["x-username"];
   res.render("energy/insert_electric", { ...options });
 };
 
 exports.getInsertGas = async (req, res, next) => {
   const options = {};
-  options.username = req.username;
+  options.username = req.headers["x-username"];
   res.render("energy/insert_gas", { ...options });
 };
 

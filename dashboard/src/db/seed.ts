@@ -1,4 +1,5 @@
 import log from "loglevel";
+import "../utils/log.utils";
 import Client from "pg";
 import env from "../environment";
 import format from "pg-format";
@@ -120,16 +121,18 @@ export class Seed {
     await this.client.query(GeneralUtils.replaceNewlineTabWithSpace(createQuery));
 
     const values: Array<any> = [];
-    data.forEach((entry) => {
-      const row = [];
-      row.push(entry.username);
-      row.push(entry.day_date.toISOString().split("T")[0]);
-      row.push(entry.clock_in.toTimeString().split(" ")[0]);
-      row.push(entry.break_in.toTimeString().split(" ")[0]);
-      row.push(entry.break_out.toTimeString().split(" ")[0]);
-      row.push(entry.clock_out.toTimeString().split(" ")[0]);
-      values.push(row);
-    });
+    if (data != null) {
+      data.forEach((entry) => {
+        const row = [];
+        row.push(entry.username);
+        row.push(entry.day_date.toISOString().split("T")[0]);
+        row.push(entry.clock_in.toTimeString().split(" ")[0]);
+        row.push(entry.break_in.toTimeString().split(" ")[0]);
+        row.push(entry.break_out.toTimeString().split(" ")[0]);
+        row.push(entry.clock_out.toTimeString().split(" ")[0]);
+        values.push(row);
+      });
+    }
 
     const insertQuery = format(
       `INSERT INTO timesheet 
@@ -261,18 +264,20 @@ export class Seed {
 
     const values = [];
 
-    data.forEach((entry) => {
-      const row = [];
-      row.push(entry.billing_start.toISOString().split("T")[0]);
-      row.push(entry.billing_end.toISOString().split("T")[0]);
-      row.push(entry.standing_order_charge_days);
-      row.push(entry.standing_order_rate);
-      row.push(entry.usage_kwh);
-      row.push(entry.rate_kwh);
-      row.push(entry.pre_tax);
-      row.push(entry.after_tax);
-      values.push(row);
-    });
+    if (data != null) {
+      data.forEach((entry) => {
+        const row = [];
+        row.push(entry.billing_start.toISOString().split("T")[0]);
+        row.push(entry.billing_end.toISOString().split("T")[0]);
+        row.push(entry.standing_order_charge_days);
+        row.push(entry.standing_order_rate);
+        row.push(entry.usage_kwh);
+        row.push(entry.rate_kwh);
+        row.push(entry.pre_tax);
+        row.push(entry.after_tax);
+        values.push(row);
+      });
+    }
 
     if (this.populateTables)
       await this.client.query(
@@ -320,18 +325,20 @@ export class Seed {
 
     const values = [];
 
-    data.forEach((entry) => {
-      const row = [];
-      row.push(entry.billing_start.toISOString().split("T")[0]);
-      row.push(entry.billing_end.toISOString().split("T")[0]);
-      row.push(entry.standing_order_charge_days);
-      row.push(entry.standing_order_rate);
-      row.push(entry.usage_kwh);
-      row.push(entry.rate_kwh);
-      row.push(entry.pre_tax);
-      row.push(entry.after_tax);
-      values.push(row);
-    });
+    if (data != null) {
+      data.forEach((entry) => {
+        const row = [];
+        row.push(entry.billing_start.toISOString().split("T")[0]);
+        row.push(entry.billing_end.toISOString().split("T")[0]);
+        row.push(entry.standing_order_charge_days);
+        row.push(entry.standing_order_rate);
+        row.push(entry.usage_kwh);
+        row.push(entry.rate_kwh);
+        row.push(entry.pre_tax);
+        row.push(entry.after_tax);
+        values.push(row);
+      });
+    }
 
     if (this.populateTables)
       await this.client.query(
@@ -376,14 +383,16 @@ export class Seed {
 
     const values = [];
 
-    data.forEach((entry) => {
-      const row = [];
-      row.push(entry.start_date.toISOString()),
-        row.push(entry.end_date.toISOString()),
-        row.push(entry.usage_kwh);
-      row.push(new Date().toISOString().split("T")[0]);
-      values.push(row);
-    });
+    if (data != null) {
+      data.forEach((entry) => {
+        const row = [];
+        row.push(entry.start_date.toISOString()),
+          row.push(entry.end_date.toISOString()),
+          row.push(entry.usage_kwh);
+        row.push(new Date().toISOString().split("T")[0]);
+        values.push(row);
+      });
+    }
 
     if (this.populateTables)
       await this.client.query(
@@ -427,14 +436,16 @@ export class Seed {
 
     const values = [];
 
-    data.forEach((entry) => {
-      const row = [];
-      row.push(entry.start_date.toISOString()),
-        row.push(entry.end_date.toISOString()),
-        row.push(entry.usage_kwh);
-      row.push(new Date().toISOString().split("T")[0]);
-      values.push(row);
-    });
+    if (data != null) {
+      data.forEach((entry) => {
+        const row = [];
+        row.push(entry.start_date.toISOString()),
+          row.push(entry.end_date.toISOString()),
+          row.push(entry.usage_kwh);
+        row.push(new Date().toISOString().split("T")[0]);
+        values.push(row);
+      });
+    }
 
     if (this.populateTables)
       await this.client.query(
@@ -461,7 +472,7 @@ export class Seed {
     await seed.electricityBill(null);
     await seed.gasUsage(null);
     await seed.electricityUsage(null);
-    logger.info("Copmleted seeding");
+    logger.info("Completed seeding");
   };
 
   static seedForDev = async () => {

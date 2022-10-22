@@ -1,6 +1,6 @@
 const userRouter = require("express").Router();
-const error = require("../controllers/error.controller");
-const userModel = require("../models/user.model");
+import error from "../controllers/error.controller";
+import userModel from "../models/user.model";
 
 userRouter.post("/select", (req, res, next) => {
   const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
@@ -13,4 +13,4 @@ userRouter.all("/select", error.methodNotAllowed);
 
 userRouter.all("/*", error.pageNotFound);
 
-module.exports = userRouter;
+export default userRouter;

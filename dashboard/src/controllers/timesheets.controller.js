@@ -1,6 +1,7 @@
-const timesheetsModel = require("../models/timsheets.model");
+// const model.default = require("../model.defaults/timsheets.model.default");
 const timesheetUtils = require("../utils/timesheet.utils");
 const dateUtils = require("../utils/date.utils");
+const model = require("../models/timesheet.model");
 
 const indexObject = (
   day,
@@ -149,21 +150,21 @@ const calculateTime = (rows) => {
 };
 
 exports.getIndex = async (req, res, next) => {
-  const rows = await timesheetsModel.selectDay(new Date(), req.username);
+  const rows = await model.default.selectDay(new Date(), req.headers["x-username"]);
   const options = calculateTime(rows);
-  options.username = req.username;
+  options.username = req.headers["x-username"];
   res.render("timesheets/index", { ...options });
 };
 
 exports.postEnter = async (req, res, next) => {
   if (req.body.action) {
     const now = new Date();
-    const username = req.username;
-    const existing = await timesheetsModel.selectDay(now, username);
+    const username = req.headers["x-username"];
+    const existing = await model.default.selectDay(now, username);
 
     switch (req.body.action) {
       case "Clock In":
-        timesheetsModel.insertClockIn(now, username);
+        model.default.insertClockIn(now, username);
         res.redirect("/timesheet");
         break;
       case "Break In":
@@ -171,7 +172,7 @@ exports.postEnter = async (req, res, next) => {
           next({ statusCode: 400, msg: `Can't '${req.body.action}' yet` });
           break;
         }
-        timesheetsModel.updateBreakStart(now, username, now);
+        model.default.updateBreakStart(now, username, now);
         res.redirect("/timesheet");
         break;
       case "Break End":
@@ -182,7 +183,7 @@ exports.postEnter = async (req, res, next) => {
           next({ statusCode: 400, msg: `Can't '${req.body.action}' before 'Break In'` });
           break;
         }
-        timesheetsModel.updateBreakEnd(now, username, now);
+        model.default.updateBreakEnd(now, username, now);
         res.redirect("/timesheet");
         break;
       case "Clock Out":
@@ -190,7 +191,7 @@ exports.postEnter = async (req, res, next) => {
           next({ statusCode: 400, msg: `Can't '${req.body.action}' yet` });
           break;
         }
-        timesheetsModel.updateClockOut(now, username, now);
+        model.default.updateClockOut(now, username, now);
         res.redirect("/timesheet");
         break;
       case "Done for the day :)":
@@ -207,12 +208,12 @@ exports.postEnter = async (req, res, next) => {
 
 exports.getView = async (req, res, next) => {
   const options = {};
-  options.username = req.username;
+  options.username = req.headers["x-username"];
   options.date = req.query.date
     ? dateUtils.constructUTCDateFromLocal(new Date(req.query.date), "12:00")
     : new Date();
 
-  const entry = await timesheetsModel.selectDay(options.date, req.username);
+  const entry = await model.default.selectDay(options.date, req.headers["x-username"]);
 
   if (entry) {
     options.clock_in = entry.clock_in;
@@ -240,12 +241,12 @@ exports.getView = async (req, res, next) => {
   res.render("timesheets/view", { ...options });
 };
 
-exports.getEdit = async (req, res, next, message = null) => {
+exports.getEdit = async (req, res, next) => {
   const options = {};
-  options.username = req.username;
+  options.username = req.headers["x-username"];
   options.date = req.query.date ? new Date(req.query.date) : new Date();
 
-  const entry = await timesheetsModel.selectDay(options.date, req.username);
+  const entry = await model.default.selectDay(options.date, req.headers["x-username"]);
   if (entry) {
     options.clock_in = entry.clock_in;
     options.break_in = entry.break_in ? entry.break_in : null;
@@ -254,16 +255,16 @@ exports.getEdit = async (req, res, next, message = null) => {
 
     if (!options.clock_out) options.alert = "Day not completed yet";
   }
-  if (message) options.alert = message;
+
   res.render("timesheets/edit", { ...options });
 };
 
 exports.postEdit = async (req, res, next) => {
   const args = req.body;
-  const username = req.username;
+  const username = req.headers["x-username"];
   if (!args.date) res.sendStatus(400);
 
-  const hasEntryYet = await timesheetsModel.selectDay(new Date(args.date), username);
+  const hasEntryYet = await model.default.selectDay(new Date(args.date), username);
 
   // Using update when no entry exists yet will just not write - use insert instead
   if (!hasEntryYet && args.clock_in) {
@@ -271,7 +272,7 @@ exports.postEdit = async (req, res, next) => {
       const insertClockInTime = new Date(args.date);
       insertClockInTime.setHours(args.clock_in.split(":")[0]);
       insertClockInTime.setMinutes(args.clock_in.split(":")[1]);
-      await timesheetsModel.insertClockIn(insertClockInTime, username);
+      await model.default.insertClockIn(insertClockInTime, username);
       res.redirect(`/timesheet/edit?date=${args.date}`);
       return;
     } else {
@@ -299,7 +300,7 @@ exports.postEdit = async (req, res, next) => {
       updateClockInTime.setHours(args.clock_in.split(":")[0]);
       updateClockInTime.setMinutes(args.clock_in.split(":")[1]);
 
-      await timesheetsModel.updateClockIn(updateClockInTime, username);
+      await model.default.updateClockIn(updateClockInTime, username);
     } else {
       res.sendStatus(400);
       return;
@@ -310,7 +311,7 @@ exports.postEdit = async (req, res, next) => {
       updateBreakStartTime.setHours(args.break_in.split(":")[0]);
       updateBreakStartTime.setMinutes(args.break_in.split(":")[1]);
 
-      await timesheetsModel.updateBreakStart(updateBreakStartTime, username);
+      await model.default.updateBreakStart(updateBreakStartTime, username);
     } else {
       res.sendStatus(400);
       return;
@@ -320,7 +321,7 @@ exports.postEdit = async (req, res, next) => {
       const updateBreakOutTime = new Date(args.date);
       updateBreakOutTime.setHours(args.break_out.split(":")[0]);
       updateBreakOutTime.setMinutes(args.break_out.split(":")[1]);
-      await timesheetsModel.updateBreakEnd(updateBreakOutTime, username);
+      await model.default.updateBreakEnd(updateBreakOutTime, username);
     } else {
       res.sendStatus(400);
       return;
@@ -330,7 +331,7 @@ exports.postEdit = async (req, res, next) => {
       const updateClockOut = new Date(args.date);
       updateClockOut.setHours(args.clock_out.split(":")[0]);
       updateClockOut.setMinutes(args.clock_out.split(":")[1]);
-      await timesheetsModel.updateClockOut(updateClockOut, username);
+      await model.default.updateClockOut(updateClockOut, username);
     } else {
       res.sendStatus(400);
       return;

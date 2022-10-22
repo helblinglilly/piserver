@@ -1,7 +1,7 @@
-const db = require("../db");
-const format = require("pg-format");
+import db from "../db";
+import format from "pg-format";
 
-exports.readByDate = async (username, date) => {
+exports.readByDate = async (username: string, date: Date) => {
   return db
     .query(
       format(
@@ -10,7 +10,7 @@ exports.readByDate = async (username, date) => {
         username,
       ),
     )
-    .then((result) => {
+    .then((result: { rows: any[] }) => {
       result.rows.forEach((entry) => {
         return (entry.timestamp = new Date(
           Date.parse(date.toISOString().split("T")[0] + "T" + entry.timestamp + "Z"),
@@ -20,7 +20,11 @@ exports.readByDate = async (username, date) => {
     });
 };
 
-exports.insert = async (username, date, action) => {
+exports.insert = async (
+  username: string,
+  date: Date,
+  action: "START" | "CONT" | "STOP" | "END",
+) => {
   const possibleActions = ["START", "CONT", "STOP", "END"];
   if (!possibleActions.includes(action)) {
     return;

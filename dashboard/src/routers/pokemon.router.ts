@@ -1,7 +1,7 @@
 const pokemonRouter = require("express").Router();
-const error = require("../controllers/error.controller");
-const pc = require("../controllers/pokemon.controller");
-const userSelection = require("../middleware/user.middleware");
+import error from "../controllers/error.controller";
+import pc from "../controllers/pokemon.controller";
+import userSelection from "../middleware/user.middleware";
 
 pokemonRouter.get("/", userSelection, pc.getRoot);
 pokemonRouter.all("/", userSelection, error.methodNotAllowed);
@@ -20,4 +20,4 @@ pokemonRouter.all("/item/:id", userSelection, error.methodNotAllowed);
 
 pokemonRouter.all("/*", userSelection, error.pageNotFound);
 
-module.exports = pokemonRouter;
+export default pokemonRouter;

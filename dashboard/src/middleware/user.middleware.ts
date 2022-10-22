@@ -7,7 +7,7 @@ export async function validateUser(
   next: express.NextFunction,
 ) {
   const ip: string =
-    req.headers["x-forwarded-for"].toString() || req.socket.remoteAddress;
+    req.socket.remoteAddress || req.headers["x-forwarded-for"].toString();
 
   const username = await UserModel.selectUser(ip);
 
