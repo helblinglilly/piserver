@@ -1,6 +1,6 @@
 // const model.default = require("../model.defaults/timsheets.model.default");
 const timesheetUtils = require("../utils/timesheet.utils");
-const dateUtils = require("../utils/date.utils");
+const dateUtils = require("../utils/date.utils").default;
 const model = require("../models/timesheet.model");
 
 const indexObject = (
