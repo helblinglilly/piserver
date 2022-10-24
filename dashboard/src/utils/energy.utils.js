@@ -28,13 +28,13 @@ exports.updateReadings = async () => {
     return;
   }
 
-  const electricityDaysToFetch = dateUtils.daysBetweenTwoDates(
+  const electricityDaysToFetch = dateUtils.default.daysBetweenTwoDates(
     latestElectricityDate,
     new Date(),
   );
   const electricityPageSize = getAppropriatePageSize(electricityDaysToFetch);
 
-  const gasDaysToFetch = dateUtils.daysBetweenTwoDates(
+  const gasDaysToFetch = dateUtils.default.daysBetweenTwoDates(
     new Date(latestGasDate),
     new Date(),
   );
