@@ -9,7 +9,7 @@ const stopwatchRouter = require("./routers/stopwatch.router");
 const pokemonRouter = require("./routers/pokemon.router");
 const userRouter = require("./routers/user.router");
 const energyRouter = require("./routers/energy.router");
-const energyUtils = require("./utils/energy.utils");
+const energyUtils = require("./utils/energy.utils").default;
 
 const app = express();
 app.set("view engine", "pug");
@@ -30,8 +30,8 @@ app.get("/", validateUser, async (req, res, next) => {
   options.host = ``;
   options.username = req.headers["x-username"];
 
-  await energyUtils.updateReadings();
-  const energyInfo = await energyUtils.fetchLatestDay();
+  energyUtils.updateReadings();
+  const energyInfo = await energyUtils.yesterdaySummary();
   options.energyInfo = energyInfo;
 
   const binDates = await BinUtils.getBinDates();

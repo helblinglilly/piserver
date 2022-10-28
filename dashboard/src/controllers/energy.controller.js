@@ -1,6 +1,6 @@
-const model = require("../models/energy.model");
+const model = require("../models/energy.model").default;
 const error = require("./error.controller");
-const energy = require("../utils/energy.utils");
+const energy = require("../utils/energy.utils").default;
 
 exports.getRoot = async (req, res, next) => {
   const options = {};

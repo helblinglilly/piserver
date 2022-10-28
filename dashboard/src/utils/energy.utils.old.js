@@ -285,7 +285,6 @@ exports.fetchLatestDay = async () => {
   const electricityRate = await model.selectLatestElectricityRateAndCharge();
   const gasRate = await model.selectLatestGasRateAndCharge();
 
-  // console.log(electricityRate);
   return {
     electricityUsage: electricityUsed.toFixed(3) + "kWh",
     gasUsage: gasUsed.toFixed(3) + "kWh",

@@ -142,6 +142,26 @@ export class DateUtils {
     returnedDate.setUTCMilliseconds(0);
     return returnedDate;
   };
+
+  static toLocaleISOString = (date: Date) => {
+    const years = date.getFullYear();
+    const months = generalUtils.padWithLeadingCharacters(date.getMonth() + 1, 2, "0");
+    const days = generalUtils.padWithLeadingCharacters(date.getDate(), 2, "0");
+    const hours = generalUtils.padWithLeadingCharacters(date.getHours(), 2, "0");
+    const minutes = generalUtils.padWithLeadingCharacters(date.getMinutes(), 2, "0");
+    const seconds = generalUtils.padWithLeadingCharacters(date.getSeconds(), 2, "0");
+    const milliseconds = generalUtils.padWithLeadingCharacters(
+      date.getMilliseconds(),
+      3,
+      "0",
+    );
+
+    return `${years}-${months}-${days}T${hours}:${minutes}:${seconds}.${milliseconds}Z`;
+  };
+
+  static yesterday = () => {
+    return new Date(Date.now() - 86400000);
+  };
 }
 
 export default DateUtils;
