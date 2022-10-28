@@ -1,11 +1,13 @@
 import log from "loglevel";
 import "../utils/log.utils";
-import { Client } from "pg";
+import { Client, Pool } from "pg";
 import env from "../environment";
 
 require("dotenv").config();
 
 class DBSetup {
+  static Pool: Pool | null = null;
+
   static getConnection = () => {
     try {
       return new Client({
@@ -73,6 +75,20 @@ class DBSetup {
           });
       });
     });
+  };
+
+  static getPool = (): Pool => {
+    if (this.Pool === null) {
+      this.Pool = new Pool({
+        user: process.env.POSTGRES_USER,
+        host: process.env.POSTGRES_HOST,
+        database: `${process.env.POSTGRES_DATABASE}_${env}`,
+        password: process.env.POSTGRES_PASSWORD,
+        connectionTimeoutMillis: 30,
+      });
+    }
+
+    return this.Pool;
   };
 }
 
