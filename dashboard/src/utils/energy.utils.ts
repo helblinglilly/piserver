@@ -1,10 +1,10 @@
 import { getLogger } from "loglevel";
 import "./log.utils";
 const dotenv = require("dotenv").config();
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import EnergyModel from "../models/energy.model";
 import dateUtils from "./date.utils";
-import { EnergyData } from "../types/energy.types";
+import { DaySummary, EnergyData } from "../types/energy.types";
 
 const log = getLogger("energy.utils");
 
@@ -121,12 +121,19 @@ class EnergyUtils {
   static genericEnergyRequest = async (requestURL: string): Promise<EnergyData[]> => {
     log.debug(`Running request: ${requestURL}`);
 
-    const response = await axios.get(requestURL, {
-      auth: {
-        username: process.env.OCTOPUS_API_KEY,
-        password: this.baseURL,
-      },
-    });
+    let response: AxiosResponse<any, any>;
+
+    try {
+      response = await axios.get(requestURL, {
+        auth: {
+          username: process.env.OCTOPUS_API_KEY,
+          password: this.baseURL,
+        },
+      });
+    } catch (err) {
+      log.error(`Request failed with issue ${err}`);
+      return [];
+    }
 
     if (response.status === 400)
       log.error(`Request failed with error 400 for ${requestURL}`);
@@ -139,37 +146,42 @@ class EnergyUtils {
     return response.data.results;
   };
 
-  static yesterdaySummary = async () => {
-    const timezoneOffset = new Date().getTimezoneOffset() * 60000;
-    let startDate = new Date();
-    startDate.setDate(startDate.getDate() - 1);
-    startDate.setHours(0);
-    startDate.setMinutes(0);
-    startDate.setSeconds(0);
-    startDate.setMilliseconds(0);
-    startDate = new Date(startDate.valueOf() - timezoneOffset);
+  static latestDailySummary = async (): Promise<DaySummary> => {
+    const [electricEndDate, gasEndDate] = await Promise.all([
+      EnergyModel.selectLatestCompleteElectricityEntry(),
+      EnergyModel.selectLatestCompleteGasEntry(),
+    ]);
 
-    let endDate = new Date(startDate);
-    endDate.setDate(startDate.getDate() + 1);
+    const electricStartDate = dateUtils.addTime(electricEndDate, 0, 0, -1);
+    const gasStartDate = dateUtils.addTime(gasEndDate, 0, 0, -1);
 
-    const electricity = await EnergyModel.selectElectricityEntry(startDate, endDate);
-    const gas = await EnergyModel.selectGasEntry(startDate, endDate);
+    const [electricityEntries, gasEntries] = await Promise.all([
+      EnergyModel.selectElectricityEntry(electricStartDate, electricEndDate),
+      EnergyModel.selectGasEntry(gasStartDate, gasEndDate),
+    ]);
 
-    const electricityUsed = electricity.reduce(
-      (partialSum, a) => partialSum + a.usage_kwh,
+    const electricityUsage = electricityEntries.reduce(
+      (partialSum, a) => partialSum + a.consumption,
       0,
     );
-    const gasUsed = gas.reduce((partialSum, a) => partialSum + a.usage_kwh, 0);
+    const gasUsage = gasEntries.reduce((partialSum, a) => partialSum + a.consumption, 0);
 
-    const electricityRate = await EnergyModel.selectLatestElectricityRateAndCharge();
-    const gasRate = await EnergyModel.selectLatestGasRateAndCharge();
+    const [electricRate, gasRate] = await Promise.all([
+      EnergyModel.selectLatestElectricityRateAndCharge(),
+      EnergyModel.selectLatestGasRateAndCharge(),
+    ]);
 
     return {
-      electricityUsage: electricityUsed.toFixed(3) + "kWh",
-      gasUsage: gasUsed.toFixed(3) + "kWh",
-      electricityPrice:
-        "£" + ((electricityUsed * electricityRate.rate_kwh) / 100).toFixed(2),
-      gasPrice: "£" + ((gasUsed * gasRate.rate_kwh) / 100).toFixed(2),
+      electric: {
+        date: electricStartDate,
+        usage: electricityUsage.toFixed(3) + "kWh",
+        price: "£" + ((electricityUsage * electricRate.rate_kwh) / 100).toFixed(2),
+      },
+      gas: {
+        date: gasStartDate,
+        usage: gasUsage.toFixed(3) + "kWh",
+        price: "£" + ((gasUsage * gasRate.rate_kwh) / 100).toFixed(2),
+      },
     };
   };
 }

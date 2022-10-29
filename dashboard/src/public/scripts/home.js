@@ -11,6 +11,18 @@ document.addEventListener("DOMContentLoaded", () => {
   if (blackDate.innerHTML === tomorrow.toLocaleDateString("en-GB")) {
     highlight(document.getElementById("blackBinCard"));
   }
+
+  const gasCard = document.getElementById("gasSummaryCard");
+  gasCard.addEventListener("click", () => {
+    const gasFooter = document.getElementById("gasFooter");
+    gasFooter.classList.toggle("is-hidden");
+  });
+
+  const electricCard = document.getElementById("electricSummaryCard");
+  electricCard.addEventListener("click", () => {
+    const electricFooter = document.getElementById("electricFooter");
+    electricFooter.classList.toggle("is-hidden");
+  });
 });
 
 const highlight = (card) => {

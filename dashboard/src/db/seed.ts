@@ -358,10 +358,10 @@ export class Seed {
     data: Array<EnergyData> = [
       {
         start_date: new Date(
-          `${DateUtils.yesterday().toISOString().split("T")[0]}T00:00:00Z`,
+          `${DateUtils.yesterday().toISOString().split("T")[0]}T23:30:00Z`,
         ),
         end_date: new Date(
-          `${DateUtils.yesterday().toISOString().split("T")[0]}T23:30:00Z`,
+          `${DateUtils.yesterday().toISOString().split("T")[0]}T00:00:00Z`,
         ),
         usage_kwh: 0.5,
       },
@@ -502,8 +502,8 @@ export class Seed {
     await seed.binDates();
     await seed.gasBill();
     await seed.electricityBill();
-    await seed.gasUsage(null);
-    await seed.electricityUsage(null);
+    await seed.gasUsage();
+    await seed.electricityUsage();
     logger.info("Completed seeding");
   };
 }

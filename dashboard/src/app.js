@@ -31,7 +31,7 @@ app.get("/", validateUser, async (req, res, next) => {
   options.username = req.headers["x-username"];
 
   energyUtils.updateReadings();
-  const energyInfo = await energyUtils.yesterdaySummary();
+  const energyInfo = await energyUtils.latestDailySummary();
   options.energyInfo = energyInfo;
 
   const binDates = await BinUtils.getBinDates();

@@ -2,6 +2,8 @@ import { getLogger } from "loglevel";
 import "../utils/log.utils";
 import db from "../db";
 import format from "pg-format";
+import DateUtils from "../utils/date.utils";
+import { EnergyData } from "../types/energy.types";
 const log = getLogger("energy.model");
 
 class EnergyModel {
@@ -163,7 +165,10 @@ class EnergyModel {
       });
   };
 
-  static selectElectricityEntry = async (startDate: Date, endDate: Date) => {
+  static selectElectricityEntry = async (
+    startDate: Date,
+    endDate: Date,
+  ): Promise<Array<EnergyData>> => {
     return await db
       .query(
         format(
@@ -172,8 +177,8 @@ class EnergyModel {
             WHERE start_date >= %L::date 
             AND end_date <= %L::date 
             ORDER BY start_date ASC`,
-          startDate.toISOString(),
-          endDate.toISOString(),
+          DateUtils.toLocaleISOString(startDate),
+          DateUtils.toLocaleISOString(endDate),
         ),
       )
       .then((result) => {
@@ -186,7 +191,10 @@ class EnergyModel {
       });
   };
 
-  static selectGasEntry = async (startDate: Date, endDate: Date) => {
+  static selectGasEntry = async (
+    startDate: Date,
+    endDate: Date,
+  ): Promise<Array<EnergyData>> => {
     return await db
       .query(
         format(
@@ -195,8 +203,8 @@ class EnergyModel {
             WHERE start_date >= %L::date 
             AND end_date <= %L::date 
             ORDER BY start_date ASC`,
-          startDate.toISOString(),
-          endDate.toISOString(),
+          DateUtils.toLocaleISOString(startDate),
+          DateUtils.toLocaleISOString(endDate),
         ),
       )
       .then((result) => {
@@ -375,8 +383,8 @@ class EnergyModel {
           AND billing_end >= %L::date
           ORDER BY billing_start
           `,
-          providedDate.toISOString(),
-          providedDate.toISOString(),
+          DateUtils.toLocaleISOString(providedDate),
+          DateUtils.toLocaleISOString(providedDate),
         ),
       )
       .then((result) => {
@@ -406,6 +414,60 @@ class EnergyModel {
       .catch((err) => {
         log.error(`selectLatestElectricityBillDate failed with error ${err}`);
         log.trace();
+      });
+  };
+
+  static selectLatestCompleteGasEntry = async (): Promise<Date> => {
+    return await db
+      .query(
+        `
+      SELECT 
+          MAX(end_date)
+      FROM gas_usage 
+      WHERE
+          date_part('hour', end_date AT TIME ZONE 'UTC') = 0
+          AND
+          date_part('minute', end_date AT TIME ZONE 'UTC') = 0
+      `,
+      )
+      .then((result) => {
+        if (result.rows.length === 0) {
+          log.error(`selectLatestCompleteGasEntry failed - Database was empty!`);
+          process.exit(-1);
+        }
+        return new Date(result.rows[0].max);
+      })
+      .catch((err) => {
+        log.error(`selectLatestCompleteGasEntry failed with error ${err}`);
+        log.trace();
+        process.exit(-1);
+      });
+  };
+
+  static selectLatestCompleteElectricityEntry = async (): Promise<Date> => {
+    return await db
+      .query(
+        `
+      SELECT 
+          MAX(end_date)
+      FROM electricity_usage 
+      WHERE
+          date_part('hour', end_date AT TIME ZONE 'UTC') = 0
+          AND
+          date_part('minute', end_date AT TIME ZONE 'UTC') = 0
+      `,
+      )
+      .then((result) => {
+        if (result.rows.length === 0) {
+          log.error(`selectLatestCompleteElectricityEntry failed - Database was empty!`);
+          process.exit(-1);
+        }
+        return new Date(result.rows[0].max);
+      })
+      .catch((err) => {
+        log.error(`selectLatestCompleteElectricityEntry failed with error ${err}`);
+        log.trace();
+        process.exit(-1);
       });
   };
 }

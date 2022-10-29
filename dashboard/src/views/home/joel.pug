@@ -30,19 +30,29 @@ block append body
         .column.is-hidden-mobile
           .columns
             .column
-              .card
+              #gasSummaryCard.card
                 .card-header-title.pb-1
                   p 🔥 Gas
                 .card-content.pt-1.pb-3
-                  p #{energyInfo.gasUsage}
-                  p #{energyInfo.gasPrice}
+                  p #{energyInfo.gas.usage}
+                  p #{energyInfo.gas.price}
+                #gasFooter.card-footer.is-hidden
+                  .card-footer-item
+                    p#gasDay #{energyInfo.gas.date.toUTCString().split(",")[0]}
+                  .card-footer-item
+                    p#gasDate #{energyInfo.gas.date.toLocaleDateString().substring(0, 5)}
             .column
-              .card
+              #electricSummaryCard.card
                 .card-header-title.pb-1
                   p ⚡️ Electric
                 .card-content.pt-1.pb-3
-                  p #{energyInfo.electricityUsage}
-                  p #{energyInfo.electricityPrice}
+                  p #{energyInfo.electric.usage}
+                  p #{energyInfo.electric.price}
+                #electricFooter.card-footer.is-hidden
+                  .card-footer-item
+                    p#electricDay #{energyInfo.electric.date.toUTCString().split(",")[0]}
+                  .card-footer-item
+                    p#electricDate #{energyInfo.electric.date.toLocaleDateString().substring(0, 5)}
 
       .columns
         .column

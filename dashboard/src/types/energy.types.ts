@@ -3,3 +3,14 @@ export type EnergyData = {
   interval_end: Date;
   consumption: number;
 };
+
+export type DaySummary = {
+  electric: DayDetails;
+  gas: DayDetails;
+};
+
+export type DayDetails = {
+  date: Date;
+  usage: string;
+  price: string;
+};
