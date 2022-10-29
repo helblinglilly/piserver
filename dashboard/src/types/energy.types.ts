@@ -1,3 +1,5 @@
+import { ChartInput } from "./common.types";
+
 export type EnergyUsage = {
   interval_start: Date;
   interval_end: Date;
@@ -33,4 +35,13 @@ export type StandingChargeInfo = {
 export type BillingPeriod = {
   start_date: Date;
   end_date: Date;
+};
+
+export type ChartData = {
+  data: Array<number>;
+  labels: Array<string>;
+  chart: ChartInput;
+  energyUsed: string;
+  charged: string;
+  rate: string;
 };

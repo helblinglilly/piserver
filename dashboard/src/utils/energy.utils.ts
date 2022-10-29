@@ -3,9 +3,14 @@ import "./log.utils";
 const dotenv = require("dotenv").config();
 import axios, { AxiosResponse } from "axios";
 import EnergyUsageModel from "../models/energy.usage.model";
-import dateUtils from "./date.utils";
-import { DaySummary, EnergyUsage } from "../types/energy.types";
-import { TableNames } from "../types/common.types";
+import dateUtils, { DateUtils } from "./date.utils";
+import {
+  ChartData,
+  DaySummary,
+  EnergyUsage,
+  StandingChargeInfo,
+} from "../types/energy.types";
+import { ChartInput, TableNames } from "../types/common.types";
 import EnergyBillModel from "../models/energy.bill.model";
 
 const log = getLogger("energy.utils");
@@ -189,6 +194,174 @@ class EnergyUtils {
         date: gasStartDate,
         usage: gasUsage.toFixed(3) + "kWh",
         price: "£" + ((gasUsage * gasRate.rate_kwh) / 100).toFixed(2),
+      },
+    };
+  };
+
+  static chartDataDateRange = async (
+    startDate: Date,
+    endDate: Date,
+    mode: "gas" | "electric",
+  ): Promise<ChartData> => {
+    const usageTableName =
+      mode === "electric" ? TableNames.electricity_usage : TableNames.gas_usage;
+    const billTableName =
+      mode === "electric" ? TableNames.electricity_bill : TableNames.gas_bill;
+
+    const usageEntries = await EnergyUsageModel.selectEntries(
+      usageTableName,
+      startDate,
+      endDate,
+    );
+
+    const standingChargeInfo = await EnergyBillModel.selectLatesetRateAndCharge(
+      billTableName,
+    );
+
+    const dataPoints: Array<number> = [];
+    const labels: Array<string> = [];
+
+    let currentDateString = "";
+    let dailyUsage = 0.0;
+
+    usageEntries.forEach((entry: EnergyUsage, i) => {
+      const day = DateUtils.weekdays.short[entry.interval_start.getUTCDay()];
+      const date = entry.interval_start.getUTCDate();
+      const month = entry.interval_start.getUTCMonth() + 1;
+      const entryDate = `${day} ${date}/${month}`;
+
+      if (i === 0) currentDateString = entryDate;
+
+      if (entryDate !== currentDateString) {
+        dataPoints.push(parseFloat(dailyUsage.toFixed(5)));
+        labels.push(currentDateString);
+
+        dailyUsage = entry.consumption;
+        currentDateString = entryDate;
+      } else {
+        dailyUsage += entry.consumption;
+      }
+    });
+
+    const chart = this.generateChart(
+      startDate.toLocaleDateString("en-GB") + "-" + endDate.toLocaleDateString("en-GB"),
+      dataPoints,
+      labels,
+      mode === "electric" ? 5 : 90,
+      "kWh",
+    );
+
+    const totalUsage = dataPoints.reduce((rolling, val) => rolling + val, 0);
+    const charge = totalUsage * standingChargeInfo.rate_kwh;
+
+    return {
+      data: dataPoints,
+      labels: labels,
+      chart: chart,
+      energyUsed: `${totalUsage.toFixed(2)} kWh`,
+      charged: "£" + (charge / 100).toFixed(2),
+      rate: `@${standingChargeInfo.rate_kwh}p/kWh`,
+    };
+  };
+
+  static chartDataSpecificDate = async (
+    startDate: Date,
+    endDate: Date,
+    mode: "gas" | "electric",
+  ): Promise<ChartData> => {
+    let usageTable =
+      mode === "electric" ? TableNames.electricity_usage : TableNames.gas_usage;
+    let billTable =
+      mode === "electric" ? TableNames.electricity_bill : TableNames.gas_bill;
+
+    const entries = await EnergyUsageModel.selectEntries(usageTable, startDate, endDate);
+    const standingChargeInfo = await EnergyBillModel.selectLatesetRateAndCharge(
+      billTable,
+    );
+
+    const dataPoints: Array<number> = [];
+    const labels: Array<string> = [];
+    let energyUsed = 0.0;
+
+    entries.forEach((entry, i) => {
+      if (i === 0) {
+        dataPoints.push(parseFloat(entry.consumption.toFixed(5)));
+      } else {
+        dataPoints.push(
+          parseFloat((dataPoints[dataPoints.length - 1] + entry.consumption).toFixed(5)),
+        );
+        energyUsed += entry.consumption;
+      }
+
+      const start_range_time = entry.interval_start
+        .toUTCString()
+        .split(" ")[4]
+        .split(":");
+      const end_range_time = entry.interval_end.toUTCString().split(" ")[4].split(":");
+
+      labels.push(
+        `${start_range_time[0]}:${start_range_time[1]}-${end_range_time[0]}:${end_range_time[1]}`,
+      );
+    });
+
+    const chart = this.generateChart(
+      startDate.toLocaleDateString("en-GB"),
+      dataPoints,
+      labels,
+      mode === "electric" ? 5 : 90,
+      "kWh",
+    );
+    let charge = (energyUsed * standingChargeInfo.rate_kwh) / 100;
+
+    return {
+      data: dataPoints,
+      labels: labels,
+      chart: chart,
+      energyUsed: `${energyUsed.toFixed(2)} kWh`,
+      charged: "£" + charge.toFixed(2),
+      rate: `@${standingChargeInfo.rate_kwh}p/kWh`,
+    };
+  };
+
+  static generateChart = (
+    title: string,
+    data: Array<number>,
+    labels: Array<string>,
+    max: number,
+    yName: string,
+  ): ChartInput => {
+    return {
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            pointRadius: 4,
+            pointBackgroundColor: "rgb(0,0,255)",
+            data: data,
+          },
+        ],
+      },
+      options: {
+        legend: { display: false },
+        scales: {
+          yAxes: [
+            {
+              display: true,
+              ticks: {
+                max: max,
+                min: 0,
+              },
+              scaleLabel: {
+                display: true,
+                labelString: yName,
+              },
+            },
+          ],
+        },
+        title: {
+          display: true,
+          text: title,
+        },
       },
     };
   };
