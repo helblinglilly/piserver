@@ -1,4 +1,4 @@
-const model = require("../models/energy.model").default;
+const model = require("../models/energy.bill.model").default;
 const error = require("./error.controller");
 const energy = require("../utils/energy.utils").default;
 

@@ -1,6 +1,6 @@
 const dotenv = require("dotenv").config();
 const axios = require("axios").default;
-const model = require("../models/energy.model");
+const model = require("../models/energy.bill.model");
 const dateUtils = require("./date.utils");
 
 const baseURL = "https://api.octopus.energy/";

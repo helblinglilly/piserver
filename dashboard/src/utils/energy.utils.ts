@@ -2,9 +2,11 @@ import { getLogger } from "loglevel";
 import "./log.utils";
 const dotenv = require("dotenv").config();
 import axios, { AxiosResponse } from "axios";
-import EnergyModel from "../models/energy.model";
+import EnergyUsageModel from "../models/energy.usage.model";
 import dateUtils from "./date.utils";
-import { DaySummary, EnergyData } from "../types/energy.types";
+import { DaySummary, EnergyUsage } from "../types/energy.types";
+import { TableNames } from "../types/common.types";
+import EnergyBillModel from "../models/energy.bill.model";
 
 const log = getLogger("energy.utils");
 
@@ -29,8 +31,8 @@ class EnergyUtils {
     const today = new Date();
 
     const latestDatePromises: Array<Promise<Date>> = [
-      EnergyModel.selectLatestGasEntryInsert(),
-      EnergyModel.selectLatestElectricityEntryInsert(),
+      EnergyUsageModel.selectLatestDate(TableNames.gas_usage),
+      EnergyUsageModel.selectLatestDate(TableNames.electricity_usage),
     ];
     const [latestGasDate, latestElectricityDate] = await Promise.all<Date>(
       latestDatePromises,
@@ -72,7 +74,8 @@ class EnergyUtils {
     const promises = [];
     data.forEach((entry) =>
       promises.push(
-        EnergyModel.insertGasEntry(
+        EnergyUsageModel.insertEntry(
+          TableNames.gas_usage,
           entry.interval_start,
           entry.interval_end,
           entry.consumption,
@@ -105,7 +108,8 @@ class EnergyUtils {
     const promises = [];
     data.forEach((entry) =>
       promises.push(
-        EnergyModel.insertElectricityEntry(
+        EnergyUsageModel.insertEntry(
+          TableNames.electricity_usage,
           entry.interval_start,
           entry.interval_end,
           entry.consumption,
@@ -118,7 +122,7 @@ class EnergyUtils {
     });
   };
 
-  static genericEnergyRequest = async (requestURL: string): Promise<EnergyData[]> => {
+  static genericEnergyRequest = async (requestURL: string): Promise<EnergyUsage[]> => {
     log.debug(`Running request: ${requestURL}`);
 
     let response: AxiosResponse<any, any>;
@@ -148,16 +152,20 @@ class EnergyUtils {
 
   static latestDailySummary = async (): Promise<DaySummary> => {
     const [electricEndDate, gasEndDate] = await Promise.all([
-      EnergyModel.selectLatestCompleteElectricityEntry(),
-      EnergyModel.selectLatestCompleteGasEntry(),
+      EnergyUsageModel.selectLatestCompletedDate(TableNames.electricity_usage),
+      EnergyUsageModel.selectLatestCompletedDate(TableNames.gas_usage),
     ]);
 
     const electricStartDate = dateUtils.addTime(electricEndDate, 0, 0, -1);
     const gasStartDate = dateUtils.addTime(gasEndDate, 0, 0, -1);
 
     const [electricityEntries, gasEntries] = await Promise.all([
-      EnergyModel.selectElectricityEntry(electricStartDate, electricEndDate),
-      EnergyModel.selectGasEntry(gasStartDate, gasEndDate),
+      EnergyUsageModel.selectEntries(
+        TableNames.electricity_usage,
+        electricStartDate,
+        electricEndDate,
+      ),
+      EnergyUsageModel.selectEntries(TableNames.gas_usage, gasStartDate, gasEndDate),
     ]);
 
     const electricityUsage = electricityEntries.reduce(
@@ -167,8 +175,8 @@ class EnergyUtils {
     const gasUsage = gasEntries.reduce((partialSum, a) => partialSum + a.consumption, 0);
 
     const [electricRate, gasRate] = await Promise.all([
-      EnergyModel.selectLatestElectricityRateAndCharge(),
-      EnergyModel.selectLatestGasRateAndCharge(),
+      EnergyBillModel.selectLatesetRateAndCharge(TableNames.electricity_bill),
+      EnergyBillModel.selectLatesetRateAndCharge(TableNames.gas_bill),
     ]);
 
     return {

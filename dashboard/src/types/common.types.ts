@@ -17,3 +17,10 @@ export enum WeekdayShort {
   Sat = "Sat",
   Sun = "Sun",
 }
+
+export enum TableNames {
+  gas_bill = "gas_bill",
+  electricity_bill = "electricity_bill",
+  electricity_usage = "electricity_usage",
+  gas_usage = "gas_usage",
+}
