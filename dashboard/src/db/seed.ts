@@ -234,8 +234,8 @@ export class Seed {
   electricityBill = async (
     data: Array<EnergyBillData> = [
       {
-        billing_start: new Date(),
-        billing_end: this.tomorrow,
+        billing_start: DateUtils.yesterday(),
+        billing_end: new Date("2099-01-01"),
         standing_order_charge_days: 1,
         standing_order_rate: 45,
         usage_kwh: 1.5,

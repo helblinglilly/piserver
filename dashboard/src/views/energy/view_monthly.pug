@@ -20,16 +20,18 @@ block append body
             .column
                 .title.is-3 #{mode} billing cycle view
             .column(style="text-align: right")
-                button.button(onclick=`location.href='/energy/view_monthly?mode=${otherMode}&daily_date=${new Date(new Date(date) - 86400000)}'`) Switch to #{otherMode}
+                form(action="/energy/view_monthly", method="get")
+                    input(name="daily_date", value=`${selected_date.toISOString().split("T")[0]}`, type="hidden")
+                    input(name="mode", value=`${otherMode.toLowerCase()}`, type="hidden")
+                    button.button(type="submit") Switch to #{otherMode}
 
         .columns    
             .column
                 .card.mt-3
                     .card-content
                         form(action=`/energy/view_monthly`, method="get", id="electric")
-                            input(id="mode", name="mode", value=`${mode}` hidden)
-                            input(id="view_date" type="date", name="daily_date", value=`${date}` required).input.mb-2
-                            button(type="submit").button.is-fullwidth#submit_button Submit
+                            input(name="mode", value=`${mode}` hidden)
+                            input(name="daily_date", type="date", value=`${selected_date.toISOString().split("T")[0]}`, max="2050-01-01", step=1, onchange="this.form.submit()", required).input.mb-2
 
             .column
                 if hasData === false

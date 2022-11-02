@@ -12,6 +12,7 @@ import {
 } from "../types/energy.types";
 import { ChartInput, TableNames } from "../types/common.types";
 import EnergyBillModel from "../models/energy.bill.model";
+import GeneralUtils from "./general.utils";
 
 const log = getLogger("energy.utils");
 
@@ -226,20 +227,42 @@ class EnergyUtils {
 
     usageEntries.forEach((entry: EnergyUsage, i) => {
       const day = DateUtils.weekdays.short[entry.interval_start.getUTCDay()];
-      const date = entry.interval_start.getUTCDate();
-      const month = entry.interval_start.getUTCMonth() + 1;
+      const date = GeneralUtils.padWithLeadingCharacters(
+        entry.interval_start.getUTCDate(),
+        2,
+        "0",
+      );
+      const month = GeneralUtils.padWithLeadingCharacters(
+        entry.interval_start.getUTCMonth() + 1,
+        2,
+        "0",
+      );
       const entryDate = `${day} ${date}/${month}`;
 
-      if (i === 0) currentDateString = entryDate;
+      if (i === 0) {
+        currentDateString = entryDate;
+        dailyUsage = entry.consumption;
+      }
 
-      if (entryDate !== currentDateString) {
+      if (entryDate === currentDateString) {
+        // Just keep adding the usage of that day
+        dailyUsage += entry.consumption;
+      } else {
+        // Entry for that day is complete
         dataPoints.push(parseFloat(dailyUsage.toFixed(5)));
         labels.push(currentDateString);
 
         dailyUsage = entry.consumption;
         currentDateString = entryDate;
-      } else {
-        dailyUsage += entry.consumption;
+      }
+
+      if (i === usageEntries.length - 1) {
+        // Reached the end
+        dataPoints.push(parseFloat(dailyUsage.toFixed(5)));
+        labels.push(currentDateString);
+
+        dailyUsage = entry.consumption;
+        currentDateString = entryDate;
       }
     });
 
@@ -279,12 +302,6 @@ class EnergyUtils {
       startDate,
       endDate,
     );
-
-    entries.forEach((entry) => {
-      log.debug(
-        `entry: ${entry.interval_start} - ${entry.interval_end} - ${entry.consumption}`,
-      );
-    });
 
     const standingChargeInfo = await EnergyBillModel.selectLatesetRateAndCharge(
       billTable,

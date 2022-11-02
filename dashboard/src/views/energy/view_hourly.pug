@@ -29,7 +29,7 @@ block append body
                 .card.mt-3
                     .card-content
                         form(action="/energy/view_hourly", method="get", id="electric")
-                            input(type="date", name="daily_date", value=`${date.toISOString().split("T")[0]}`, max=`${maxDate.toISOString().split("T")[0]}`, step=1, onchange="this.form.submit()", required).input.mb-2
+                            input(name="daily_date", type="date", value=`${date.toISOString().split("T")[0]}`, max=`${maxDate.toISOString().split("T")[0]}`, step=1, onchange="this.form.submit()", required).input.mb-2
                             input(name="mode", value=`${mode.toLowerCase()}`, type="hidden")
 
             .column
