@@ -274,8 +274,6 @@ class EnergyUtils {
     let billTable =
       mode === "electric" ? TableNames.electricity_bill : TableNames.gas_bill;
 
-    log.debug(`startDate: ${startDate} endDate: ${endDate}`);
-
     const entries: Array<EnergyUsage> = await EnergyUsageModel.selectEntries(
       usageTable,
       startDate,

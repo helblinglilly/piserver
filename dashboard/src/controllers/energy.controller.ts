@@ -44,9 +44,7 @@ class EnergyController {
       req.query.daily_date.setHours(0);
       req.query.daily_date.setMinutes(0);
       req.query.daily_date.setMilliseconds(0);
-      //   const timezoneOffset = req.query.daily_date.getTimezoneOffset() * 60000;
 
-      //   startDate = new Date(req.query.daily_date.valueOf() - timezoneOffset);
       startDate = req.query.daily_date;
       endDate = new Date(startDate.toISOString());
       endDate.setDate(startDate.getDate() + 1);
@@ -55,6 +53,10 @@ class EnergyController {
     if (!endDate || endDate > latestEntry) {
       endDate = latestEntry;
       startDate = DateUtils.yesterday();
+      startDate.setHours(0);
+      startDate.setMinutes(0);
+      startDate.setSeconds(0);
+      startDate.setMilliseconds(0);
     }
 
     const chartData = await EnergyUtils.chartDataSpecificDate(startDate, endDate, mode);
@@ -69,10 +71,9 @@ class EnergyController {
       energy_used: chartData.energyUsed,
       energy_charged: chartData.charged,
       rate: chartData.rate,
-      maxDate: latestEntry,
+      maxDate: new Date(latestEntry.valueOf() - 1),
     };
 
-    log.debug(startDate, endDate);
     res.render("energy/view_hourly", { ...options });
   };
 
