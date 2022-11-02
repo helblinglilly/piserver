@@ -1,4 +1,4 @@
-import { ChartInput } from "./common.types";
+import { ChartInput, UsernameOptions } from "./common.types";
 
 export type EnergyUsage = {
   interval_start: Date;
@@ -45,3 +45,20 @@ export type ChartData = {
   charged: string;
   rate: string;
 };
+
+export type HourlyViewQuery = {
+  mode: "gas" | "electric";
+  daily_date: Date;
+};
+
+export interface GetHourlyOptions extends UsernameOptions {
+  date: Date;
+  mode: "Gas" | "Electric";
+  otherMode: "Gas" | "Electric";
+  hasData: boolean;
+  chart_data: string;
+  energy_used: string;
+  energy_charged: string;
+  rate: string;
+  maxDate: Date;
+}

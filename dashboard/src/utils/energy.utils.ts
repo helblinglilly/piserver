@@ -274,7 +274,20 @@ class EnergyUtils {
     let billTable =
       mode === "electric" ? TableNames.electricity_bill : TableNames.gas_bill;
 
-    const entries = await EnergyUsageModel.selectEntries(usageTable, startDate, endDate);
+    log.debug(`startDate: ${startDate} endDate: ${endDate}`);
+
+    const entries: Array<EnergyUsage> = await EnergyUsageModel.selectEntries(
+      usageTable,
+      startDate,
+      endDate,
+    );
+
+    entries.forEach((entry) => {
+      log.debug(
+        `entry: ${entry.interval_start} - ${entry.interval_end} - ${entry.consumption}`,
+      );
+    });
+
     const standingChargeInfo = await EnergyBillModel.selectLatesetRateAndCharge(
       billTable,
     );
@@ -283,26 +296,35 @@ class EnergyUtils {
     const labels: Array<string> = [];
     let energyUsed = 0.0;
 
-    entries.forEach((entry, i) => {
-      if (i === 0) {
-        dataPoints.push(parseFloat(entry.consumption.toFixed(5)));
-      } else {
-        dataPoints.push(
-          parseFloat((dataPoints[dataPoints.length - 1] + entry.consumption).toFixed(5)),
-        );
-        energyUsed += entry.consumption;
-      }
-
-      const start_range_time = entry.interval_start
-        .toUTCString()
-        .split(" ")[4]
-        .split(":");
-      const end_range_time = entry.interval_end.toUTCString().split(" ")[4].split(":");
-
-      labels.push(
-        `${start_range_time[0]}:${start_range_time[1]}-${end_range_time[0]}:${end_range_time[1]}`,
+    if (entries === undefined || entries.length === 0) {
+      log.info(
+        `Trying to generate a chart for ${startDate.toUTCString()} but no entries exist`,
       );
-    });
+    } else {
+      entries.forEach((entry, i) => {
+        if (i === 0) {
+          dataPoints.push(parseFloat(entry.consumption.toFixed(5)));
+          energyUsed = entry.consumption;
+        } else {
+          dataPoints.push(
+            parseFloat(
+              (dataPoints[dataPoints.length - 1] + entry.consumption).toFixed(5),
+            ),
+          );
+          energyUsed += entry.consumption;
+        }
+
+        const start_range_time = entry.interval_start
+          .toUTCString()
+          .split(" ")[4]
+          .split(":");
+        const end_range_time = entry.interval_end.toUTCString().split(" ")[4].split(":");
+
+        labels.push(
+          `${start_range_time[0]}:${start_range_time[1]}-${end_range_time[0]}:${end_range_time[1]}`,
+        );
+      });
+    }
 
     const chart = this.generateChart(
       startDate.toLocaleDateString("en-GB"),

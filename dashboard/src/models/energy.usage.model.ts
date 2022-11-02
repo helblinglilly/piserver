@@ -82,18 +82,20 @@ class EnergyUsageModel {
       log.error(`selectEntries has been called with an invalid table name ${table}`);
       return [];
     }
-
     return await db
       .query(
         format(
           `
-            SELECT usage_kwh, start_date, end_date 
+            SELECT 
+              usage_kwh AS consumption, 
+              start_date AS interval_start, 
+              end_date AS interval_end
             FROM ${table}
             WHERE start_date >= %L::date 
             AND end_date <= %L::date 
             ORDER BY start_date ASC`,
-          DateUtils.toLocaleISOString(startDate),
-          DateUtils.toLocaleISOString(endDate),
+          startDate.toISOString(),
+          endDate.toISOString(),
         ),
       )
       .then((result) => {
@@ -106,6 +108,12 @@ class EnergyUsageModel {
       });
   };
 
+  /**
+   * This method is intended to find out what the latest entry present in the databse is,
+   * with the intention of identifying from which point data has to be fetched from
+   * @param table
+   * @returns The end_date of the latest entry that has been inserted into the database
+   */
   static selectLatestDate = async (table: TableNames): Promise<Date> => {
     if (!this.acceptableTables.includes(table)) {
       log.error(`selectLatestDate has been called with an invalid table name ${table}`);
@@ -127,6 +135,12 @@ class EnergyUsageModel {
       });
   };
 
+  /**
+   * This method is intended to find out the latest date for which all data about a given
+   * table is present, with the intention of providing reporting information about that day.
+   * @param table TableNames.gas_usage or TableNames.electricity_usage
+   * @returns The latest date for which the daily entry is complete
+   */
   static selectLatestCompletedDate = async (table: TableNames): Promise<Date> => {
     if (!this.acceptableTables.includes(table)) {
       log.error(

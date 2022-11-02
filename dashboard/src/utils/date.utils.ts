@@ -160,7 +160,9 @@ export class DateUtils {
   };
 
   static yesterday = () => {
-    return new Date(Date.now() - 86400000);
+    const now = new Date();
+    now.setDate(now.getDate() - 1);
+    return now;
   };
 }
 

@@ -19,7 +19,7 @@ energyRouter.all("/insert_gas", error.methodNotAllowed);
 energyRouter.get("/view_monthly", userSelection, ec.getViewMonthly);
 energyRouter.all("/view_monthly", error.methodNotAllowed);
 
-energyRouter.get("/view_hourly", userSelection, ec.getViewHourly);
+energyRouter.get("/view_hourly", userSelection, ec.getHourlyUsage);
 energyRouter.all("/view_hourly", error.methodNotAllowed);
 
 energyRouter.all("/*", error.pageNotFound);

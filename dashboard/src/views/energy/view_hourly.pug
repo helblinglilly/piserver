@@ -20,14 +20,17 @@ block append body
             .column
                 .title.is-3 #{mode} Hourly view
             .column(style="text-align: right")
-                button.button(onclick=`location.href='/energy/view_hourly?mode=${otherMode}&daily_date=${new Date(date).toISOString().split("T")[0]}'`) Switch to #{otherMode}
+                form(action="/energy/view_hourly", method="get", id="electric")
+                    input(name="daily_date", value=`${date.toISOString().split("T")[0]}`, type="hidden")
+                    input(name="mode", value=`${otherMode.toLowerCase()}`, type="hidden")
+                    button.button(type="submit") Switch to #{otherMode}
         .columns    
             .column
                 .card.mt-3
                     .card-content
                         form(action="/energy/view_hourly", method="get", id="electric")
-                            input(id="view_date" type="date", name="daily_date", value=`${date}` required).input.mb-2
-                            button(type="submit").button.is-fullwidth#submit_button Submit
+                            input(type="date", name="daily_date", value=`${date.toISOString().split("T")[0]}`, max=`${maxDate.toISOString().split("T")[0]}`, step=1, onchange="this.form.submit()", required).input.mb-2
+                            input(name="mode", value=`${mode.toLowerCase()}`, type="hidden")
 
             .column
                 if hasData === false

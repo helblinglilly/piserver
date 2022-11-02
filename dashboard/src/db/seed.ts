@@ -358,11 +358,18 @@ export class Seed {
     data: Array<EnergyData> = [
       {
         start_date: new Date(
-          `${DateUtils.yesterday().toISOString().split("T")[0]}T23:30:00Z`,
-        ),
-        end_date: new Date(
           `${DateUtils.yesterday().toISOString().split("T")[0]}T00:00:00Z`,
         ),
+        end_date: new Date(
+          `${DateUtils.yesterday().toISOString().split("T")[0]}T00:30:00Z`,
+        ),
+        usage_kwh: 0.5,
+      },
+      {
+        start_date: new Date(
+          `${DateUtils.yesterday().toISOString().split("T")[0]}T23:30:00Z`,
+        ),
+        end_date: new Date(`${new Date().toISOString().split("T")[0]}T00:00:00Z`),
         usage_kwh: 0.5,
       },
       {
@@ -373,6 +380,11 @@ export class Seed {
       {
         start_date: new Date(`${new Date().toISOString().split("T")[0]}T00:30:00Z`),
         end_date: new Date(`${new Date().toISOString().split("T")[0]}T01:00:00Z`),
+        usage_kwh: 0.5,
+      },
+      {
+        start_date: new Date(`${new Date().toISOString().split("T")[0]}T01:00:00Z`),
+        end_date: new Date(`${new Date().toISOString().split("T")[0]}T01:30:00Z`),
         usage_kwh: 0.5,
       },
     ],
@@ -424,8 +436,15 @@ export class Seed {
           `${DateUtils.yesterday().toISOString().split("T")[0]}T00:00:00Z`,
         ),
         end_date: new Date(
+          `${DateUtils.yesterday().toISOString().split("T")[0]}T00:30:00Z`,
+        ),
+        usage_kwh: 0.5,
+      },
+      {
+        start_date: new Date(
           `${DateUtils.yesterday().toISOString().split("T")[0]}T23:30:00Z`,
         ),
+        end_date: new Date(`${new Date().toISOString().split("T")[0]}T00:00:00Z`),
         usage_kwh: 0.5,
       },
       {

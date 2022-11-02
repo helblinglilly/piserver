@@ -75,3 +75,7 @@ type ChartTitle = {
   display: boolean;
   text: string;
 };
+
+export type UsernameOptions = {
+  username: string;
+};
