@@ -24,14 +24,14 @@ block append body
 
         .columns
             .column
-                .card
+                .card.is-half
                     .card-header-title
                         p Standing charge
                     .card-content
                         p#standing_charge_data(hidden) #{chart_standing_charge_data}
                         canvas#standing_charge_chart
 
-            .column
+            .column.is-half
                 .card
                     .card-header-title
                         p kWh rate

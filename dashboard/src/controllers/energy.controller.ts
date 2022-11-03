@@ -89,7 +89,7 @@ class EnergyController {
       return;
     }
 
-    const mode = req.query.mode === "gas" ? "gas" : "electric";
+    const mode = req.query.mode.toLowerCase() === "gas" ? "gas" : "electric";
     const billing_table =
       mode === "gas" ? TableNames.gas_bill : TableNames.electricity_bill;
 
@@ -311,14 +311,6 @@ class EnergyController {
     };
 
     res.render("energy/insert_bill", { ...options });
-  };
-
-  static getInsertElectric = async (req: express.Request, res: express.Response) => {
-    res.sendStatus(200);
-  };
-
-  static getInsertGas = async (req: express.Request, res: express.Response) => {
-    res.sendStatus(200);
   };
 
   static postInsert = async (req: express.Request, res: express.Response) => {
