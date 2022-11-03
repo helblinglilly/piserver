@@ -23,6 +23,7 @@ export type Bill = {
   standing_order_charge_days: number;
   standing_order_rate: number;
   usage_kwh: number;
+  rate_kwh: number;
   pre_tax: number;
   after_tax: number;
 };

@@ -10,6 +10,7 @@ import {
   StandingChargeInfo,
 } from "../types/energy.types";
 import { TableNames } from "../types/common.types";
+import { EnergyBillData } from "../db/seed";
 const log = getLogger("energy.bill.model");
 
 class EnergyBillModel {
@@ -159,9 +160,14 @@ class EnergyBillModel {
       });
   };
 
-  static selectLatestBillDate = async (): Promise<Date> => {
+  static selectLatestBillDate = async (table: TableNames): Promise<Date> => {
+    if (table !== TableNames.electricity_bill && table !== TableNames.gas_bill) {
+      log.error(`selectLatestBillDate has been called with an invalid table: ${table}`);
+      return new Date(0);
+    }
+
     return await db
-      .query(format(`SELECT MAX(billing_end) FROM electricity_bill`))
+      .query(format(`SELECT MAX(billing_end) FROM ${table}`))
       .then((result) => {
         if (result.rows[0].max == null) {
           return new Date(process.env.MOVE_IN_DATE);
@@ -172,6 +178,32 @@ class EnergyBillModel {
         log.error(`selectLatestBillDate failed with error ${err}`);
         log.trace();
         return new Date(0);
+      });
+  };
+
+  static selectLatestBill = async (table: TableNames): Promise<EnergyBillData> => {
+    if (table !== TableNames.electricity_bill && table !== TableNames.gas_bill) {
+      log.error(`selectLatestBill has been called with an invalid table: ${table}`);
+      return;
+    }
+
+    return await db
+      .query(
+        format(
+          `
+        SELECT billing_start, billing_end, standing_order_charge_days, standing_order_rate, usage_kwh, rate_kwh, pre_tax, after_tax
+        FROM ${table}
+        ORDER BY billing_end DESC
+        LIMIT 1;
+      `,
+        ),
+      )
+      .then((result) => {
+        return result.rows[0];
+      })
+      .catch((err) => {
+        log.error(`selectLatestBill failed with error ${err}`);
+        log.trace();
       });
   };
 }

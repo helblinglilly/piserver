@@ -16,10 +16,10 @@ block append body
         .columns.mb-6
             .column
                 .title.is-3 Electric
-                .card.mt-6(onclick="location.href='/energy/insert_electric'")
+                .card.mt-6(onclick="location.href='/energy/insert_bill?mode=electric'")
                     .card-content
                         figure.container(style="display: flex; align-items: center;")
-                            a.card-text(href='/energy/insert_electric') Add electricity bill
+                            a.card-text(href='/energy/insert_bill?mode=electric') Add electricity bill
 
                 .card.mt-3(onclick="location.href='/energy/bills?mode=electric'")
                     .card-content
@@ -41,10 +41,10 @@ block append body
 
             .column 
                 .title.is-3 Gas
-                .card.mt-6(onclick="location.href='/energy/insert_gas'")
+                .card.mt-6(onclick="location.href='/energy/insert_bill?mode=gas'")
                     .card-content
                         figure.container(style="display: flex; align-items: center;")
-                            a.card-text(href='/energy/insert_gas') Add gas bill
+                            a.card-text(href='/energy/insert_bill?mode=gas') Add gas bill
 
                 .card.mt-3(onclick="location.href='/energy/bills?mode=gas'")
                     .card-content

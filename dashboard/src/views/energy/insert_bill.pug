@@ -29,24 +29,24 @@ block append body
                 li
                     a(href="/energy") Energy
                 li.is-active
-                    a(href="", aria-current="page") Add gas bill
+                    a(href="", aria-current="page") Add #{mode} bill
 
-        form(action="/energy/insert_gas", method="post", id="gas").mb-6
-            input(name="kind", value="gas" hidden)
-            .title.is-3 Add gas bill
-            
+        form(action=`/energy/insert_bill?mode=${mode}   `, method="post").mb-6
+            input(name="mode", value=`${mode}` hidden)
+            .title.is-3 Add #{mode} bill
+
             .columns
                 .column
                     .card
                         .card-header-title Billing Start
                         .card-content
-                            input(id="start_date_picker" type="date", name="start_date", value=date_start required).input
+                            input(id="start_date_picker" type="date", name="start_date", value=`${default_start.toISOString().split("T")[0]}` required).input
 
                 .column
                     .card
                         .card-header-title Billing End
                         .card-content
-                            input(id="end_date_picker" type="date", name="end_date", value=date_end required).input
+                            input(id="end_date_picker" type="date", name="end_date", value=`${default_end.toISOString().split("T")[0]}` required).input
             
             .columns
                 .column
@@ -54,14 +54,14 @@ block append body
                         .card-header-title Standing Charge Days
                         .card-content
                             .input-group
-                                input(id="standing_charge_days" type="number", name="standing_charge_days", value=sc_days, placeholder="31" required).input
+                                input(id="standing_charge_days" type="number", name="standing_charge_days", placeholder="31" required).input
                                 span.input-group-addon days
                 .column
                     .card
                         .card-header-title Standing Charge Rate
                         .card-content
                             .input-group
-                                input(id="standing_charge_rate" type="number", name="standing_charge_rate", value=sc_rate, step="0.01", placeholder="@ 25.92" required).input
+                                input(id="standing_charge_rate" type="number", name="standing_charge_rate", step="0.01", placeholder=latest_standing_order_rate required).input
                                 span.input-group-addon p/day
 
             .columns
@@ -70,14 +70,14 @@ block append body
                         .card-header-title kWh used
                         .card-content
                             .input-group
-                                input(id="kwh_used" type="number", name="units_used", value=units_used, step="0.01", placeholder="89.51" required).input
+                                input(id="kwh_used" type="number", name="units_used", value=units_used, step="0.01", placeholder=latest_kwh_used required).input
                                 span.input-group-addon kWh
                 .column
                     .card
                         .card-header-title kWh rate
                         .card-content
                             .input-group
-                                input(id="kwh_rate" type="number", name="unit_price", value=unit_price, step="0.01", placeholder="@ 6.93" required).input
+                                input(id="kwh_rate" type="number", name="unit_price", value=unit_price, step="0.01", placeholder=`@ ${latest_kwh_rate}` required).input
                                 span.input-group-addon p/kWh
             button(type="submit").button.is-fullwidth#submit_button Submit
         

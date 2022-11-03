@@ -8,13 +8,9 @@ energyRouter.get("/", userSelection, ec.getRoot);
 energyRouter.get("/bills", userSelection, ec.getBills);
 energyRouter.all("/bills", error.methodNotAllowed);
 
-energyRouter.get("/insert_electric", userSelection, ec.getInsertElectric);
-energyRouter.post("/insert_electric", userSelection, ec.postInsert);
-energyRouter.all("/insert_electric", error.methodNotAllowed);
-
-energyRouter.get("/insert_gas", userSelection, ec.getInsertGas);
-energyRouter.post("/insert_gas", userSelection, ec.postInsert);
-energyRouter.all("/insert_gas", error.methodNotAllowed);
+energyRouter.get("/insert_bill", userSelection, ec.getInsert);
+energyRouter.post("/insert_bill", userSelection, ec.postInsert);
+energyRouter.all("/insert_bill", error.methodNotAllowed);
 
 energyRouter.get("/view_monthly", userSelection, ec.getViewMonthly);
 energyRouter.all("/view_monthly", error.methodNotAllowed);
