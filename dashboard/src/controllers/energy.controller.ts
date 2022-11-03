@@ -34,7 +34,7 @@ class EnergyController {
       return;
     }
 
-    const mode = req.query.mode === "gas" ? "gas" : "electric";
+    const mode = req.query.mode.toLowerCase() === "gas" ? "gas" : "electric";
     const tableName =
       mode === "gas" ? TableNames.gas_usage : TableNames.electricity_usage;
 
@@ -105,7 +105,7 @@ class EnergyController {
       usageDataPoints.push(entry.usage_kwh);
       standingDataPoints.push(entry.standing_order_rate);
       kWhDataPoints.push(entry.rate_kwh);
-      pricesDataPoints.push(entry.after_tax);
+      pricesDataPoints.push(entry.after_tax) / 100;
       labels.push(entry.billing_end.toLocaleDateString("en-GB"));
     });
 
@@ -261,7 +261,7 @@ class EnergyController {
       return;
     }
 
-    const mode = req.query.mode === "gas" ? "gas" : "electric";
+    const mode = req.query.mode.toLowerCase() === "gas" ? "gas" : "electric";
     let selectedDate = req.query.daily_date ? new Date(req.query.daily_date) : new Date();
 
     const billDates = await EnergyBillModel.selectBillingPeriodFromDate(selectedDate);
@@ -297,7 +297,9 @@ class EnergyController {
     }
 
     const billTable =
-      req.query.mode === "gas" ? TableNames.gas_bill : TableNames.electricity_bill;
+      req.query.mode.toLowerCase() === "gas"
+        ? TableNames.gas_bill
+        : TableNames.electricity_bill;
     const latestBill = await EnergyBillModel.selectLatestBill(billTable);
 
     const options = {
@@ -313,14 +315,19 @@ class EnergyController {
     res.render("energy/insert_bill", { ...options });
   };
 
-  static postInsert = async (req: express.Request, res: express.Response) => {
+  static postInsert = async (
+    req: express.Request<unknown, unknown, any, HourlyViewQuery>,
+    res: express.Response,
+  ) => {
     if (!req.query.mode) {
       log.error("postInsert received a query without 'mode' set");
       res.sendStatus(400);
       return;
     }
     const billTable =
-      req.query.mode === "gas" ? TableNames.gas_bill : TableNames.electricity_bill;
+      req.query.mode.toLowerCase() === "gas"
+        ? TableNames.gas_bill
+        : TableNames.electricity_bill;
 
     const startDate = new Date(req.body.start_date);
     const endDate = new Date(req.body.end_date);
