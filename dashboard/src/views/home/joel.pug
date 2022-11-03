@@ -40,7 +40,7 @@ block append body
                   .card-footer-item
                     p#gasDay #{energyInfo.gas.date.toUTCString().split(",")[0]}
                   .card-footer-item
-                    p#gasDate #{energyInfo.gas.date.toLocaleDateString().substring(0, 5)}
+                    p#gasDate #{energyInfo.gas.date.toLocaleDateString("en-GB").substring(0, 5)}
             .column
               #electricSummaryCard.card
                 .card-header-title.pb-1
@@ -52,7 +52,7 @@ block append body
                   .card-footer-item
                     p#electricDay #{energyInfo.electric.date.toUTCString().split(",")[0]}
                   .card-footer-item
-                    p#electricDate #{energyInfo.electric.date.toLocaleDateString().substring(0, 5)}
+                    p#electricDate #{energyInfo.electric.date.toLocaleDateString("en-GB").substring(0, 5)}
 
       .columns
         .column
