@@ -47,10 +47,9 @@ class EnergyUsageModel {
           .query(
             format(
               `
-                UPDATE %L 
+                UPDATE ${table}
                 SET start_date=%L, end_date=%L, usage_kwh=%L, entry_created=%L
                 WHERE usage_kwh=%L AND start_date=%L AND end_date=%L`,
-              table,
               startDate,
               endDate,
               usage,
