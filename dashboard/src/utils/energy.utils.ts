@@ -84,7 +84,7 @@ class EnergyUtils {
           TableNames.gas_usage,
           entry.interval_start,
           entry.interval_end,
-          entry.consumption,
+          (entry.consumption * 1.02264 * 40.1) / 3.6,
         ),
       ),
     );
