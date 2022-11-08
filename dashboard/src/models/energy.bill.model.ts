@@ -150,7 +150,7 @@ class EnergyBillModel {
           const maxBillingEnd = await db.query(
             `SELECT MAX(billing_end) FROM electricity_bill`,
           );
-          start = maxBillingEnd.rows[0].billing_end;
+          start = maxBillingEnd.rows[0].max;
           end = new Date();
         } else {
           start = result.rows[0].billing_start;
