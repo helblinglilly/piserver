@@ -136,15 +136,27 @@ class EnergyBillModel {
           WHERE billing_start <= %L::date
           AND billing_end >= %L::date
           ORDER BY billing_start
+          LIMIT 1
           `,
           DateUtils.toLocaleISOString(snapshotDate),
           DateUtils.toLocaleISOString(snapshotDate),
         ),
       )
-      .then((result) => {
-        const start =
-          result.rows[0] != undefined ? result.rows[0].billing_start : new Date();
-        const end = result.rows[0] != undefined ? result.rows[0].billing_end : new Date();
+      .then(async (result) => {
+        let start: Date;
+        let end: Date;
+
+        if (result.rowCount === 0) {
+          const maxBillingEnd = await db.query(
+            `SELECT MAX(billing_end) FROM electricity_bill`,
+          );
+          start = maxBillingEnd.rows[0].billing_end;
+          end = new Date();
+        } else {
+          start = result.rows[0].billing_start;
+          end = result.rows[0].billing_end;
+        }
+
         return {
           start_date: start,
           end_date: end,
