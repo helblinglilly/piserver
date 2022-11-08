@@ -12,9 +12,7 @@ class EnergyUsageModel {
 
   static insertEntry = async (
     table: TableNames,
-    startDate: Date,
-    endDate: Date,
-    usage: number,
+    values: Array<any>,
   ): Promise<boolean> => {
     if (table !== TableNames.gas_usage && table !== TableNames.electricity_usage) {
       log.error(`insertEntry has been called with an invalid table name`);
@@ -29,43 +27,34 @@ class EnergyUsageModel {
           INSERT INTO ${table}
           (start_date, end_date, usage_kwh, entry_created)
           VALUES
-          (%L, %L, %L, %L)
+          %L
           `,
-          startDate,
-          endDate,
-          usage,
-          createdDate,
+          values,
         ),
       )
       .then(() => true)
       .catch(async (err1) => {
-        log.warn(
-          `insertElectricityEntry failed to insert with values start_date: ${startDate}, end_date: ${endDate}, usage: ${usage}kWh. Will try once more`,
-        );
+        log.warn(`insertEntry failed to insert with values ${values}`);
 
         return await db
           .query(
             format(
               `
-                UPDATE ${table}
-                SET start_date=%L, end_date=%L, usage_kwh=%L, entry_created=%L
-                WHERE usage_kwh=%L AND start_date=%L AND end_date=%L`,
-              startDate,
-              endDate,
-              usage,
-              createdDate,
-              usage,
-              startDate,
-              endDate,
+              INSERT INTO ${table}
+              (start_date, end_date, usage_kwh, entry_created)
+              VALUES
+              %L
+              `,
+              values,
             ),
           )
           .then(() => true)
           .catch((err2) => {
             log.error(
               `insertElectricityEntry failed to update value after trying to insert.`,
-              `values start_date: ${startDate}, end_date: ${endDate}, usage: ${usage}kWh`,
-              `INSERT error message: ${err1}`,
-              `UPDATE error message: ${err2}`,
+              `values ${values}`,
+              `INSERT 1 error message: ${err1}`,
+              `INSERT 1 error message: ${err2}`,
             );
             return false;
           });

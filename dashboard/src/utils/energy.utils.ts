@@ -31,7 +31,10 @@ class EnergyUtils {
   };
 
   static updateReadings = async () => {
-    if (this.isLoading) return;
+    if (this.isLoading) {
+      log.info("Already loading data from another request");
+      return;
+    }
 
     this.isLoading = true;
     const today = new Date();
@@ -54,7 +57,7 @@ class EnergyUtils {
 
     if (readingPromises.length === 0) return;
 
-    await Promise.all(readingPromises).then(() => {
+    Promise.all(readingPromises).then(() => {
       this.isLoading = false;
       log.info("Updated energy entries");
     });
@@ -65,7 +68,7 @@ class EnergyUtils {
     const pageSize = this.getAppropriatePageSize(days);
 
     log.info(
-      `Updating gas entries between ${dateUtils.toLocaleISOString(
+      `Gas: Getting data between ${dateUtils.toLocaleISOString(
         startDate,
       )} and ${dateUtils.toLocaleISOString(endDate)}`,
     );
@@ -75,22 +78,27 @@ class EnergyUtils {
     requestURL += `&period_to=${dateUtils.toLocaleISOString(endDate)}`;
 
     const data = await this.genericEnergyRequest(requestURL);
-    log.debug(`Retrieved ${data.length} gas entries`);
+    log.debug(`Gas: Fetched ${data.length} entries`);
 
     const promises = [];
-    data.forEach((entry) =>
-      promises.push(
-        EnergyUsageModel.insertEntry(
-          TableNames.gas_usage,
-          entry.interval_start,
-          entry.interval_end,
-          (entry.consumption * 1.02264 * 40.1) / 3.6,
-        ),
-      ),
-    );
+    const entries = [];
+    data.forEach((entry, i) => {
+      entries.push([
+        entry.interval_start,
+        entry.interval_end,
+        (entry.consumption * 1.02264 * 40.1) / 3.6,
+        new Date(),
+      ]);
+
+      if ((i % 100 === 0 || i === data.length - 1) && i > 0) {
+        log.debug(`Gas: ${entries.length} entries, making it ${i}/${data.length}`);
+        promises.push(EnergyUsageModel.insertEntry(TableNames.gas_usage, entries));
+        entries.length = 0;
+      }
+    });
 
     await Promise.all(promises).then(() => {
-      log.debug(`Inserted ${promises.length} gas entries`);
+      log.info(`Gas: ${promises.length} queries executed for ${data.length} data points`);
     });
   };
 
@@ -99,7 +107,7 @@ class EnergyUtils {
     const pageSize = this.getAppropriatePageSize(days);
 
     log.info(
-      `Updating electricity entries between ${dateUtils.toLocaleISOString(
+      `Electric: Getting data between ${dateUtils.toLocaleISOString(
         startDate,
       )} and ${dateUtils.toLocaleISOString(endDate)}`,
     );
@@ -109,22 +117,31 @@ class EnergyUtils {
     requestURL += `&period_to=${dateUtils.toLocaleISOString(endDate)}`;
 
     const data = await this.genericEnergyRequest(requestURL);
-    log.debug(`Retrieved ${data.length} electricity entries`);
+    log.debug(`Electric: Fetched ${data.length} entries`);
 
     const promises = [];
-    data.forEach((entry) =>
-      promises.push(
-        EnergyUsageModel.insertEntry(
-          TableNames.electricity_usage,
-          entry.interval_start,
-          entry.interval_end,
-          entry.consumption,
-        ),
-      ),
-    );
+    const entries = [];
+    data.forEach((entry, i) => {
+      entries.push([
+        entry.interval_start,
+        entry.interval_end,
+        entry.consumption,
+        new Date(),
+      ]);
+
+      if ((i % 100 === 0 || i === data.length - 1) && i > 0) {
+        log.debug(`Electric: ${entries.length} entries, making it ${i}/${data.length}`);
+        promises.push(
+          EnergyUsageModel.insertEntry(TableNames.electricity_usage, entries),
+        );
+        entries.length = 0;
+      }
+    });
 
     await Promise.all(promises).then(() => {
-      log.debug(`Inserted ${promises.length} electricity entries`);
+      log.info(
+        `Electric: ${promises.length} queries executed for ${data.length} data points`,
+      );
     });
   };
 

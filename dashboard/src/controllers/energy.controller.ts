@@ -3,16 +3,12 @@ import "../utils/log.utils";
 import express from "express";
 const log = getLogger("energy.controller");
 
-import usageModel from "../models/energy.usage.model";
-import billModel from "../models/energy.bill.model";
-import error from "./error.controller";
 import EnergyUtils from "../utils/energy.utils";
 import { TableNames, UsernameOptions } from "../types/common.types";
 import { GetHourlyOptions, HourlyViewQuery } from "../types/energy.types";
 import DateUtils from "../utils/date.utils";
 import EnergyUsageModel from "../models/energy.usage.model";
 import EnergyBillModel from "../models/energy.bill.model";
-import { rmSync } from "fs";
 
 class EnergyController {
   static getRoot = async (req: express.Request, res: express.Response) => {
