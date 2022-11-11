@@ -42,6 +42,8 @@ type ChartDatasets = {
 };
 
 type ChartOptions = {
+  responsive: boolean;
+  maintainAspectRatio: boolean;
   legend: ChartLegend;
   scales: ChartScales;
   title: ChartTitle;
