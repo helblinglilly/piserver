@@ -388,8 +388,6 @@ class EnergyUtils {
         ],
       },
       options: {
-        responsive: true,
-        maintainAspectRatio: false,
         legend: { display: false },
         scales: {
           yAxes: [
