@@ -20,7 +20,6 @@ class EnergyUtils {
   static baseURL = "https://api.octopus.energy";
   static defaultPageSize = 500;
   static maximumPageSize = 20000;
-  static isLoading = false;
 
   static getAppropriatePageSize = (daysToFetch: number): number => {
     const requiredEntries = 24 * 2 * daysToFetch;
@@ -31,12 +30,6 @@ class EnergyUtils {
   };
 
   static updateReadings = async () => {
-    if (this.isLoading) {
-      log.info("Already loading data from another request");
-      return;
-    }
-
-    this.isLoading = true;
     const today = new Date();
 
     const latestDatePromises: Array<Promise<Date>> = [
@@ -58,7 +51,6 @@ class EnergyUtils {
     if (readingPromises.length === 0) return;
 
     Promise.all(readingPromises).then(() => {
-      this.isLoading = false;
       log.info("Updated energy entries");
     });
   };
@@ -396,6 +388,8 @@ class EnergyUtils {
         ],
       },
       options: {
+        responsive: true,
+        maintainAspectRatio: false,
         legend: { display: false },
         scales: {
           yAxes: [
