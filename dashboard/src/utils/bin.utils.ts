@@ -27,7 +27,16 @@ class BinUtils {
       GreenDay: "",
     };
 
-    if (entries.length === 0) {
+    let hasBlackEntry = false;
+    let hasGreenEntry = false;
+
+    for (let i = 0; i < entries.length; i++) {
+      if (entries[i].type === "GREEN") hasGreenEntry = true;
+      else if (entries[i].type === "BLACK") hasBlackEntry = true;
+      if (hasBlackEntry && hasBlackEntry) return;
+    }
+
+    if (!hasBlackEntry || !hasGreenEntry) {
       this.fetchFreshBinDates();
       return latestDates;
     }
