@@ -27,20 +27,6 @@ class BinUtils {
       GreenDay: "",
     };
 
-    let hasBlackEntry = false;
-    let hasGreenEntry = false;
-
-    for (let i = 0; i < entries.length; i++) {
-      if (entries[i].type === "GREEN") hasGreenEntry = true;
-      else if (entries[i].type === "BLACK") hasBlackEntry = true;
-      if (hasBlackEntry && hasBlackEntry) break;
-    }
-
-    if (!hasBlackEntry || !hasGreenEntry) {
-      this.fetchFreshBinDates();
-      return latestDates;
-    }
-
     for (let i = 0; i < entries.length; i++) {
       if (latestDates.BlackDate === "Loading..." && entries[i].type === "BLACK") {
         latestDates.BlackDate = entries[i].date;
@@ -55,7 +41,7 @@ class BinUtils {
 
     // If we get to this point, this means that no black or green bin entry could be found - grab a new file
     if (
-      latestDates.BlackDate === "Loading..." &&
+      latestDates.BlackDate === "Loading..." ||
       latestDates.GreenDate === "Loading..."
     ) {
       this.fetchFreshBinDates();
