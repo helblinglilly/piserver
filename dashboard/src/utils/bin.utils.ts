@@ -91,7 +91,7 @@ class BinUtils {
       .on("data", (data) => {
         if (data[0] === process.env.ADDRESS_CODE) {
           const [day, month, year] = data[2].split("/");
-          const date = new Date(parseInt("20" + year), month, day);
+          const date = new Date(parseInt("20" + year), month - 1, day);
 
           if (data[1] === "BLACK") binDates.push({ type: "BLACK", date: date });
           else if (data[1] === "GREEN") binDates.push({ type: "GREEN", date: date });

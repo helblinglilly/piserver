@@ -15,11 +15,7 @@ class BinModel {
           VALUES
           (%L, %L)`,
         entry.type,
-        `${entry.date.getFullYear()}-${GeneralUtils.padWithLeadingCharacters(
-          entry.date.getMonth() + 1,
-          2,
-          "0",
-        )}-${entry.date.getDate()}`,
+        entry.date.toISOString(),
       ),
     );
   };
