@@ -6,7 +6,6 @@ const express = require("express");
 const error = require("./controllers/error.controller");
 const timesheetRouter = require("./routers/timesheet.router");
 const stopwatchRouter = require("./routers/stopwatch.router");
-const pokemonRouter = require("./routers/pokemon.router");
 const userRouter = require("./routers/user.router");
 const energyRouter = require("./routers/energy.router");
 const energyUtils = require("./utils/energy.utils");
@@ -21,7 +20,6 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use("/timesheet", timesheetRouter);
 app.use("/stopwatch", stopwatchRouter.default);
-app.use("/pokemon", pokemonRouter.default);
 app.use("/user", userRouter.default);
 app.use("/energy", energyRouter.default);
 
@@ -56,6 +54,10 @@ app.use((err, _, res, next) => {
   if (err) {
     error.handleErrors(res, err);
   } else next(err);
+});
+
+app.listen(port, "0.0.0.0", () => {
+  log.info(`Listening on http://127.0.0.1:${port}`);
 });
 
 export default app;
