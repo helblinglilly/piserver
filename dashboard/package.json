@@ -9,7 +9,7 @@
     "lint": "prettier --write '**/*.js'",
     "compile": "npx tsc && rm -fr out",
     "start": "node ./dist/setup.js",
-    "build": "rm -fr ./dist && tsc && cp -r ./src/views ./dist/views && cp -r ./src/pokedata ./dist/pokedata && rm -fr ./dist/public && cp -r ./src/public ./dist/public"
+    "build": "rm -fr ./dist && tsc && cp -r ./src/views ./dist/views &&  rm -fr ./dist/public && cp -r ./src/public ./dist/public"
   },
   "author": "",
   "license": "ISC",
