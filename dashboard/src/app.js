@@ -9,6 +9,7 @@ const stopwatchRouter = require("./routers/stopwatch.router");
 const userRouter = require("./routers/user.router");
 const energyRouter = require("./routers/energy.router");
 const energyUtils = require("./utils/energy.utils");
+const log = require("./utils/log.utils");
 
 const app = express();
 app.set("view engine", "pug");
@@ -56,8 +57,9 @@ app.use((err, _, res, next) => {
   } else next(err);
 });
 
+const port = process.env.NODE_ENV === "production" ? 80 : 3000;
 app.listen(port, "0.0.0.0", () => {
-  log.info(`Listening on http://127.0.0.1:${port}`);
+  // log.info(`Listening on http://127.0.0.1:${port}`);
 });
 
 export default app;

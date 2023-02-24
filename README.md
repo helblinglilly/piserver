@@ -67,3 +67,23 @@ Show the item's description, buying price, and which Pokemon can hold it in the 
 
 - Details about different attacks
 - Showing a pokemon's type weakness / multiplier
+
+## Get started
+
+Work on Dashboard
+
+```sh
+# Install depedencies
+npm install
+
+# Run in develop mode
+npm run dev
+```
+
+Deploy everything
+
+```sh
+# Run install.sh
+chmod +x install.sh
+./install.sh
+```
