@@ -28,13 +28,13 @@ exports.updateReadings = async () => {
     return;
   }
 
-  const electricityDaysToFetch = dateUtils.daysBetweenTwoDates(
+  const electricityDaysToFetch = dateUtils.default.daysBetweenTwoDates(
     latestElectricityDate,
     new Date(),
   );
   const electricityPageSize = getAppropriatePageSize(electricityDaysToFetch);
 
-  const gasDaysToFetch = dateUtils.daysBetweenTwoDates(
+  const gasDaysToFetch = dateUtils.default.daysBetweenTwoDates(
     new Date(latestGasDate),
     new Date(),
   );
@@ -142,7 +142,7 @@ exports.chartDataForDateRange = async (startDate, endDate, mode) => {
 
   entries.forEach((entry, i) => {
     // dateUtils.default.weekdays.short
-    const day = dateUtils.default.weekdays.short[entry.start_date.getUTCDay()];
+    const day = dateUtils.default.getWeekdayLong(entry.start_date.getUTCDay());
     const date = entry.start_date.getUTCDate();
     const month = entry.start_date.getUTCMonth() + 1;
     const entryDate = `${day} ${date}/${month}`;
