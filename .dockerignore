@@ -1,6 +1,0 @@
-./dashboard/.vscode
-./dashboard/cache
-./dashboard/dist
-./dashboard/tests
-./dashboard/jest.config.js
-./dashboard/README.md
