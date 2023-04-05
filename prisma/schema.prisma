@@ -1,0 +1,65 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model bin_dates {
+  bin_type        String   @db.VarChar(12)
+  collection_date DateTime @db.Date
+
+  @@id([bin_type, collection_date])
+}
+
+model energy_bill {
+  is_electric                Boolean @db.Boolean
+  is_gas                     Boolean @db.Boolean
+  billing_start              DateTime @db.Date
+  billing_end                DateTime @db.Date
+  standing_order_charge_days Int @db.SmallInt
+  standing_order_rate        Decimal  @db.Decimal
+  usage_kwh                  Decimal  @db.Decimal
+  rate_kwh                   Decimal  @db.Decimal
+  pre_tax                    Decimal  @db.Decimal
+  after_tax                  Decimal  @db.Decimal
+
+  @@id([is_electric, is_gas, billing_start, billing_end])
+}
+
+model energy_usage {
+  is_electric                Boolean @db.Boolean
+  is_gas                     Boolean @db.Boolean
+  usage_kwh                  Float    @db.Real
+  start_date                 DateTime @db.Timestamptz(6)
+  end_date                   DateTime @db.Timestamptz(6)
+  entry_created              DateTime @db.Date
+
+  @@id([is_electric, is_gas, usage_kwh, start_date, end_date])
+}
+
+model stopwatch {
+  username  String   @db.VarChar
+  day_date  DateTime @db.Date
+  timestamp DateTime @db.Time(6)
+  action    String   @db.VarChar(5)
+
+  @@id([username, day_date, timestamp, action])
+}
+
+model timesheet {
+  id        Int       @id @default(autoincrement())
+  username  String    @db.VarChar
+  day_date  DateTime  @db.Date
+  clock_in  DateTime  @db.Time(6)
+  break_in  DateTime? @db.Time(6)
+  break_out DateTime? @db.Time(6)
+  clock_out DateTime? @db.Time(6)
+}
+
+model usertable {
+  ip       String @id @db.VarChar(255)
+  username String @db.VarChar(255)
+}
