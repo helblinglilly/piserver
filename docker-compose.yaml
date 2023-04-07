@@ -1,0 +1,114 @@
+services:
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    restart: always
+    ports:
+      - "1234:9443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+
+  dashboard:
+    depends_on:
+      - "db"
+    image: helblingjoel/piserver:20230407
+    container_name: dashboard
+    ports:
+      - "80:3000"
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: ""
+      OCTOPUS_ACCOUNT_NUMBER: ""
+      TZ: "Europe/London"
+      OCTOPUS_API_KEY: ""
+      OCTOPUS_ELECTRIC_MPAN: ""
+      OCTOPUS_ELECTRIC_SERIAL: ""
+      OCTOPUS_GAS_MPRN: ""
+      OCTOPUS_GAS_SERIAL: ""
+      MOVE_IN_DATE: ""
+      ADDRESS_CODE: ""
+
+  pihole:
+    depends_on:
+      - "db"
+    container_name: pihole
+    image: pihole/pihole:latest
+    hostname: pihole
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "67:67/udp"
+      - "81:80/tcp"
+      - "443:443/tcp"
+    environment:
+      TZ: "Europe/London"
+    volumes:
+      - "pihole-data:/etc/pihole/"
+      - "pihole-dns:/etc/dnsmasq.d/"
+    dns:
+      - 127.0.0.1
+      - 1.1.1.1
+    cap_add:
+      - NET_ADMIN
+    restart: unless-stopped
+
+  db:
+    image: postgres
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ""
+      POSTGRES_PASSWORD: ""
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  plex:
+    depends_on:
+      - "db"
+    image: lscr.io/linuxserver/plex:latest
+    container_name: plex
+    network_mode: host
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - VERSION=docker
+    volumes:
+      - /home/joel/filebrowser/files/plex/config:/config
+      - /home/joel/filebrowser/files/plex/tvshows:/tv
+      - /home/joel/filebrowser/files/plex/movies:/movies
+      - /home/joel/filebrowser/files/plex/music:/music
+      - /home/joel/filebrowser/files/plex/videos:/videos
+      - plexappstate:/var/lib/plexmediaserver/Library/Application Support/Plex Media Server/
+    restart: unless-stopped
+
+  castblock:
+    image: erdnaxeli/castblock
+    container_name: castblock
+    network_mode: host
+    restart: unless-stopped
+    environment:
+      - MUTE_ADS=true
+
+  filebrowser:
+    image: filebrowser/filebrowser
+    container_name: filebrowser
+    restart: unless-stopped
+    ports:
+      - "5000:80"
+    volumes:
+      - /home/joel/filebrowser/files:/srv
+      - /home/joel/filebrowser/config/filebrowser.db:/database.db
+      - /home/joel/filebrowser/config/branding:/config/branding
+      - /home/joel/filebrowser/config/settings.json:/.filebrowser.json
+    environment:
+      FB_BASEURL: "/files"
+
+volumes:
+  pgdata:
+  portainer_data:
+  pihole-data:
+  pihole-dns:
+  plexappstate:
