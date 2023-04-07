@@ -1,3 +1,4 @@
+import Selector from "@/components/Selector";
 import DatePicker from "@/components/datePicker";
 import RootAppCard from "@/components/rootAppCard";
 import { energy_usage } from "@prisma/client";
@@ -26,7 +27,7 @@ export default function EnergyIndex() {
 	const [selectedMode, setSelectedMode] = useState<"hourly" | "daily">(
 		"hourly"
 	);
-	const [selectedDays] = useState(3);
+	const [selectedDays, setSelectedDays] = useState(3);
 	const [displayMode, setDisplayMode] = useState<"cummulative" | "individual">(
 		"individual"
 	);
@@ -109,8 +110,8 @@ export default function EnergyIndex() {
 			to.setDate(from.getDate() + 1);
 		} else if (selectedMode === "daily") {
 			to = new Date(selectedDate);
-			to.setHours(0);
-			to.setMinutes(0);
+			to.setHours(23);
+			to.setMinutes(30);
 			to.setSeconds(0);
 			to.setMilliseconds(0);
 			from = new Date(to);
@@ -139,6 +140,43 @@ export default function EnergyIndex() {
 				Gas: Number(a.kwh_gas.toFixed(4)),
 			};
 		});
+	};
+
+	const aggregateToDays = (data: UsageData[]) => {
+		const combined: { date: Date; Electric: number; Gas: number }[] = [];
+
+		data.forEach((entry) => {
+			const entryDate = entry.end_date;
+			entryDate.setHours(0);
+			entryDate.setMinutes(0);
+			entryDate.setMinutes(0);
+			entryDate.setMilliseconds(0);
+
+			const existingId = combined.findIndex(
+				(a) => a.date.valueOf() === entryDate.valueOf()
+			);
+
+			if (existingId === -1) {
+				combined.push({
+					date: entryDate,
+					Electric: entry.kwh_electric,
+					Gas: entry.kwh_gas,
+				});
+				return;
+			}
+
+			combined[existingId].Electric += entry.kwh_electric;
+			combined[existingId].Gas += entry.kwh_gas;
+		});
+		return combined
+			.sort((a, b) => (a.date < b.date ? 1 : -1))
+			.map((a) => {
+				return {
+					Date: a.date.toLocaleDateString("en-GB"),
+					Electric: a.Electric.toFixed(4),
+					Gas: a.Gas.toFixed(4),
+				};
+			});
 	};
 
 	return (
@@ -225,7 +263,7 @@ export default function EnergyIndex() {
 						) : (
 							<ResponsiveContainer width="100%" height={400} className="mb-3">
 								<AreaChart
-									data={formatDatesToTime(accumulativeData)}
+									data={formatDatesToTime(data)}
 									margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
 								>
 									<CartesianGrid strokeDasharray="3 3" />
@@ -254,18 +292,8 @@ export default function EnergyIndex() {
 						<div style={{ display: "flex", justifyContent: "space-between" }}>
 							<div>
 								<p className="title is-4">Daily usage in kWh</p>
-								<p className="title is-4">
-									Probably better to turn this into bar charts
-								</p>
-								<p>
-									Need to group the data by dates. Need to add a button to
-									change the time period displayed.
-								</p>
-								<p>
-									As reported by the smart-metre in 30 minute intervals,
-									displaying the end time of that interval. Data may lag between
-									three to twelve hours.
-								</p>
+								<p>As reported by the smart-metre in 30 minute intervals.</p>
+								<p>Data may lag between three to twelve hours.</p>
 							</div>
 							<div style={{ maxWidth: "50%" }} className="mb-2">
 								<DatePicker
@@ -276,30 +304,25 @@ export default function EnergyIndex() {
 									maxDate={new Date()}
 									isReadOnly={false}
 								/>
-								<button
-									className={`button mt-2 ${
-										displayMode === "cummulative" ? "is-info" : ""
-									}`}
-									onClick={() =>
-										displayMode === "cummulative"
-											? setDisplayMode("individual")
-											: setDisplayMode("cummulative")
-									}
+								<Selector
+									possibleValues={[2, 3, 5, 7, 14]}
+									initialValue={selectedDays}
+									supplementary="days"
+									onSelectHandler={setSelectedDays}
+									className="mt-2"
 									style={{ width: "100%" }}
-								>
-									Accumulative
-								</button>
+								/>
 							</div>
 						</div>
 
 						{displayMode === "individual" ? (
 							<ResponsiveContainer width="100%" height={400} className="mb-3">
 								<AreaChart
-									data={formatDatesToDays(data)}
+									data={aggregateToDays(data)}
 									margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
 								>
 									<CartesianGrid strokeDasharray="3 3" />
-									<XAxis dataKey="end_date" />
+									<XAxis dataKey="Date" />
 									<YAxis />
 									<Tooltip />
 									<Area
