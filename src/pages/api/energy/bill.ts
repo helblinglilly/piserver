@@ -2,7 +2,10 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { ZodError, z } from "zod";
 import { PrismaClient, energy_bill } from "@prisma/client";
-import { Decimal, PrismaClientKnownRequestError } from "@prisma/client/runtime";
+import {
+	Decimal,
+	PrismaClientKnownRequestError,
+} from "@prisma/client/runtime/library";
 
 const prisma = new PrismaClient();
 
