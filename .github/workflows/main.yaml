@@ -44,7 +44,7 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          platforms: linux/arm64v8
+          platforms: linux/arm64/v8
           tags: helblingjoel/piserver:${{ steps.date.outputs.date }}
 
   restart:
