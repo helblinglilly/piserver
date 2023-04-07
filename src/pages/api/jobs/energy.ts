@@ -162,7 +162,11 @@ export default async function handler(
 		fetchGasData(),
 	]);
 
-	res.status(200).json({ inserted: electricRows + gasRows });
+	res
+		.status(200)
+		.json({
+			inserted: (electricRows ? electricRows : 0) + (gasRows ? gasRows : 0),
+		});
 }
 
 export async function octopusAuthedRequest(requestURL: string) {
