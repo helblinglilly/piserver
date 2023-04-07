@@ -26,7 +26,7 @@ export default function EnergyIndex() {
 	const [selectedMode, setSelectedMode] = useState<"hourly" | "daily">(
 		"hourly"
 	);
-	const [selectedDays, setSelectedDays] = useState(3);
+	const [selectedDays] = useState(3);
 	const [displayMode, setDisplayMode] = useState<"cummulative" | "individual">(
 		"individual"
 	);
