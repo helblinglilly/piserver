@@ -4,10 +4,13 @@ on:
     branches:
       - main
 jobs:
-  docker:
-    name: Push Docker Image
+  my_job:
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
+    strategy:
+      matrix:
+        runner:
+          - arm64v8
     steps:
       - uses: actions/checkout@v2
       - name: Extract branch name
