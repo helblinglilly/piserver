@@ -15,9 +15,6 @@ RUN sh -c crond -f -l 8
 RUN npm ci
 RUN npm run build
 
-# Run database migration
-RUN npx prisma db push --accept-data-loss
-
 ENV NODE_ENV production
 EXPOSE 3000
 
