@@ -367,15 +367,6 @@ export default function EnergyIndex() {
 					</>
 				)}
 			</div>
-			<div className="column">
-				<RootAppCard
-					link={{
-						url: "energy/monthly",
-						newTab: false,
-					}}
-					title={"Monthly Usage"}
-				/>
-			</div>
 		</>
 	);
 }
