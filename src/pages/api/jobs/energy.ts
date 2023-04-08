@@ -1,7 +1,9 @@
+import Log from "@/log";
 import { PrismaClient } from "@prisma/client";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 const prisma = new PrismaClient();
+const log = new Log("energy_usage");
 
 type Data = {
 	inserted: number;
@@ -183,13 +185,12 @@ export async function octopusAuthedRequest(requestURL: string) {
 		headers,
 	});
 
-	console.log(requestURL, response.status);
+	log.info(`${response.status} for ${requestURL}`);
 
 	if (response.status === 200) {
 		const body = await response.json();
 		return body;
 	} else {
-		console.log(response.status);
 		return;
 	}
 }
