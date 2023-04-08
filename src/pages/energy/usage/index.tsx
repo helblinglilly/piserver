@@ -109,7 +109,8 @@ export default function EnergyIndex() {
 			to.setDate(from.getDate() + 1);
 		} else if (selectedMode === "daily") {
 			to = new Date(selectedDate);
-			to.setHours(23);
+			// to.setDate(to.getDate() );
+			to.setHours(0);
 			to.setMinutes(30);
 			to.setSeconds(0);
 			to.setMilliseconds(0);
@@ -120,25 +121,33 @@ export default function EnergyIndex() {
 	}, [selectedDate, selectedMode, selectedDays]);
 
 	const formatDatesToTime = (data: UsageData[]) => {
-		return data.map((a) => {
-			return {
-				start_date: a.start_date.toLocaleTimeString("en-GB", { hour12: false }),
-				end_date: a.end_date.toLocaleTimeString("en-GB", { hour12: false }),
-				Electric: Number(a.kwh_electric.toFixed(4)),
-				Gas: Number(a.kwh_gas.toFixed(4)),
-			};
-		});
+		return data
+			.map((a) => {
+				return {
+					start_date: a.start_date.toLocaleTimeString("en-GB", {
+						hour12: false,
+					}),
+					end_date: a.end_date.toLocaleTimeString("en-GB", { hour12: false }),
+					Electric: Number(a.kwh_electric.toFixed(4)),
+					Gas: Number(a.kwh_gas.toFixed(4)),
+				};
+			})
+			.filter((a) => a.Electric > -1 && a.Gas > -1);
 	};
 
 	const formatDatesToDays = (data: UsageData[]) => {
-		return data.map((a) => {
-			return {
-				start_date: a.start_date.toLocaleDateString("en-GB", { hour12: false }),
-				end_date: a.end_date.toLocaleDateString("en-GB", { hour12: false }),
-				Electric: Number(a.kwh_electric.toFixed(4)),
-				Gas: Number(a.kwh_gas.toFixed(4)),
-			};
-		});
+		return data
+			.map((a) => {
+				return {
+					start_date: a.start_date.toLocaleDateString("en-GB", {
+						hour12: false,
+					}),
+					end_date: a.end_date.toLocaleDateString("en-GB", { hour12: false }),
+					Electric: Number(a.kwh_electric.toFixed(4)),
+					Gas: Number(a.kwh_gas.toFixed(4)),
+				};
+			})
+			.filter((a) => a.Electric > -1 && a.Gas > -1);
 	};
 
 	const aggregateToDays = (data: UsageData[]) => {
@@ -169,6 +178,7 @@ export default function EnergyIndex() {
 		});
 		return combined
 			.sort((a, b) => (a.date < b.date ? 1 : -1))
+			.filter((a) => a.Electric > -0.5 && a.Gas > -0.5)
 			.map((a) => {
 				return {
 					Date: a.date.toLocaleDateString("en-GB"),
