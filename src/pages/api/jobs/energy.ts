@@ -68,6 +68,7 @@ const fetchElectricityData = async () => {
 
 		const response = await octopusAuthedRequest(requestURL);
 
+		if (!response) return;
 		if (response.next === null) {
 			fetchedAllData = true;
 		}
@@ -87,7 +88,7 @@ const fetchElectricityData = async () => {
 				usage_kwh: a.consumption,
 				start_date: new Date(a.interval_start),
 				end_date: new Date(a.interval_end),
-				entry_created: now,
+				entry_created: now.toISOString(),
 			};
 		});
 
@@ -122,6 +123,7 @@ const fetchGasData = async () => {
 		}/consumption?page_size=1000&period_from=${latestDate.toISOString()}&period_to=${now.toISOString()}&order_by=period`;
 
 		const response = await octopusAuthedRequest(requestURL);
+		if (!response) return;
 		if (!response.next) {
 			fetchedAllData = true;
 		}
@@ -162,11 +164,9 @@ export default async function handler(
 		fetchGasData(),
 	]);
 
-	res
-		.status(200)
-		.json({
-			inserted: (electricRows ? electricRows : 0) + (gasRows ? gasRows : 0),
-		});
+	res.status(200).json({
+		inserted: (electricRows ? electricRows : 0) + (gasRows ? gasRows : 0),
+	});
 }
 
 export async function octopusAuthedRequest(requestURL: string) {
@@ -182,6 +182,8 @@ export async function octopusAuthedRequest(requestURL: string) {
 		method: "GET",
 		headers,
 	});
+
+	console.log(requestURL, response.status);
 
 	if (response.status === 200) {
 		const body = await response.json();
