@@ -262,7 +262,7 @@ export default function EnergyIndex() {
 						) : (
 							<ResponsiveContainer width="100%" height={400} className="mb-3">
 								<AreaChart
-									data={formatDatesToTime(data)}
+									data={formatDatesToTime(accumulativeData)}
 									margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
 								>
 									<CartesianGrid strokeDasharray="3 3" />
