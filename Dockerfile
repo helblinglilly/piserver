@@ -2,6 +2,7 @@ FROM arm64v8/node:18-alpine AS base
 
 # Install cron, and add file with schedule + command
 RUN apk add dcron
+RUN apk add	curl
 ADD crontab /etc/crontabs/root
 
 WORKDIR /app
