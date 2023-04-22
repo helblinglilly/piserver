@@ -5,6 +5,7 @@ import type { AppProps } from "next/app";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import Head from "next/head";
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
 	// eslint-disable-next-line no-unused-vars
@@ -39,6 +40,9 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
 
 	return getLayout(
 		<>
+			<Head>
+				<title>Look Mum No WiFi</title>
+			</Head>
 			<nav className="navbar" role={"navigation"} id="navbar">
 				<div className="navbar-brand" style={{ display: "inline-flex" }}>
 					<a className="navbar-item">
