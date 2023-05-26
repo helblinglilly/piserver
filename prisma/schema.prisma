@@ -50,13 +50,21 @@ model stopwatch {
 }
 
 model timesheet {
-  id        Int       @id @default(autoincrement())
   username  String    @db.VarChar
   day_date  DateTime  @db.Date
   clock_in  DateTime  @db.Time(6)
-  break_in  DateTime? @db.Time(6)
-  break_out DateTime? @db.Time(6)
   clock_out DateTime? @db.Time(6)
+
+  @@id([username, day_date])
+}
+
+model timesheet_breaks {
+  day_date  DateTime @db.Date
+  username  String    @db.VarChar
+  break_in DateTime @db.Time(6)
+  break_out DateTime? @db.Time(6)
+
+  @@id([username, day_date])
 }
 
 model usertable {
