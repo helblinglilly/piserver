@@ -54,7 +54,6 @@ model timesheet {
   day_date  DateTime  @db.Date
   clock_in  DateTime  @db.Time(6)
   clock_out DateTime? @db.Time(6)
-
   @@id([username, day_date])
 }
 

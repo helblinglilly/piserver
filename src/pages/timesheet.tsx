@@ -1,9 +1,9 @@
 import { toDayDDMM, toHHMM, toHHMMUTC } from "@/utilities/dateUtils";
 import Notification from "@/components/Notification";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 export default function Timesheet() {
-	const [failureMessages] = useState<string[]>([]);
+	const [failureMessages, setFailureMessages] = useState<string[]>([]);
 
 	const [currentTime, setCurrentTime] = useState(new Date());
 	const [workedTime, setWorkedTime] = useState(new Date(0));
@@ -18,6 +18,17 @@ export default function Timesheet() {
 	const breakStartRef = useRef<HTMLButtonElement>();
 	const breakEndRef = useRef<HTMLButtonElement>();
 	const [breaks, setBreaks] = useState<IBreak[]>([]);
+
+	useEffect(() => {
+		const fetchData = async () => {
+			const data = await fetch(
+				`/api/timesheet?username=admin&date=${currentTime.toISOString()}`,
+				{}
+			);
+			console.log(data);
+		};
+		fetchData();
+	}, []);
 
 	setInterval(() => {
 		const now = new Date();
@@ -71,34 +82,102 @@ export default function Timesheet() {
 		minWidth: "4em",
 	};
 
-	const onClockInHandle = (event: React.MouseEvent<HTMLButtonElement>) => {
-		setClockIn(new Date());
-		event.currentTarget.disabled = true;
+	const post = async (
+		action: "clockIn" | "breakIn" | "breakOut" | "clockOut",
+		time: Date
+	) => {
+		return await fetch("/api/timesheet", {
+			method: "POST",
+			body: JSON.stringify({
+				action: action,
+				date: currentTime.toISOString(),
+				time: time.toISOString(),
+			}),
+		});
 	};
 
-	const onBreakInHandle = (event: React.MouseEvent<HTMLButtonElement>) => {
-		event.currentTarget.disabled = true;
-		setBreaks([...breaks, { start: new Date(), end: undefined }]);
+	const onClockInHandle = async (
+		event: React.MouseEvent<HTMLButtonElement>
+	) => {
+		const target = event.currentTarget;
+		try {
+			const response = await post("clockIn", currentTime);
+			if (response.status !== 200) {
+				const error = response.json();
+				throw new Error(JSON.stringify(error));
+			}
+			setClockIn(new Date());
+		} catch (error) {
+			setFailureMessages([...failureMessages, `Failed to send Clock In`]);
+			return;
+		}
+		target.disabled = true;
+	};
 
+	const onBreakInHandle = async (
+		event: React.MouseEvent<HTMLButtonElement>
+	) => {
+		const target = event.currentTarget;
+		try {
+			const response = await post("breakIn", currentTime);
+			if (response.status !== 200) {
+				const error = response.json();
+				throw new Error(JSON.stringify(error));
+			}
+			setBreaks([...breaks, { start: new Date(), end: undefined }]);
+		} catch (error) {
+			setFailureMessages([...failureMessages, `Failed to send Break In`]);
+			return;
+		}
+		target.disabled = true;
 		if (breakEndRef.current) breakEndRef.current.disabled = false;
 	};
 
-	const onBreakEndHandle = (event: React.MouseEvent<HTMLButtonElement>) => {
-		const incompleteBreakEntry = breaks.filter(
-			(breakEntries) => breakEntries.end === undefined
-		)[0];
-		const breakEntriesCopy = breaks.filter((entry) => entry.end !== undefined);
+	const onBreakEndHandle = async (
+		event: React.MouseEvent<HTMLButtonElement>
+	) => {
+		const target = event.currentTarget;
+		try {
+			const response = await post("breakOut", currentTime);
+			if (response.status !== 200) {
+				const error = response.json();
+				throw new Error(JSON.stringify(error));
+			}
+			const incompleteBreakEntry = breaks.filter(
+				(breakEntries) => breakEntries.end === undefined
+			)[0];
+			const breakEntriesCopy = breaks.filter(
+				(entry) => entry.end !== undefined
+			);
 
-		incompleteBreakEntry.end = new Date();
-		breakEntriesCopy.push(incompleteBreakEntry);
-		setBreaks(breakEntriesCopy);
-
-		event.currentTarget.disabled = true;
+			incompleteBreakEntry.end = new Date();
+			breakEntriesCopy.push(incompleteBreakEntry);
+			setBreaks(breakEntriesCopy);
+		} catch (error) {
+			setFailureMessages([...failureMessages, `Failed to send Break Out`]);
+			return;
+		}
+		target.disabled = true;
 		if (breakStartRef.current) breakStartRef.current.disabled = false;
 	};
 
-	const onClockOutHandle = () => {
-		setClockOut(new Date());
+	const onClockOutHandle = async (
+		event: React.MouseEvent<HTMLButtonElement>
+	) => {
+		const target = event.currentTarget;
+
+		try {
+			const response = await post("clockOut", currentTime);
+			if (response.status !== 200) {
+				const error = response.json();
+				throw new Error(JSON.stringify(error));
+			}
+			setClockOut(new Date());
+		} catch (error) {
+			setFailureMessages([...failureMessages, `Failed to send Clock Out`]);
+			return;
+		}
+		target.disabled = true;
 	};
 
 	return (
