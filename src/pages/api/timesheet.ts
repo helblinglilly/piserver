@@ -74,10 +74,8 @@ const POST = async (req: NextApiRequest, res: NextApiResponse) => {
 					break_out: time,
 				},
 				where: {
-					username_day_date: {
-						username: "admin",
-						day_date: date,
-					},
+					username: "admin",
+					day_date: date,
 				},
 			});
 		} else if (action === "clockOut") {

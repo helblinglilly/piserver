@@ -15,11 +15,11 @@ model bin_dates {
 }
 
 model energy_bill {
-  is_electric                Boolean @db.Boolean
-  is_gas                     Boolean @db.Boolean
+  is_electric                Boolean  @db.Boolean
+  is_gas                     Boolean  @db.Boolean
   billing_start              DateTime @db.Date
   billing_end                DateTime @db.Date
-  standing_order_charge_days Int @db.SmallInt
+  standing_order_charge_days Int      @db.SmallInt
   standing_order_rate        Decimal  @db.Decimal
   usage_kwh                  Decimal  @db.Decimal
   rate_kwh                   Decimal  @db.Decimal
@@ -30,12 +30,12 @@ model energy_bill {
 }
 
 model energy_usage {
-  is_electric                Boolean @db.Boolean
-  is_gas                     Boolean @db.Boolean
-  usage_kwh                  Float    @db.Real
-  start_date                 DateTime @db.Timestamptz(6)
-  end_date                   DateTime @db.Timestamptz(6)
-  entry_created              DateTime @db.Date
+  is_electric   Boolean  @db.Boolean
+  is_gas        Boolean  @db.Boolean
+  usage_kwh     Float    @db.Real
+  start_date    DateTime @db.Timestamptz(6)
+  end_date      DateTime @db.Timestamptz(6)
+  entry_created DateTime @db.Date
 
   @@id([is_electric, is_gas, usage_kwh, start_date, end_date])
 }
@@ -50,20 +50,20 @@ model stopwatch {
 }
 
 model timesheet {
-  username  String    @db.VarChar
-  day_date  DateTime  @db.Date
-  clock_in  DateTime  @db.Time(6)
-  clock_out DateTime? @db.Time(6)
-  @@id([username, day_date])
+  id               Int                @id @default(autoincrement())
+  username         String
+  day_date         DateTime
+  clock_in         DateTime
+  clock_out        DateTime?
+  timesheet_breaks timesheet_breaks[]
 }
 
 model timesheet_breaks {
-  day_date  DateTime @db.Date
-  username  String    @db.VarChar
-  break_in DateTime @db.Time(6)
-  break_out DateTime? @db.Time(6)
-
-  @@id([username, day_date])
+  id          Int       @id @default(autoincrement())
+  break_in    DateTime
+  break_out   DateTime
+  timesheet   timesheet @relation(fields: [timesheetId], references: [id])
+  timesheetId Int
 }
 
 model usertable {
