@@ -13,7 +13,7 @@ RUN chmod +x jobs.sh
 RUN sh -c crond -f -l 8
 
 # Install depdendencies and build app
-RUN npm ci
+# RUN npm ci
 RUN npm run build
 
 ENV NODE_ENV production
