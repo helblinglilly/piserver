@@ -1,8 +1,8 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
-import { PrismaClient } from "@prisma/client";
+import TimesheetModel from "@/data/TimesheetData";
 
-const prisma = new PrismaClient();
+const dataInterface = new TimesheetModel();
 
 const GET = async (req: NextApiRequest, res: NextApiResponse) => {
 	let { date, username } = req.query;
@@ -13,27 +13,20 @@ const GET = async (req: NextApiRequest, res: NextApiResponse) => {
 		res.status(400).end();
 		return;
 	}
-	console.log("Date", date);
-	const cleanDate = new Date(date.toString());
-	cleanDate.setUTCHours(0);
-	cleanDate.setUTCMinutes(0);
-	cleanDate.setUTCSeconds(0);
-	cleanDate.setUTCMilliseconds(0);
 
 	try {
-		const timesheetData: any = await prisma.timesheet.findMany({
-			where: {
-				username: username,
-				day_date: cleanDate,
-			},
-			include: {
-				timesheet_breaks: true,
-			},
-		});
+		const timesheetData = await dataInterface.getDailyData(
+			new Date(date.toString()),
+			"admin"
+		);
 
-		res.status(200).json({ data: timesheetData });
+		if (timesheetData.length === 0) {
+			res.status(204).end();
+			return;
+		}
+		res.status(200).json(timesheetData[0]);
 	} catch (error) {
-		console.log(error);
+		console.error(error);
 		res.status(500).end();
 		return;
 	}
@@ -42,60 +35,25 @@ const GET = async (req: NextApiRequest, res: NextApiResponse) => {
 const POST = async (req: NextApiRequest, res: NextApiResponse) => {
 	interface IPayload {
 		action: "clockIn" | "breakIn" | "breakOut" | "clockOut";
-		date: Date;
 		time: Date;
 	}
-	let { action, date, time } = JSON.parse(req.body) as IPayload;
-	date = new Date(date);
-	date.setUTCHours(0);
-	date.setUTCMinutes(0);
-	date.setUTCSeconds(0);
-	date.setUTCMilliseconds(0);
+	let { action, time } = JSON.parse(req.body) as IPayload;
 	try {
 		if (action === "clockIn") {
-			prisma.timesheet.create({
-				data: {
-					username: "admin",
-					day_date: date,
-					clock_in: time,
-				},
-			});
+			await dataInterface.clockIn(time, "admin");
 		} else if (action === "breakIn") {
-			prisma.timesheet_breaks.create({
-				data: {
-					username: "admin",
-					day_date: date,
-					break_in: time,
-				},
-			});
+			await dataInterface.breakIn(time, "admin");
 		} else if (action === "breakOut") {
-			prisma.timesheet_breaks.update({
-				data: {
-					break_out: time,
-				},
-				where: {
-					username: "admin",
-					day_date: date,
-				},
-			});
+			await dataInterface.breakOut(time, "admin");
 		} else if (action === "clockOut") {
-			prisma.timesheet.update({
-				data: {
-					clock_out: time,
-				},
-				where: {
-					username_day_date: {
-						username: "admin",
-						day_date: date,
-					},
-				},
-			});
+			await dataInterface.clockOut(time, "admin");
 		}
 	} catch (exception) {
+		console.error(exception);
 		res.status(500).json({ error: "Failed to insert data" });
 		return;
 	}
-	res.status(200).json({ action: action, date: date, time: time });
+	res.status(200).json({ action: action, time: time });
 	return;
 };
 

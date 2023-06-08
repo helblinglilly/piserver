@@ -61,7 +61,7 @@ model timesheet {
 model timesheet_breaks {
   id          Int       @id @default(autoincrement())
   break_in    DateTime
-  break_out   DateTime
+  break_out   DateTime?
   timesheet   timesheet @relation(fields: [timesheetId], references: [id])
   timesheetId Int
 }

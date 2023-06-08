@@ -116,3 +116,18 @@ export const toHHMMUTC = (date: Date): string => {
 		2
 	)}`;
 };
+
+/**
+ * Returns a date that has stUTC[Hours|Minutes|Seconds|Milliseconds] applied to it. Meant to be used to get a consistent Date value out of a Date object
+ * @param date
+ * @returns Date
+ */
+export const toMidnightUTC = (date: Date): Date => {
+	const dateCopy = new Date(date);
+	dateCopy.setUTCHours(0);
+	dateCopy.setUTCMinutes(0);
+	dateCopy.setUTCSeconds(0);
+	dateCopy.setUTCMilliseconds(0);
+
+	return dateCopy;
+};
