@@ -1,5 +1,4 @@
-import DatePicker from "@/components/datePicker";
-import StandingChargeDaysInput from "@/components/energyBills/standingChargeDaysInput";
+import DatePicker from "@/components/DatePicker";
 import { EnergyBillPayload } from "@/pages/api/energy/bill";
 import { energy_bill } from "@prisma/client";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -169,14 +168,14 @@ export default function EnergyBillsEdit() {
 						<div className="card" style={{ width: "100%" }}>
 							<div className="card-header-title">Standing Charge Days</div>
 							<div className="card-content">
-								<StandingChargeDaysInput
+								{/* <StandingChargeDaysInput
 									changeHandler={(e) => {
 										standingChargeDays.current = Number(e.target.value);
 									}}
 									formName="standing_charge_days"
 									initialValue={0}
 									value={standingChargeDays.current}
-								/>
+								/> */}
 							</div>
 						</div>
 					</div>

@@ -1,57 +1,32 @@
-import DatePicker from "@/components/datePicker";
-import StandingChargeDaysInput from "@/components/energyBills/standingChargeDaysInput";
-import StandingChargeRateInput from "@/components/energyBills/standingChargeRateInput";
-import { EnergyBillPayload } from "@/pages/api/energy/bill";
+import Notification from "@/components/Notification";
+import DatePicker from "@/components/DatePicker";
+import { useEffect, useRef, useState } from "react";
 import { energy_bill } from "@prisma/client";
-import { useRouter, useSearchParams } from "next/navigation";
-import { FormEvent, useEffect, useRef, useState } from "react";
 
 export default function EnergyBillsAdd() {
-	const params = useSearchParams();
-	const { push } = useRouter();
+	const [successMessage] = useState<string[]>([]);
+	const [errorMessage] = useState<string[]>([]);
 
-	const type = params.get("type")?.toLowerCase();
+	const lastGasStandingCharge = useRef(0.0);
+	const gasStandingCharge = useRef(0.0);
+	const lastGasUsage = useRef(0.0);
+	const gasUsage = useRef(0.0);
+	const lastGasRate = useRef(0.0);
+	const gasRate = useRef(0.0);
 
-	const isGas = type === "gas";
+	const lastElectricStandingCharge = useRef(0.0);
+	const electricStandingCharge = useRef(0.0);
+	const lastElectricUsage = useRef(0.0);
+	const electricUsage = useRef(0.0);
+	const lastElectricRate = useRef(0.0);
+	const electricRate = useRef(0.0);
 
-	useEffect(() => {
-		if (!type || !["gas", "electric"].includes(type)) {
-			push("/energy/bills");
-		}
-
-		const getLatestBill = async () => {
-			let response = await fetch(
-				`/api/energy/bill?endDate=${new Date().toISOString()}&type=${
-					isGas ? "gas" : "electric"
-				}&limit=1`
-			);
-			if (response.status === 200) {
-				const responseBill = (await response.json()) as energy_bill[];
-				const lastBill = responseBill[0];
-				setLastBillEndDate(new Date(lastBill.billing_end));
-				setBillingDateStart(new Date(lastBill.billing_end));
-				setStandingChargeDays(
-					daysBetweenDates(new Date(lastBill.billing_end), new Date())
-				);
-
-				lastStandingCharge.current = Number(lastBill.standing_order_rate);
-				lastUsage.current = Number(lastBill.usage_kwh);
-				lastRate.current = Number(lastBill.rate_kwh);
-			}
-		};
-		getLatestBill();
-	}, [isGas, push, type]);
-
-	function daysBetweenDates(date1: Date, date2: Date): number {
+	const daysBetweenDates = (date1: Date, date2: Date): number => {
 		return Math.abs(
-			Math.round((date1.valueOf() - date2.valueOf()) / (1000 * 60 * 60 * 24))
+			Math.ceil((date1.valueOf() - date2.valueOf()) / (1000 * 60 * 60 * 24))
 		);
-	}
+	};
 
-	const lastStandingCharge = useRef<number>(45.96);
-	const lastUsage = useRef<number>(89.51);
-	const lastRate = useRef<number>(26.06);
-	const standingChargeRate = useRef<number>(0);
 	const [lastBillEndDate, setLastBillEndDate] = useState(new Date(0));
 	const [billingDateStart, setBillingDateStart] = useState(new Date(0));
 	const [billingDateEnd, setBillingDateEnd] = useState(new Date());
@@ -59,10 +34,67 @@ export default function EnergyBillsAdd() {
 		daysBetweenDates(billingDateStart, billingDateEnd)
 	);
 
-	const [kwhUsage, setKwhUsage] = useState(0.0);
-	const [kwhRate, setKwhRate] = useState(0.0);
-	const [successMessage, setSuccessMessage] = useState("");
-	const [errorMessage, setErrorMessage] = useState<string[]>([]);
+	useEffect(() => {
+		const setElectricValues = (bill: energy_bill) => {
+			lastElectricStandingCharge.current = Number(bill.standing_order_rate);
+			electricStandingCharge.current = Number(bill.standing_order_rate);
+			lastElectricUsage.current = Number(bill.usage_kwh);
+			lastElectricRate.current = Number(bill.rate_kwh);
+		};
+
+		const setGasValues = (bill: energy_bill) => {
+			lastGasStandingCharge.current = Number(bill.standing_order_rate);
+			gasStandingCharge.current = Number(bill.standing_order_rate);
+			lastGasUsage.current = Number(bill.usage_kwh);
+			lastGasRate.current = Number(bill.rate_kwh);
+		};
+
+		const getLatestBill = async () => {
+			let response = await fetch(
+				`/api/energy/bill?endDate=${new Date().toISOString()}&limit=1`
+			);
+			if (response.status === 200) {
+				const responseBill = (await response.json()) as energy_bill[];
+
+				const gasBill = responseBill.filter((bill) => bill.is_gas)[0];
+				const electricBill = responseBill.filter((bill) => bill.is_electric)[0];
+
+				if (gasBill && electricBill) {
+					const lastBillEndDate = new Date(
+						Math.min(
+							new Date(gasBill.billing_end).valueOf(),
+							new Date(electricBill.billing_end).valueOf()
+						)
+					);
+					setLastBillEndDate(lastBillEndDate);
+					setBillingDateStart(lastBillEndDate);
+					setElectricValues(electricBill);
+					setGasValues(gasBill);
+					setStandingChargeDays(
+						daysBetweenDates(lastBillEndDate, billingDateEnd)
+					);
+				} else if (!gasBill && electricBill) {
+					setLastBillEndDate(new Date(electricBill.billing_end));
+					setBillingDateStart(new Date(electricBill.billing_end));
+					setElectricValues(electricBill);
+					setStandingChargeDays(
+						daysBetweenDates(electricBill.billing_end, billingDateEnd)
+					);
+				} else if (gasBill && !electricBill) {
+					setLastBillEndDate(new Date(gasBill.billing_end));
+					setBillingDateStart(new Date(gasBill.billing_end));
+					setGasValues(gasBill);
+					setStandingChargeDays(
+						daysBetweenDates(gasBill.billing_end, billingDateEnd)
+					);
+				}
+			}
+		};
+		getLatestBill();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
+
+	const handleSubmit = () => {};
 
 	const onBillingStartChange = (newDate: Date) => {
 		setBillingDateStart(newDate);
@@ -74,77 +106,18 @@ export default function EnergyBillsAdd() {
 		setStandingChargeDays(daysBetweenDates(billingDateStart, newDate));
 	};
 
-	const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-		event.preventDefault();
-
-		const payload: EnergyBillPayload = {
-			billType: isGas ? "gas" : "electric",
-			startDate: billingDateStart,
-			endDate: billingDateEnd,
-			standingChargeDays: standingChargeDays,
-			standingChargeRate: standingChargeRate.current,
-			kwhUsage: kwhUsage,
-			kwhRate: kwhRate,
-		};
-
-		const result = await fetch("/api/energy/bill", {
-			method: "POST",
-			headers: {
-				Accept: "application/json",
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify(payload),
-		});
-
-		if (result.status === 201) {
-			setErrorMessage([]);
-			setSuccessMessage(`Bill has been added successfully!`);
-		} else if (result.status === 409) {
-			setSuccessMessage("");
-			setErrorMessage(
-				errorMessage.concat([
-					`A${
-						isGas ? " Gas" : "n Electricity"
-					} bill for the same time period already exists.`,
-				])
-			);
-		} else if (result.status === 400) {
-			const issue = await result.json();
-			setErrorMessage(issue.errors);
-		}
-
-		document.getElementById("navbar")?.scrollIntoView({ behavior: "smooth" });
-	};
-
 	return (
 		<>
-			<p className="title is-3" id="pageTitle">
-				Add {isGas ? "Gas" : "Electricity"} Bill
-			</p>
-			<div
-				className="notification is-success"
-				style={successMessage.length > 0 ? {} : { display: "none" }}
-			>
-				{successMessage}
-			</div>
+			<p className="title is-3">Add Bill</p>
 
-			<div
-				className="notification is-danger"
-				style={errorMessage.length > 0 ? {} : { display: "none" }}
-			>
-				{errorMessage.map((message, i) => {
-					return <p key={`error-${i}`}>{message}</p>;
-				})}
-			</div>
+			<Notification type="success" message={successMessage} />
+			<Notification type="fail" message={errorMessage} />
+
+			<p className="title is-5">Overview</p>
+
 			<form id="data" onSubmit={handleSubmit}>
-				<input
-					name="type"
-					value={isGas ? "gas" : "electricity"}
-					hidden
-					readOnly
-				/>
-				{/* Start and End dates */}
 				<div className="columns">
+					{/* Billing start date */}
 					<div className="column is-flex">
 						<div className="card" style={{ width: "100%" }}>
 							<div className="card-header-title">Billing Start</div>
@@ -161,6 +134,7 @@ export default function EnergyBillsAdd() {
 						</div>
 					</div>
 
+					{/* Billing Date End */}
 					<div className="column is-flex">
 						<div className="card" style={{ width: "100%" }}>
 							<div className="card-header-title">Billing End</div>
@@ -176,43 +150,76 @@ export default function EnergyBillsAdd() {
 							</div>
 						</div>
 					</div>
-				</div>
 
-				{/* Standing charge */}
-				<div className="columns">
+					{/* Standing Charge Days */}
 					<div className="column is-flex">
 						<div className="card" style={{ width: "100%" }}>
 							<div className="card-header-title">Standing Charge Days</div>
 							<div className="card-content">
-								<StandingChargeDaysInput
-									changeHandler={(e) => {
-										setStandingChargeDays(Number(e.target.value));
-									}}
-									formName="standing_charge_days"
-									initialValue={0}
-									value={standingChargeDays}
-								/>
-							</div>
-						</div>
-					</div>
-					<div className="column is-flex">
-						<div className="card" style={{ width: "100%" }}>
-							<div className="card-header-title">Standing Charge Rate</div>
-							<div className="card-content">
-								<StandingChargeRateInput
-									changeHandler={(e) =>
-										(standingChargeRate.current = Number(e.target.value))
-									}
-									formName="standing_charge_rate"
-									initialValue={lastStandingCharge.current}
-								/>
+								<div className="field is-horizontal">
+									<div className="field-body">
+										<div className="field">
+											<p className="control">
+												<input
+													className="input"
+													id="standing_charge_days"
+													type="number"
+													name="standing_charge_days"
+													step="0.01"
+													value={standingChargeDays}
+													required
+													readOnly
+													disabled
+												/>
+											</p>
+										</div>
+									</div>
+									<div className="field-label is-normal">
+										<label className="label">days</label>
+									</div>
+								</div>
 							</div>
 						</div>
 					</div>
 				</div>
 
-				{/* kWh usage*/}
+				<p className="title is-5">Electricity</p>
 				<div className="columns">
+					{/* standing charge rate */}
+					<div className="column is-flex">
+						<div className="card" style={{ width: "100%" }}>
+							<div className="card-header-title">Standing Charge Rate</div>
+							<div className="card-content">
+								<div className="field is-horizontal">
+									<div className="field-body">
+										<div className="field">
+											<p className="control">
+												<input
+													className="input"
+													id="standing_charge_rate"
+													type="number"
+													name="standing_charge_rate"
+													step="0.01"
+													onChange={(e) =>
+														(electricStandingCharge.current = Number(
+															e.target.value
+														))
+													}
+													placeholder={`${lastElectricStandingCharge.current} p/day`}
+													required
+												/>
+											</p>
+										</div>
+									</div>
+									<div className="field-label is-normal">
+										<label className="label">p/day</label>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					{/* kwh usage */}
 					<div className="column is-flex">
 						<div className="card" style={{ width: "100%" }}>
 							<div className="card-header-title">kWh Used</div>
@@ -227,8 +234,10 @@ export default function EnergyBillsAdd() {
 													type="number"
 													name="units_used"
 													step="0.01"
-													placeholder={`${lastUsage.current} kWh`}
-													onChange={(e) => setKwhUsage(Number(e.target.value))}
+													placeholder={`${lastElectricUsage.current} kWh`}
+													onChange={(e) =>
+														(electricUsage.current = Number(e.target.value))
+													}
 													required
 												/>
 											</p>
@@ -241,6 +250,8 @@ export default function EnergyBillsAdd() {
 							</div>
 						</div>
 					</div>
+
+					{/* kwh rate */}
 					<div className="column is-flex">
 						<div className="card" style={{ width: "100%" }}>
 							<div className="card-header-title">kWh Rate</div>
@@ -255,8 +266,10 @@ export default function EnergyBillsAdd() {
 													type="number"
 													name="unit_price"
 													step="0.01"
-													placeholder={`${lastRate.current} p/kWh`}
-													onChange={(e) => setKwhRate(Number(e.target.value))}
+													placeholder={`${lastElectricRate.current} p/kWh`}
+													onChange={(e) =>
+														(electricRate.current = Number(e.target.value))
+													}
 													required
 												/>
 											</p>
@@ -270,13 +283,105 @@ export default function EnergyBillsAdd() {
 						</div>
 					</div>
 				</div>
-				<button
-					type="submit"
-					className="button is-fullwidth is-primary"
-					id="submit_button"
-				>
-					Submit
-				</button>
+
+				<p className="title is-5">Gas</p>
+				<div className="columns">
+					{/* standing charge rate */}
+					<div className="column is-flex">
+						<div className="card" style={{ width: "100%" }}>
+							<div className="card-header-title">Standing Charge Rate</div>
+							<div className="card-content">
+								<div className="field is-horizontal">
+									<div className="field-body">
+										<div className="field">
+											<p className="control">
+												<input
+													className="input"
+													id="standing_charge_rate"
+													type="number"
+													name="standing_charge_rate"
+													step="0.01"
+													onChange={(e) =>
+														(gasStandingCharge.current = Number(e.target.value))
+													}
+													placeholder={`${lastGasStandingCharge.current} p/day`}
+													required
+												/>
+											</p>
+										</div>
+									</div>
+									<div className="field-label is-normal">
+										<label className="label">p/day</label>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					{/* kwh usage */}
+					<div className="column is-flex">
+						<div className="card" style={{ width: "100%" }}>
+							<div className="card-header-title">kWh Used</div>
+							<div className="card-content">
+								<div className="field is-horizontal">
+									<div className="field-body">
+										<div className="field">
+											<p className="control">
+												<input
+													className="input"
+													id="units_used"
+													type="number"
+													name="units_used"
+													step="0.01"
+													placeholder={`${lastGasUsage.current} kWh`}
+													onChange={(e) =>
+														(gasUsage.current = Number(e.target.value))
+													}
+													required
+												/>
+											</p>
+										</div>
+									</div>
+									<div className="field-label is-normal">
+										<label className="label">kWh</label>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					{/* kwh rate */}
+					<div className="column is-flex">
+						<div className="card" style={{ width: "100%" }}>
+							<div className="card-header-title">kWh Rate</div>
+							<div className="card-content">
+								<div className="field is-horizontal">
+									<div className="field-body">
+										<div className="field">
+											<p className="control">
+												<input
+													className="input"
+													id="unit_price"
+													type="number"
+													name="unit_price"
+													step="0.01"
+													placeholder={`${lastGasRate.current} p/kWh`}
+													onChange={(e) =>
+														(gasRate.current = Number(e.target.value))
+													}
+													required
+												/>
+											</p>
+										</div>
+									</div>
+									<div className="field-label is-normal">
+										<label className="label">p/kWh</label>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
 			</form>
 		</>
 	);

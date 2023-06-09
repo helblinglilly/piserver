@@ -1,5 +1,5 @@
 import Selector from "@/components/Selector";
-import DatePicker from "@/components/datePicker";
+import DatePicker from "@/components/DatePicker";
 import { energy_usage } from "@prisma/client";
 import { useEffect, useState } from "react";
 import {
