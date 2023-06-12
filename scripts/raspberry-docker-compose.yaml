@@ -1,0 +1,72 @@
+services:
+  dashboard:
+    depends_on:
+      - "db"
+    image: helblingjoel/piserver:20230609
+    container_name: dashboard
+    ports:
+      - "80:3000"
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: ""
+      OCTOPUS_ACCOUNT_NUMBER: ""
+      TZ: "Europe/London"
+      OCTOPUS_API_KEY: ""
+      OCTOPUS_ELECTRIC_MPAN: ""
+      OCTOPUS_ELECTRIC_SERIAL: ""
+      OCTOPUS_GAS_MPRN: ""
+      OCTOPUS_GAS_SERIAL: ""
+      MOVE_IN_DATE: ""
+      ADDRESS_CODE: ""
+
+  db:
+    image: postgres
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ""
+      POSTGRES_PASSWORD: ""
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  plex:
+    depends_on:
+      - "db"
+    image: lscr.io/linuxserver/plex:latest
+    container_name: plex
+    network_mode: host
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - VERSION=docker
+    volumes:
+      - /media/hdd/filebrowser/files/plex/config:/config
+      - /media/hdd/filebrowser/files/plex/tvshows:/tv
+      - /media/hdd/filebrowser/files/plex/movies:/movies
+      - /media/hdd/filebrowser/files/plex/music:/music
+      - /media/hdd/filebrowser/files/plex/videos:/videos
+      - plexappstate:/var/lib/plexmediaserver/Library/Application Support/Plex Media Server/
+    restart: unless-stopped
+
+  filebrowser:
+    image: filebrowser/filebrowser
+    container_name: filebrowser
+    restart: unless-stopped
+    ports:
+      - "5000:80"
+    volumes:
+      - /media/hdd/filebrowser/files:/srv
+      - /media/hdd/filebrowser/config/filebrowser.db:/database.db
+      - /media/hdd/filebrowser/config/branding:/config/branding
+      - /media/hdd/filebrowser/config/settings.json:/.filebrowser.json
+    environment:
+      FB_BASEURL: "/files"
+
+volumes:
+  pgdata:
+  portainer_data:
+  pihole-data:
+  pihole-dns:
+  plexappstate:
