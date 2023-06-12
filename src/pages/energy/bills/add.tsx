@@ -1,5 +1,5 @@
 import Notification from "@/components/Notification";
-import DatePicker from "@/components/DatePicker";
+// import DatePicker from "@/components/DatePicker";
 import { useEffect, useRef, useState } from "react";
 import { energy_bill } from "@prisma/client";
 
@@ -33,6 +33,7 @@ export default function EnergyBillsAdd() {
 	const [standingChargeDays, setStandingChargeDays] = useState(
 		daysBetweenDates(billingDateStart, billingDateEnd)
 	);
+	console.log(lastBillEndDate);
 
 	useEffect(() => {
 		const setElectricValues = (bill: energy_bill) => {
@@ -95,7 +96,7 @@ export default function EnergyBillsAdd() {
 	}, []);
 
 	const handleSubmit = () => {};
-
+	/*
 	const onBillingStartChange = (newDate: Date) => {
 		setBillingDateStart(newDate);
 		setStandingChargeDays(daysBetweenDates(newDate, billingDateEnd));
@@ -105,7 +106,8 @@ export default function EnergyBillsAdd() {
 		setBillingDateEnd(newDate);
 		setStandingChargeDays(daysBetweenDates(billingDateStart, newDate));
 	};
-
+	*/
+	setBillingDateEnd(new Date(0));
 	return (
 		<>
 			<p className="title is-3">Add Bill</p>
@@ -122,14 +124,15 @@ export default function EnergyBillsAdd() {
 						<div className="card" style={{ width: "100%" }}>
 							<div className="card-header-title">Billing Start</div>
 							<div className="card-content">
-								<DatePicker
+								{/*<DatePicker
 									changeHandler={onBillingStartChange}
 									name="start_date"
 									initialDate={lastBillEndDate}
 									minDate={lastBillEndDate}
 									maxDate={billingDateEnd}
 									isReadOnly={false}
-								/>
+								/>*/}
+								<p>Date Picker</p>
 							</div>
 						</div>
 					</div>
@@ -139,14 +142,15 @@ export default function EnergyBillsAdd() {
 						<div className="card" style={{ width: "100%" }}>
 							<div className="card-header-title">Billing End</div>
 							<div className="card-content">
-								<DatePicker
+								{/*<DatePicker
 									changeHandler={onBillingEndChange}
 									name="end_date"
 									initialDate={new Date()}
 									minDate={billingDateStart}
 									maxDate={new Date()}
 									isReadOnly={false}
-								/>
+								/>*/}
+								<p>Date Picker</p>
 							</div>
 						</div>
 					</div>
