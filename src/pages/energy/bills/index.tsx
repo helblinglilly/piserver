@@ -143,260 +143,240 @@ export default function EnergyBills() {
 	}, [monthsDisplayed]);
 
 	return (
-		<div className="box">
-			<div className="tabs is-fullwidth">
-				<ul>
-					<li
-						onClick={() => setSelectedGraph("Costs")}
-						className={selectedGraph === "Costs" ? "is-active" : ""}
-					>
-						<a>Costs</a>
-					</li>
-					<li
-						onClick={() => setSelectedGraph("Usage")}
-						className={selectedGraph === "Usage" ? "is-active" : ""}
-					>
-						<a>Usage</a>
-					</li>
-					<li
-						onClick={() => setSelectedGraph("kWh Rate")}
-						className={selectedGraph === "kWh Rate" ? "is-active" : ""}
-					>
-						<a>kWh Rate</a>
-					</li>
-					<li
-						onClick={() => setSelectedGraph("Standing order charges")}
-						className={
-							selectedGraph === "Standing order charges" ? "is-active" : ""
-						}
-					>
-						<a>Standing charges</a>
-					</li>
-				</ul>
-			</div>
-
-			{selectedGraph === "Costs" && (
-				<>
-					<div style={{ display: "flex", justifyContent: "space-between" }}>
-						<p className="title is-4">Costs in Pounds</p>
-
-						<Selector
-							possibleValues={[6, 12, 18, 24]}
-							initialValue={monthsDisplayed}
-							supplementary="Months"
-							onSelectHandler={setMonthsDisplayed}
+		<>
+			<div className="box">
+				<p className="title is-4">Bills</p>
+				<div className="columns">
+					<div className="column">
+						<RootAppCard
+							link={{ url: "/energy/bills/add?type=gas", newTab: false }}
+							title={"Add bill"}
 						/>
 					</div>
-					<p>
-						Including tax. Based on usage and rate - not including any reduction
-						schemes like{" "}
-						<a href="https://octopus.energy/blog/energy-price-cap-oct-2022/">
-							Energy price guarantee
-						</a>{" "}
-						or{" "}
-						<a href="https://www.gov.uk/guidance/energy-bills-discount-scheme">
-							Govt energy discount scheme
-						</a>{" "}
-					</p>
-					<ResponsiveContainer width="100%" height={400} className="mb-3">
-						<AreaChart
-							data={mapForBillData()}
-							margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
-						>
-							<CartesianGrid strokeDasharray="3 3" />
-							<XAxis dataKey="Date" />
-							<YAxis />
-							<Tooltip />
-							<Area
-								type="monotone"
-								dataKey="Gas"
-								stroke="#2d5ff7"
-								fill="#7396ff"
-							/>
-							<Area
-								type="monotone"
-								dataKey="Electric"
-								stroke="#fabf34"
-								fill="#fadc34"
-							/>
-						</AreaChart>
-					</ResponsiveContainer>
-				</>
-			)}
-			{selectedGraph === "Usage" && (
-				<>
-					<div style={{ display: "flex", justifyContent: "space-between" }}>
-						<p className="title is-4">Usage in kWh</p>
-						<Selector
-							possibleValues={[6, 12, 18, 24]}
-							initialValue={monthsDisplayed}
-							supplementary="Months"
-							onSelectHandler={setMonthsDisplayed}
+					<div className="column">
+						<RootAppCard
+							link={{ url: "/energy/bills/history?type=gas", newTab: false }}
+							title={"View billing history"}
 						/>
 					</div>
-					<p>
-						Data points are taken at billing date time and <b>not</b> from the
-						smart metre. Gas is recorded in m³ and conversion might not always
-						be accurate.
-					</p>
-					<ResponsiveContainer width="100%" height={400} className="mb-3">
-						<AreaChart
-							data={mapForUsage()}
-							margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
+				</div>
+			</div>
+			<div className="box">
+				<div className="tabs is-fullwidth">
+					<ul>
+						<li
+							onClick={() => setSelectedGraph("Costs")}
+							className={selectedGraph === "Costs" ? "is-active" : ""}
 						>
-							<CartesianGrid strokeDasharray="3 3" />
-							<XAxis dataKey="Date" />
-							<YAxis />
-							<Tooltip />
-							<Area
-								type="monotone"
-								dataKey="Gas"
-								stroke="#2d5ff7"
-								fill="#7396ff"
-							/>
-							<Area
-								type="monotone"
-								dataKey="Electric"
-								stroke="#fabf34"
-								fill="#fadc34"
-							/>
-						</AreaChart>
-					</ResponsiveContainer>
-				</>
-			)}
-			{selectedGraph === "kWh Rate" && (
-				<>
-					<div style={{ display: "flex", justifyContent: "space-between" }}>
-						<p className="title is-4">Price per kWh</p>
-						<Selector
-							possibleValues={[6, 12, 18, 24]}
-							initialValue={monthsDisplayed}
-							supplementary="Months"
-							onSelectHandler={setMonthsDisplayed}
-						/>
-					</div>
-					<p>
-						Prices in pence. Does not account for price reduction schemes like{" "}
-						<a href="https://octopus.energy/blog/energy-price-cap-oct-2022/">
-							Energy price guarantee
-						</a>{" "}
-						or{" "}
-						<a href="https://www.gov.uk/guidance/energy-bills-discount-scheme">
-							Govt energy discount scheme
-						</a>{" "}
-					</p>
-					<ResponsiveContainer width="100%" height={400} className="mb-3">
-						<AreaChart
-							data={mapForRate()}
-							margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
+							<a>Costs</a>
+						</li>
+						<li
+							onClick={() => setSelectedGraph("Usage")}
+							className={selectedGraph === "Usage" ? "is-active" : ""}
 						>
-							<CartesianGrid strokeDasharray="3 3" />
-							<XAxis dataKey="Date" />
-							<YAxis />
-							<Tooltip />
-							<Area
-								type="monotone"
-								dataKey="Electric"
-								stroke="#fabf34"
-								fill="#fadc34"
-							/>
-							<Area
-								type="monotone"
-								dataKey="Gas"
-								stroke="#2d5ff7"
-								fill="#7396ff"
-							/>
-						</AreaChart>
-					</ResponsiveContainer>
-				</>
-			)}
-			{selectedGraph === "Standing order charges" && (
-				<>
-					<div style={{ display: "flex", justifyContent: "space-between" }}>
-						<p className="title is-4">Daily standing order charges</p>
-						<Selector
-							possibleValues={[6, 12, 18, 24]}
-							initialValue={monthsDisplayed}
-							supplementary="Months"
-							onSelectHandler={setMonthsDisplayed}
-						/>
-					</div>
-					<p>Prices in pence.</p>
-					<ResponsiveContainer width="100%" height={400} className="mb-3">
-						<AreaChart
-							data={mapForStandingCharge()}
-							margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
+							<a>Usage</a>
+						</li>
+						<li
+							onClick={() => setSelectedGraph("kWh Rate")}
+							className={selectedGraph === "kWh Rate" ? "is-active" : ""}
 						>
-							<CartesianGrid strokeDasharray="3 3" />
-							<XAxis dataKey="Date" />
-							<YAxis />
-							<Tooltip />
-							<Area
-								type="monotone"
-								dataKey="Electric"
-								stroke="#fabf34"
-								fill="#fadc34"
+							<a>kWh Rate</a>
+						</li>
+						<li
+							onClick={() => setSelectedGraph("Standing order charges")}
+							className={
+								selectedGraph === "Standing order charges" ? "is-active" : ""
+							}
+						>
+							<a>Standing charges</a>
+						</li>
+					</ul>
+				</div>
+
+				{selectedGraph === "Costs" && (
+					<>
+						<div style={{ display: "flex", justifyContent: "space-between" }}>
+							<p className="title is-4">Costs in Pounds</p>
+
+							<Selector
+								possibleValues={[6, 12, 18, 24]}
+								initialValue={monthsDisplayed}
+								supplementary="Months"
+								onSelectHandler={setMonthsDisplayed}
 							/>
-							<Area
-								type="monotone"
-								dataKey="Gas"
-								stroke="#2d5ff7"
-								fill="#7396ff"
+						</div>
+						<p>
+							Including tax. Based on usage and rate - not including any
+							reduction schemes like{" "}
+							<a href="https://octopus.energy/blog/energy-price-cap-oct-2022/">
+								Energy price guarantee
+							</a>{" "}
+							or{" "}
+							<a href="https://www.gov.uk/guidance/energy-bills-discount-scheme">
+								Govt energy discount scheme
+							</a>{" "}
+						</p>
+						<ResponsiveContainer width="100%" height={400} className="mb-3">
+							<AreaChart
+								data={mapForBillData()}
+								margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
+							>
+								<CartesianGrid strokeDasharray="3 3" />
+								<XAxis dataKey="Date" />
+								<YAxis />
+								<Tooltip />
+								<Area
+									type="monotone"
+									dataKey="Gas"
+									stroke="#2d5ff7"
+									fill="#7396ff"
+								/>
+								<Area
+									type="monotone"
+									dataKey="Electric"
+									stroke="#fabf34"
+									fill="#fadc34"
+								/>
+							</AreaChart>
+						</ResponsiveContainer>
+					</>
+				)}
+				{selectedGraph === "Usage" && (
+					<>
+						<div style={{ display: "flex", justifyContent: "space-between" }}>
+							<p className="title is-4">Usage in kWh</p>
+							<Selector
+								possibleValues={[6, 12, 18, 24]}
+								initialValue={monthsDisplayed}
+								supplementary="Months"
+								onSelectHandler={setMonthsDisplayed}
 							/>
-						</AreaChart>
-					</ResponsiveContainer>
-				</>
-			)}
-			<p>
-				Graphs omit billing periods that cover less than 20 days to avoid
-				skewing the visualisations.
-			</p>
-			<hr />
+						</div>
+						<p>
+							Data points are taken at billing date time and <b>not</b> from the
+							smart metre. Gas is recorded in m³ and conversion might not always
+							be accurate.
+						</p>
+						<ResponsiveContainer width="100%" height={400} className="mb-3">
+							<AreaChart
+								data={mapForUsage()}
+								margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
+							>
+								<CartesianGrid strokeDasharray="3 3" />
+								<XAxis dataKey="Date" />
+								<YAxis />
+								<Tooltip />
+								<Area
+									type="monotone"
+									dataKey="Gas"
+									stroke="#2d5ff7"
+									fill="#7396ff"
+								/>
+								<Area
+									type="monotone"
+									dataKey="Electric"
+									stroke="#fabf34"
+									fill="#fadc34"
+								/>
+							</AreaChart>
+						</ResponsiveContainer>
+					</>
+				)}
+				{selectedGraph === "kWh Rate" && (
+					<>
+						<div style={{ display: "flex", justifyContent: "space-between" }}>
+							<p className="title is-4">Price per kWh</p>
+							<Selector
+								possibleValues={[6, 12, 18, 24]}
+								initialValue={monthsDisplayed}
+								supplementary="Months"
+								onSelectHandler={setMonthsDisplayed}
+							/>
+						</div>
+						<p>
+							Prices in pence. Does not account for price reduction schemes like{" "}
+							<a href="https://octopus.energy/blog/energy-price-cap-oct-2022/">
+								Energy price guarantee
+							</a>{" "}
+							or{" "}
+							<a href="https://www.gov.uk/guidance/energy-bills-discount-scheme">
+								Govt energy discount scheme
+							</a>{" "}
+						</p>
+						<ResponsiveContainer width="100%" height={400} className="mb-3">
+							<AreaChart
+								data={mapForRate()}
+								margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
+							>
+								<CartesianGrid strokeDasharray="3 3" />
+								<XAxis dataKey="Date" />
+								<YAxis />
+								<Tooltip />
+								<Area
+									type="monotone"
+									dataKey="Electric"
+									stroke="#fabf34"
+									fill="#fadc34"
+								/>
+								<Area
+									type="monotone"
+									dataKey="Gas"
+									stroke="#2d5ff7"
+									fill="#7396ff"
+								/>
+							</AreaChart>
+						</ResponsiveContainer>
+					</>
+				)}
+				{selectedGraph === "Standing order charges" && (
+					<>
+						<div style={{ display: "flex", justifyContent: "space-between" }}>
+							<p className="title is-4">Daily standing order charges</p>
+							<Selector
+								possibleValues={[6, 12, 18, 24]}
+								initialValue={monthsDisplayed}
+								supplementary="Months"
+								onSelectHandler={setMonthsDisplayed}
+							/>
+						</div>
+						<p>Prices in pence.</p>
+						<ResponsiveContainer width="100%" height={400} className="mb-3">
+							<AreaChart
+								data={mapForStandingCharge()}
+								margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
+							>
+								<CartesianGrid strokeDasharray="3 3" />
+								<XAxis dataKey="Date" />
+								<YAxis />
+								<Tooltip />
+								<Area
+									type="monotone"
+									dataKey="Electric"
+									stroke="#fabf34"
+									fill="#fadc34"
+								/>
+								<Area
+									type="monotone"
+									dataKey="Gas"
+									stroke="#2d5ff7"
+									fill="#7396ff"
+								/>
+							</AreaChart>
+						</ResponsiveContainer>
+					</>
+				)}
+				<p>
+					Graphs omit billing periods that cover less than 20 days to avoid
+					skewing the visualisations.
+				</p>
+				<hr />
 
-			<p className="title is-3">Electricity</p>
-
-			<div className="columns">
-				<div className="column">
-					<RootAppCard
-						link={{ url: "/energy/bills/add?type=electric", newTab: false }}
-						title={"Add bill"}
-					/>
+				<div className="modal">
+					<div className="modal-background"></div>
+					<div className="modal-content"></div>
+					<button className="modal-close is-large" aria-label="close"></button>
 				</div>
 			</div>
-
-			<div className="columns">
-				<div className="column">
-					<RootAppCard
-						link={{ url: "/energy/bills/history?type=electric", newTab: false }}
-						title={"View billing history"}
-					/>
-				</div>
-			</div>
-
-			<p className="title is-3 pt-4">Gas</p>
-			<div className="columns">
-				<div className="column">
-					<RootAppCard
-						link={{ url: "/energy/bills/add?type=gas", newTab: false }}
-						title={"Add bill"}
-					/>
-				</div>
-			</div>
-
-			<div className="columns">
-				<div className="column">
-					<RootAppCard
-						link={{ url: "/energy/bills/history?type=gas", newTab: false }}
-						title={"View billing history"}
-					/>
-				</div>
-			</div>
-
-			<div className="modal">
-				<div className="modal-background"></div>
-				<div className="modal-content"></div>
-				<button className="modal-close is-large" aria-label="close"></button>
-			</div>
-		</div>
+		</>
 	);
 }

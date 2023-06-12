@@ -1,5 +1,5 @@
 import Selector from "@/components/Selector";
-import DatePicker from "@/components/datePicker";
+// import DatePicker from "@/components/DatePicker";
 import { energy_usage } from "@prisma/client";
 import { useEffect, useState } from "react";
 import {
@@ -22,7 +22,7 @@ export default function EnergyIndex() {
 	const yesterday = new Date();
 	yesterday.setDate(new Date().getDate() - 1);
 
-	const [selectedDate, setSelectedDate] = useState(yesterday);
+	const [selectedDate] = useState(yesterday);
 	const [selectedMode, setSelectedMode] = useState<"hourly" | "daily">(
 		"hourly"
 	);
@@ -221,14 +221,14 @@ export default function EnergyIndex() {
 								</p>
 							</div>
 							<div style={{ maxWidth: "50%" }} className="mb-2">
-								<DatePicker
+								{/*<DatePicker
 									name="dateSelector"
 									changeHandler={setSelectedDate}
 									initialDate={selectedDate}
 									minDate={new Date(0)}
 									maxDate={new Date()}
 									isReadOnly={false}
-								/>
+								/>*/}
 								<button
 									className={`button mt-2 ${
 										displayMode === "cummulative" ? "is-info" : ""
@@ -305,14 +305,14 @@ export default function EnergyIndex() {
 								<p>Data may lag between three to twelve hours.</p>
 							</div>
 							<div style={{ maxWidth: "50%" }} className="mb-2">
-								<DatePicker
+								{/*<DatePicker
 									name="dateSelector"
 									changeHandler={setSelectedDate}
 									initialDate={selectedDate}
 									minDate={new Date(0)}
 									maxDate={new Date()}
 									isReadOnly={false}
-								/>
+								/>*/}
 								<Selector
 									possibleValues={[2, 3, 5, 7, 14]}
 									initialValue={selectedDays}

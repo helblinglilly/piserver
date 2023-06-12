@@ -177,6 +177,74 @@ const retrieveAnyBill = async (
 	endDate: Date,
 	limit: number
 ): Promise<energy_bill[]> => {
+	if (limit === 1) {
+		const gasPromise = prisma.energy_bill.findFirst({
+			take: limit,
+			select: {
+				billing_start: true,
+				billing_end: true,
+				is_electric: billType === "all",
+				is_gas: billType === "all",
+				usage_kwh: true,
+				rate_kwh: true,
+				standing_order_rate: true,
+				standing_order_charge_days: true,
+				pre_tax: true,
+				after_tax: true,
+			},
+			where: {
+				AND: {
+					is_gas: true,
+					billing_start: {
+						gte: startDate,
+					},
+					billing_end: {
+						lte: endDate,
+					},
+				},
+			},
+			orderBy: {
+				billing_start: "desc",
+			},
+		});
+
+		const electricPromise = prisma.energy_bill.findFirst({
+			take: limit,
+			select: {
+				billing_start: true,
+				billing_end: true,
+				is_electric: billType === "all",
+				is_gas: billType === "all",
+				usage_kwh: true,
+				rate_kwh: true,
+				standing_order_rate: true,
+				standing_order_charge_days: true,
+				pre_tax: true,
+				after_tax: true,
+			},
+			where: {
+				AND: {
+					is_gas: false,
+					billing_start: {
+						gte: startDate,
+					},
+					billing_end: {
+						lte: endDate,
+					},
+				},
+			},
+			orderBy: {
+				billing_start: "desc",
+			},
+		});
+
+		const [gas, electric] = await Promise.all([gasPromise, electricPromise]);
+		const result: energy_bill[] = [];
+
+		if (gas) result.push(gas);
+		if (electric) result.push(electric);
+		return result;
+	}
 	return await prisma.energy_bill.findMany({
 		take: limit,
 		select: {
