@@ -16,7 +16,6 @@ services:
      OCTOPUS_GAS_SERIAL: ""
      MOVE_IN_DATE: ""
      ADDRESS_CODE: ""
-     
   portainer:
     image: portainer/portainer-ce:latest
     container_name: portainer

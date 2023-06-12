@@ -67,7 +67,7 @@ export default function Home() {
 				<div className="column">
 					<RootAppCard
 						link={{
-							url: "http://192.168.0.10:5000/files/login?redirect=%2Ffiles%2F",
+							url: "http://192.168.0.11:5000/files/login?redirect=%2Ffiles%2F",
 							newTab: false,
 						}}
 						image={{ url: "/files.png", altText: "File Icon" }}
@@ -91,7 +91,7 @@ export default function Home() {
 				<div className="column">
 					<RootAppCard
 						link={{
-							url: "http://192.168.0.10:32400/web",
+							url: "http://192.168.0.11:32400/web",
 							newTab: false,
 						}}
 						image={{ url: "/plex.png", altText: "Plex Icon" }}
