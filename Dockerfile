@@ -1,4 +1,4 @@
-FROM node:20
+FROM arm64v8/node:18 AS base
 
 WORKDIR /app
 
@@ -10,7 +10,7 @@ RUN npm install
 
 # Create prod build
 COPY . .
-ENTRYPOINT [ "npm", "run", "dev" ]
+CMD [ "npm", "run", "dev" ]
 # RUN npx prisma generate
 # RUN npm run build
 # ENV NODE_ENV production
