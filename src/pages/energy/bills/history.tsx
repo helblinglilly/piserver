@@ -1,4 +1,4 @@
-import { energy_bill } from "@prisma/client";
+// import { energy_bill } from "@prisma/client";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -25,7 +25,7 @@ export default function EnergyBillsHistory() {
 	const secondaryAreaFillColour = isGas ? "#4962ab" : "#f2b65c";
 	const secondaryStrokeColour = isGas ? "#2044ab" : "#eda02d";
 
-	const [bills, setBills] = useState<energy_bill[]>([]);
+	const [bills, setBills] = useState<any[]>([]);
 	const [chartBills, setChartBills] = useState<
 		{
 			date: string;
@@ -50,7 +50,7 @@ export default function EnergyBillsHistory() {
 				}`
 			);
 			if (response.status === 200) {
-				const repsonseBills = (await response.json()) as energy_bill[];
+				const repsonseBills = (await response.json()) as any[];
 				setBills(repsonseBills);
 
 				const responseChartBills = repsonseBills.map((a) => {

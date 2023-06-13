@@ -1,6 +1,6 @@
 import Selector from "@/components/Selector";
 import RootAppCard from "@/components/rootAppCard";
-import { energy_bill } from "@prisma/client";
+// import { energy_bill } from "@prisma/client";
 import { useEffect, useState } from "react";
 import {
 	ResponsiveContainer,
@@ -80,7 +80,7 @@ export default function EnergyBills() {
 			);
 
 			if (response.status === 200) {
-				const repsonseBills = (await response.json()) as energy_bill[];
+				const repsonseBills = (await response.json()) as any[];
 				const responseCombinedBills: {
 					date: string;
 					gasBill: number;
