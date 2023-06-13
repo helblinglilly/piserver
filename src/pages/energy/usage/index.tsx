@@ -1,6 +1,6 @@
 import Selector from "@/components/Selector";
 // import DatePicker from "@/components/DatePicker";
-import { energy_usage } from "@prisma/client";
+// import { energy_usage } from "@prisma/client";
 import { useEffect, useState } from "react";
 import {
 	ResponsiveContainer,
@@ -35,7 +35,7 @@ export default function EnergyIndex() {
 
 	const [accumulativeData, setAccumulativeData] = useState<UsageData[]>([]);
 
-	const combineUsageData = (input: energy_usage[]) => {
+	const combineUsageData = (input: any[]) => {
 		const combined: UsageData[] = [];
 
 		input.forEach((usage) => {
@@ -75,7 +75,7 @@ export default function EnergyIndex() {
 				return;
 			}
 
-			const responseUsage = (await response.json()) as energy_usage[];
+			const responseUsage = (await response.json()) as any[];
 
 			const combined = combineUsageData(responseUsage);
 			setData(combined);

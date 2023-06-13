@@ -1,23 +1,27 @@
 import Log from "@/log";
-import { PrismaClient } from "@prisma/client";
+// import { PrismaClient } from "@prisma/client";
 import type { NextApiRequest, NextApiResponse } from "next";
 
-const prisma = new PrismaClient();
+// const prisma = new PrismaClient();
 const log = new Log("energy_usage");
 
 type Data = {
 	inserted: number;
 };
 
+/*
 type EnergyData = {
 	consumption: number;
 	interval_start: Date;
 	interval_end: Date;
 };
+*/
 
 const baseURL = "https://api.octopus.energy/";
 
+/*
 const latestGasEntry = () => {
+	return;
 	return prisma.energy_usage.findFirst({
 		select: {
 			end_date: true,
@@ -31,8 +35,11 @@ const latestGasEntry = () => {
 		},
 	});
 };
+*/
 
+/*
 const latestElectricityEntry = () => {
+	return;
 	return prisma.energy_usage.findFirst({
 		select: {
 			end_date: true,
@@ -46,8 +53,11 @@ const latestElectricityEntry = () => {
 		},
 	});
 };
+*/
 
+/*
 const fetchElectricityData = async () => {
+	return;
 	const latestDBEntry = await latestElectricityEntry();
 
 	let latestDate = latestDBEntry
@@ -102,8 +112,11 @@ const fetchElectricityData = async () => {
 	}
 	return rowCount;
 };
+*/
 
+/*
 const fetchGasData = async () => {
+	return;
 	const latestDBEntry = await latestGasEntry();
 
 	let latestDate = latestDBEntry
@@ -156,11 +169,15 @@ const fetchGasData = async () => {
 	}
 	return rowCount;
 };
+*/
 
 export default async function handler(
 	req: NextApiRequest,
 	res: NextApiResponse<Data>
 ) {
+	res.status(200).end();
+	return;
+	/*
 	const [electricRows, gasRows] = await Promise.all([
 		fetchElectricityData(),
 		fetchGasData(),
@@ -169,6 +186,7 @@ export default async function handler(
 	res.status(200).json({
 		inserted: (electricRows ? electricRows : 0) + (gasRows ? gasRows : 0),
 	});
+	*/
 }
 
 export async function octopusAuthedRequest(requestURL: string) {
