@@ -50,7 +50,7 @@ jobs:
   restart:
     needs: docker
     name: Redeploy
-    runs-on: raspberry
+    runs-on: strawberry
     if: github.event_name == 'pull_request'
     steps:
       - name: Login to DockerHub
