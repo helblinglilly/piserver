@@ -1,6 +1,6 @@
 // import DatePicker from "@/components/DatePicker";
 // import { EnergyBillPayload } from "@/pages/api/energy/bill";
-import { energy_bill } from "@prisma/client";
+// import { energy_bill } from "@prisma/client";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, useEffect, useRef, useState } from "react";
 
@@ -41,7 +41,7 @@ export default function EnergyBillsEdit() {
 			);
 
 			if (response.status === 200) {
-				const repsonseBill = (await response.json()) as energy_bill[];
+				const repsonseBill = (await response.json()) as any[];
 				const bill = repsonseBill[0];
 				setStartDate(new Date(bill.billing_start));
 				setEndDate(new Date(bill.billing_end));
