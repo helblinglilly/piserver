@@ -1,14 +1,13 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
-import { z } from "zod";
-import { PrismaClient, energy_usage } from "@prisma/client";
-
-const prisma = new PrismaClient();
 
 export default async function handler(
 	req: NextApiRequest,
 	res: NextApiResponse
 ) {
+	res.status(200).end();
+	return;
+	/*
 	if (req.method !== "GET") {
 		res.status(405).end();
 		return;
@@ -17,6 +16,7 @@ export default async function handler(
 		Default to:
 		All entries between yesterday and now
 	*/
+	/*
 	let fromDateParam = req.query["from"];
 	let toDateParam = req.query["to"];
 	let usageTypeParam = req.query["type"];
@@ -65,8 +65,10 @@ export default async function handler(
 		return;
 	}
 	res.status(200).json(results);
+	*/
 }
 
+/*
 const getElectricUsage = async (
 	from: Date,
 	to: Date
@@ -152,3 +154,5 @@ const getEnergyUsage = async (
 		},
 	});
 };
+
+*/

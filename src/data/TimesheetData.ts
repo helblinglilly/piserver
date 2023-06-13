@@ -1,4 +1,5 @@
-import { toMidnightUTC } from "@/utilities/dateUtils";
+// import { toMidnightUTC } from "@/utilities/dateUtils";
+/*
 import { PrismaClient } from "@prisma/client";
 
 export default class TimesheetModel {
@@ -155,7 +156,7 @@ export default class TimesheetModel {
 		return content;
 	}
 }
-
+*/
 export interface ITimesheetDay {
 	day_date: Date;
 	clock_in: Date;

@@ -1,18 +1,17 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-import type { NextApiRequest, NextApiResponse } from "next";
-import { ZodError, z } from "zod";
-import { PrismaClient, energy_bill } from "@prisma/client";
-import {
-	Decimal,
-	PrismaClientKnownRequestError,
-} from "@prisma/client/runtime/library";
+// import type { NextApiRequest, NextApiResponse } from "next";
 
-const prisma = new PrismaClient();
+import { NextApiRequest, NextApiResponse } from "next";
+
+// const prisma = new PrismaClient();
 
 export default async function handler(
 	req: NextApiRequest,
 	res: NextApiResponse
 ) {
+	res.status(200).end();
+	return;
+	/*
 	if (req.method === "GET") {
 		let startDateParam = req.query["startDate"];
 		let startDate = new Date(0);
@@ -149,8 +148,10 @@ export default async function handler(
 	} else {
 		return res.status(405).end();
 	}
+	*/
 }
 
+/*
 const insertBill = async (data: EnergyBillPayload) => {
 	const preTax =
 		(data.standingChargeDays + Number(data.kwhUsage) * Number(data.kwhRate)) /
@@ -170,7 +171,9 @@ const insertBill = async (data: EnergyBillPayload) => {
 		},
 	});
 };
+*/
 
+/*
 const retrieveAnyBill = async (
 	billType: "gas" | "electric" | "all",
 	startDate: Date,
@@ -274,7 +277,9 @@ const retrieveAnyBill = async (
 		},
 	});
 };
+*/
 
+/*
 const retrieveElectricBill = async (
 	billType: "gas" | "electric" | "all",
 	startDate: Date,
@@ -311,7 +316,9 @@ const retrieveElectricBill = async (
 		},
 	});
 };
+*/
 
+/*
 const retrieveGasBill = async (
 	billType: "gas" | "electric" | "all",
 	startDate: Date,
@@ -348,7 +355,8 @@ const retrieveGasBill = async (
 		},
 	});
 };
-
+*/
+/*
 const updateBill = async (updatedData: EnergyBillPayload) => {
 	const preTax =
 		updatedData.standingChargeDays +
@@ -372,6 +380,9 @@ const updateBill = async (updatedData: EnergyBillPayload) => {
 		},
 	});
 };
+*/
+
+/* Types
 
 export type EnergyBillRetrieval = z.infer<typeof EnergyBillRetrievalSchema>;
 export type EnergyBillPayload = z.infer<typeof EnergyBillPayloadSchema>;
@@ -433,3 +444,4 @@ const EnergyBillPayloadSchema = z.object({
 		message: "More than £20/kWhis likely too high",
 	}),
 });
+*/

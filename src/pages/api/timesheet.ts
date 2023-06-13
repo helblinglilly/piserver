@@ -1,7 +1,8 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
-import TimesheetModel from "@/data/TimesheetData";
+// import TimesheetModel from "@/data/TimesheetData";
 
+/*
 const dataInterface = new TimesheetModel();
 
 const GET = async (req: NextApiRequest, res: NextApiResponse) => {
@@ -56,11 +57,15 @@ const POST = async (req: NextApiRequest, res: NextApiResponse) => {
 	res.status(200).json({ action: action, time: time });
 	return;
 };
+*/
 
 export default async function handler(
 	req: NextApiRequest,
 	res: NextApiResponse
 ) {
+	res.status(200).end();
+	return;
+	/*
 	if (req.method === "GET") {
 		await GET(req, res);
 	} else if (req.method === "POST") {
@@ -68,4 +73,5 @@ export default async function handler(
 	} else {
 		res.status(405).end();
 	}
+	*/
 }

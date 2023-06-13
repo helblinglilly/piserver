@@ -1,5 +1,5 @@
 // import DatePicker from "@/components/DatePicker";
-import { EnergyBillPayload } from "@/pages/api/energy/bill";
+// import { EnergyBillPayload } from "@/pages/api/energy/bill";
 import { energy_bill } from "@prisma/client";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, useEffect, useRef, useState } from "react";
@@ -64,7 +64,7 @@ export default function EnergyBillsEdit() {
 	const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 
-		const payload: EnergyBillPayload = {
+		const payload = {
 			billType: isGas ? "gas" : "electric",
 			startDate: startDate,
 			endDate: endDate,
