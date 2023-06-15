@@ -6,48 +6,6 @@ export default function Home() {
 		<main>
 			<div className="columns">
 				<div className="column">
-					<div className="columns">
-						<div className="column">
-							<div className="card">
-								<div className="card-content">
-									<p>Black bin</p>
-								</div>
-							</div>
-						</div>
-
-						<div className="column">
-							<div className="card">
-								<div className="card-content">
-									<p>Green bin</p>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-
-				<div className="column">
-					<div className="columns">
-						<div className="column">
-							<div className="card">
-								<div className="card-content">
-									<p>Gas</p>
-								</div>
-							</div>
-						</div>
-
-						<div className="column">
-							<div className="card">
-								<div className="card-content">
-									<p>Electric</p>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-
-			<div className="columns">
-				<div className="column">
 					<RootAppCard
 						link={{ url: "http://192.168.0.10:81/admin", newTab: false }}
 						image={{ url: "/pihole.svg", altText: "Pi Hole Icon" }}
@@ -98,17 +56,6 @@ export default function Home() {
 						title={"Plex"}
 					/>
 				</div>
-
-				<div className="column">
-					<RootAppCard
-						link={{
-							url: "/stopwatch",
-							newTab: false,
-						}}
-						image={{ url: "/stopwatch.png", altText: "Clock" }}
-						title={"Stopwatch"}
-					/>
-				</div>
 			</div>
 
 			<div className="columns">
@@ -120,20 +67,6 @@ export default function Home() {
 						}}
 						image={{ url: "/docker.png", altText: "Docker Icon" }}
 						title={"Portainer"}
-					/>
-				</div>
-
-				<div className="column">
-					<RootAppCard
-						link={{
-							url: "https://pokemon.helbling.uk",
-							newTab: false,
-						}}
-						image={{
-							url: "https://pokemon.helbling.uk/static/favicon.png",
-							altText: "Pokeball",
-						}}
-						title={"Pokémon"}
 					/>
 				</div>
 			</div>
