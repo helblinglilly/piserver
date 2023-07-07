@@ -21,7 +21,7 @@ const downloadSourceFile = async () => {
 	}
 
 	// const dest = fs.createWriteStream(destinationFolder, { highWaterMark: 16 });
-	console.log(response.body);
+	// console.log(response.body);
 	// await response.body.pipeTo(dest);
 };
 

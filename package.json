@@ -8,7 +8,8 @@
 		"build": "next build",
 		"start": "next start",
 		"lint": "next lint",
-		"jobs": "node src/jobs.ts"
+		"jobs": "node src/jobs.ts",
+		"generate": "drizzle-kit generate:pg"
 	},
 	"dependencies": {
 		"@antv/g2plot": "^2.4.28",
@@ -16,20 +17,21 @@
 		"@types/node": "18.15.5",
 		"@types/react": "18.0.28",
 		"@types/react-dom": "18.0.11",
-		"axios": "^1.3.4",
 		"bulma": "^0.9.4",
-		"cron": "^2.3.0",
+		"dotenv": "^16.3.1",
+		"drizzle-orm": "^0.27.0",
 		"eslint-config-next": "13.2.4",
 		"next": "13.2.4",
+		"postgres": "^3.3.5",
 		"react": "18.2.0",
 		"react-dom": "18.2.0",
 		"recharts": "^2.5.0",
-		"sharp": "^0.32.0",
-		"zod": "^3.21.4"
+		"sharp": "^0.32.0"
 	},
 	"devDependencies": {
 		"@types/cron": "^2.0.1",
 		"@typescript-eslint/parser": "^5.56.0",
+		"drizzle-kit": "^0.19.3",
 		"eslint": "^8.36.0",
 		"eslint-plugin-react-hooks": "^4.6.0",
 		"prettier": "^2.8.7",
