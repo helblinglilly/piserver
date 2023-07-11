@@ -1,199 +1,78 @@
-import Log from "@/log";
-// import { PrismaClient } from "@prisma/client";
-import type { NextApiRequest, NextApiResponse } from "next";
+import { getLatestUsageEndDate } from "@/db/Energy";
+import { NextApiRequest, NextApiResponse } from "next";
 
-// const prisma = new PrismaClient();
-const log = new Log("energy_usage");
+const OCTOPUS_BASE_URL = "https://api.octopus.energy/v1/";
+const ELECTRIC_URL = `https://api.octopus.energy/v1/electricity-meter-points/${process.env.OCTOPUS_ELECTRIC_MPAN}/meters/${process.env.OCTOPUS_ELECTRIC_SERIAL}/consumption`;
 
-type Data = {
-	inserted: number;
-};
-
-/*
-type EnergyData = {
-	consumption: number;
-	interval_start: Date;
-	interval_end: Date;
-};
-*/
-
-const baseURL = "https://api.octopus.energy/";
-
-/*
-const latestGasEntry = () => {
-	return;
-	return prisma.energy_usage.findFirst({
-		select: {
-			end_date: true,
-		},
-		where: {
-			is_electric: true,
-			is_gas: false,
-		},
-		orderBy: {
-			end_date: "desc",
-		},
-	});
-};
-*/
-
-/*
-const latestElectricityEntry = () => {
-	return;
-	return prisma.energy_usage.findFirst({
-		select: {
-			end_date: true,
-		},
-		where: {
-			is_electric: false,
-			is_gas: true,
-		},
-		orderBy: {
-			end_date: "desc",
-		},
-	});
-};
-*/
-
-/*
-const fetchElectricityData = async () => {
-	return;
-	const latestDBEntry = await latestElectricityEntry();
-
-	let latestDate = latestDBEntry
-		? latestDBEntry.end_date
-		: process.env.MOVE_IN_DATE
-		? new Date(process.env.MOVE_IN_DATE)
-		: new Date(0);
-
-	let fetchedAllData = false;
-	const now = new Date();
-
-	let rowCount = 0;
-
-	while (!fetchedAllData) {
-		const requestURL = `${baseURL}v1/electricity-meter-points/${
-			process.env.OCTOPUS_ELECTRIC_MPAN
-		}/meters/${
-			process.env.OCTOPUS_ELECTRIC_SERIAL
-		}/consumption?page_size=1000&period_from=${latestDate.toISOString()}&period_to=${now.toISOString()}&order_by=period`;
-
-		const response = await octopusAuthedRequest(requestURL);
-
-		if (!response) return;
-		if (response.next === null) {
-			fetchedAllData = true;
-		}
-
-		if (response.results.length === 0) {
-			return;
-		}
-
-		latestDate = new Date(
-			response.results[response.results.length - 1].interval_end
-		);
-
-		const payload = response.results.map((a: EnergyData) => {
-			return {
-				is_electric: true,
-				is_gas: false,
-				usage_kwh: a.consumption,
-				start_date: new Date(a.interval_start),
-				end_date: new Date(a.interval_end),
-				entry_created: now.toISOString(),
-			};
-		});
-
-		const insertCount = await prisma.energy_usage.createMany({
-			data: [...payload],
-			skipDuplicates: true,
-		});
-		rowCount += insertCount.count;
-	}
-	return rowCount;
-};
-*/
-
-/*
-const fetchGasData = async () => {
-	return;
-	const latestDBEntry = await latestGasEntry();
-
-	let latestDate = latestDBEntry
-		? latestDBEntry.end_date
-		: process.env.MOVE_IN_DATE
-		? new Date(process.env.MOVE_IN_DATE)
-		: new Date(0);
-
-	let fetchedAllData = false;
-	const now = new Date();
-
-	let rowCount = 0;
-
-	while (!fetchedAllData) {
-		const requestURL = `${baseURL}v1/gas-meter-points/${
-			process.env.OCTOPUS_GAS_MPRN
-		}/meters/${
-			process.env.OCTOPUS_GAS_SERIAL
-		}/consumption?page_size=1000&period_from=${latestDate.toISOString()}&period_to=${now.toISOString()}&order_by=period`;
-
-		const response = await octopusAuthedRequest(requestURL);
-		if (!response) return;
-		if (!response.next) {
-			fetchedAllData = true;
-		}
-
-		if (response.results.length === 0) {
-			return;
-		}
-		latestDate = new Date(
-			response.results[response.results.length - 1].interval_end
-		);
-
-		const payload = response.results.map((a: EnergyData) => {
-			return {
-				is_electric: false,
-				is_gas: true,
-				usage_kwh: a.consumption,
-				start_date: new Date(a.interval_start),
-				end_date: new Date(a.interval_end),
-				entry_created: now,
-			};
-		});
-
-		const insertCount = await prisma.energy_usage.createMany({
-			data: [...payload],
-			skipDuplicates: true,
-		});
-		rowCount += insertCount.count;
-	}
-	return rowCount;
-};
-*/
+// eslint-disable-next-line no-unused-vars
+const GAS_URL = `https://api.octopus.energy/v1/gas-meter-points/${process.env.OCTOPUS_GAS_MPRN}/meters/${process.env.OCTOPUS_GAS_SERIAL}/consumption`;
 
 export default async function handler(
 	req: NextApiRequest,
-	res: NextApiResponse<Data>
+	res: NextApiResponse
 ) {
-	res.status(200).end();
-	return;
-	/*
-	const [electricRows, gasRows] = await Promise.all([
-		fetchElectricityData(),
-		fetchGasData(),
-	]);
 
-	res.status(200).json({
-		inserted: (electricRows ? electricRows : 0) + (gasRows ? gasRows : 0),
-	});
-	*/
+	const lookup = {
+		GET: GET,
+	};
+
+	const result = lookup[req.method as "GET"];
+
+	if (!result) {
+		res.status(405).end();
+		return;
+	}
+
+	await result(res);
 }
 
-export async function octopusAuthedRequest(requestURL: string) {
+interface APIResponse {
+  consumption: number;
+  interval_start: string;
+  interval_end: string;
+}
+
+const GET = async (res: NextApiResponse) => {
+  const [latestElectricityDate, latesetGasDate] = await Promise.all([
+    getLatestUsageEndDate("electricity"), 
+    getLatestUsageEndDate("gas")
+  ]);
+
+  await Promise.all([
+    fetchElectricityData(latestElectricityDate),
+    fetchGasData(latesetGasDate)
+  ])
+  res.status(200).end();
+}
+
+const fetchElectricityData = async (startDate: Date, endDate = new Date()) => {
+  let completed = false;
+
+
+  while(!completed){
+    const requestURL = `${ELECTRIC_URL}?page_size=1000&period_from=${startDate.toISOString()}&period_to=${endDate.toISOString()}&order_by=period`;
+    const response = await octopusAuthedRequest(requestURL) as APIResponse[] | number;
+    if (typeof response === "number" || response.length === 0){
+      completed = true;
+      return;
+    }
+
+    
+
+  }
+}
+
+const fetchGasData = async (startDate: Date, endDate?: Date) => {
+  if (!endDate){
+    endDate = new Date();
+  }
+}
+
+async function octopusAuthedRequest(requestURL: string) {
 	const headers = new Headers();
 	headers.set(
 		"Authorization",
-		`Basic ${Buffer.from(`${process.env.OCTOPUS_API_KEY}:${baseURL}`).toString(
+		`Basic ${Buffer.from(`${process.env.OCTOPUS_API_KEY}:${OCTOPUS_BASE_URL}`).toString(
 			"base64"
 		)}`
 	);
@@ -203,12 +82,12 @@ export async function octopusAuthedRequest(requestURL: string) {
 		headers,
 	});
 
-	log.info(`${response.status} for ${requestURL}`);
+	console.log(`${response.status} for ${requestURL}`);
 
 	if (response.status === 200) {
 		const body = await response.json();
 		return body;
 	} else {
-		return;
+		return response.status;
 	}
 }
