@@ -1,17 +1,18 @@
-import { getLatestUsageEndDate } from "@/db/Energy";
+import {
+	EnergyUsageRow,
+	getLatestUsageEndDate,
+	insertEnergyUsage,
+} from "@/db/Energy";
 import { NextApiRequest, NextApiResponse } from "next";
 
 const OCTOPUS_BASE_URL = "https://api.octopus.energy/v1/";
 const ELECTRIC_URL = `https://api.octopus.energy/v1/electricity-meter-points/${process.env.OCTOPUS_ELECTRIC_MPAN}/meters/${process.env.OCTOPUS_ELECTRIC_SERIAL}/consumption`;
-
-// eslint-disable-next-line no-unused-vars
 const GAS_URL = `https://api.octopus.energy/v1/gas-meter-points/${process.env.OCTOPUS_GAS_MPRN}/meters/${process.env.OCTOPUS_GAS_SERIAL}/consumption`;
 
 export default async function handler(
 	req: NextApiRequest,
 	res: NextApiResponse
 ) {
-
 	const lookup = {
 		GET: GET,
 	};
@@ -27,54 +28,78 @@ export default async function handler(
 }
 
 interface APIResponse {
-  consumption: number;
-  interval_start: string;
-  interval_end: string;
+	results: {
+		consumption: number;
+		interval_start: string;
+		interval_end: string;
+	}[];
+	count: number;
+	next: string;
+	previous: string;
 }
 
 const GET = async (res: NextApiResponse) => {
-  const [latestElectricityDate, latesetGasDate] = await Promise.all([
-    getLatestUsageEndDate("electricity"), 
-    getLatestUsageEndDate("gas")
-  ]);
+	const [latestElectricityDate, latesetGasDate] = await Promise.all([
+		getLatestUsageEndDate("electricity"),
+		getLatestUsageEndDate("gas"),
+	]);
 
-  await Promise.all([
-    fetchElectricityData(latestElectricityDate),
-    fetchGasData(latesetGasDate)
-  ])
-  res.status(200).end();
-}
+	const [electricRows, gasRows] = await Promise.all([
+		fetchEnergyData("electricity", latestElectricityDate),
+		fetchEnergyData("gas", latesetGasDate),
+	]);
+	res.status(200).json({ electricRows: electricRows, gasRows: gasRows });
+};
 
-const fetchElectricityData = async (startDate: Date, endDate = new Date()) => {
-  let completed = false;
+const fetchEnergyData = async (
+	kind: "electricity" | "gas",
+	startDate: Date,
+	endDate = new Date()
+) => {
+	let requestURL = `${
+		kind === "electricity" ? ELECTRIC_URL : GAS_URL
+	}?page_size=1000&period_from=${startDate.toISOString()}&period_to=${endDate.toISOString()}&order_by=period`;
 
+	let completed = false;
+	let count = 0;
 
-  while(!completed){
-    const requestURL = `${ELECTRIC_URL}?page_size=1000&period_from=${startDate.toISOString()}&period_to=${endDate.toISOString()}&order_by=period`;
-    const response = await octopusAuthedRequest(requestURL) as APIResponse[] | number;
-    if (typeof response === "number" || response.length === 0){
-      completed = true;
-      return;
-    }
+	while (!completed) {
+		const response = (await octopusAuthedRequest(requestURL)) as
+			| APIResponse
+			| number;
 
-    
+		if (typeof response === "number" || response.count === 0) {
+			completed = true;
+			break;
+		}
 
-  }
-}
+		const mapped = response.results.map((item): EnergyUsageRow => {
+			return {
+				energyType: kind,
+				kWh: item.consumption,
+				startDate: new Date(item.interval_start),
+				endDate: new Date(item.interval_end),
+			};
+		});
+		await insertEnergyUsage(mapped);
+		count += response.count;
 
-const fetchGasData = async (startDate: Date, endDate?: Date) => {
-  if (!endDate){
-    endDate = new Date();
-  }
-}
+		if (response.next === null) {
+			completed = true;
+			break;
+		}
+		requestURL = response.next;
+	}
+	return count;
+};
 
 async function octopusAuthedRequest(requestURL: string) {
 	const headers = new Headers();
 	headers.set(
 		"Authorization",
-		`Basic ${Buffer.from(`${process.env.OCTOPUS_API_KEY}:${OCTOPUS_BASE_URL}`).toString(
-			"base64"
-		)}`
+		`Basic ${Buffer.from(
+			`${process.env.OCTOPUS_API_KEY}:${OCTOPUS_BASE_URL}`
+		).toString("base64")}`
 	);
 
 	const response = await fetch(requestURL, {
@@ -82,7 +107,7 @@ async function octopusAuthedRequest(requestURL: string) {
 		headers,
 	});
 
-	console.log(`${response.status} for ${requestURL}`);
+	console.log(`${response.status} from ${requestURL}`);
 
 	if (response.status === 200) {
 		const body = await response.json();

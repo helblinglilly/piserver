@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "pg",
-  "id": "1d2fa449-c47d-4e64-963e-d6bf2fc24a15",
+  "id": "b32c392a-31b2-4889-9ada-4c6711c95a4f",
   "prevId": "7ed90ac7-b6d9-4bb5-9054-8b3f22dd7751",
   "tables": {
     "energy_usage": {
@@ -22,13 +22,13 @@
         },
         "start_date": {
           "name": "start_date",
-          "type": "date",
+          "type": "timestamp",
           "primaryKey": false,
           "notNull": true
         },
         "end_date": {
           "name": "end_date",
-          "type": "date",
+          "type": "timestamp",
           "primaryKey": false,
           "notNull": true
         },

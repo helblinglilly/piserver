@@ -7,8 +7,8 @@ END $$;
 CREATE TABLE IF NOT EXISTS "energy_usage" (
 	"type" "energy_type" NOT NULL,
 	"kwh" numeric NOT NULL,
-	"start_date" date NOT NULL,
-	"end_date" date NOT NULL,
+	"start_date" timestamp NOT NULL,
+	"end_date" timestamp NOT NULL,
 	"created_at" timestamp with time zone NOT NULL
 );
 --> statement-breakpoint
