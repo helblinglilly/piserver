@@ -48,6 +48,11 @@ const GET = async (res: NextApiResponse) => {
 		fetchEnergyData("electricity", latestElectricityDate),
 		fetchEnergyData("gas", latesetGasDate),
 	]);
+
+	if (electricRows === 0 && gasRows === 0) {
+		res.status(204).end();
+		return;
+	}
 	res.status(200).json({ electricRows: electricRows, gasRows: gasRows });
 };
 

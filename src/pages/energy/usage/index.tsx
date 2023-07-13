@@ -1,6 +1,7 @@
+import HourlyRundownChart from "@/components/Energy/HourlyRundownChart";
 import Selector from "@/components/Selector";
-// import DatePicker from "@/components/DatePicker";
-// import { energy_usage } from "@prisma/client";
+import DatePicker from "@/components/datePicker";
+import { EnergyUsageRow } from "@/db/Energy";
 import { useEffect, useState } from "react";
 import {
 	ResponsiveContainer,
@@ -19,13 +20,12 @@ type UsageData = {
 	kwh_gas: number;
 };
 export default function EnergyIndex() {
+	const [mode, setMode] = useState<"hourly" | "daily">("hourly");
+	/*
 	const yesterday = new Date();
 	yesterday.setDate(new Date().getDate() - 1);
 
-	const [selectedDate] = useState(yesterday);
-	const [selectedMode, setSelectedMode] = useState<"hourly" | "daily">(
-		"hourly"
-	);
+	const [selectedDate, setSelectedDate] = useState(yesterday);
 	const [selectedDays, setSelectedDays] = useState(3);
 	const [displayMode, setDisplayMode] = useState<"cummulative" | "individual">(
 		"individual"
@@ -35,28 +35,28 @@ export default function EnergyIndex() {
 
 	const [accumulativeData, setAccumulativeData] = useState<UsageData[]>([]);
 
-	const combineUsageData = (input: any[]) => {
+	const combineUsageData = (input: EnergyUsageRow[]) => {
 		const combined: UsageData[] = [];
 
 		input.forEach((usage) => {
 			const findFn = (a: { start_date: Date }) =>
-				a.start_date.valueOf() === new Date(usage.start_date).valueOf();
+				a.start_date.valueOf() === new Date(usage.startDate).valueOf();
 
 			const existing = combined.find((a) => findFn(a));
 			const existingId = combined.findIndex((a) => findFn(a));
 
 			if (!existing) {
 				combined.push({
-					start_date: new Date(usage.start_date),
-					end_date: new Date(usage.end_date),
-					kwh_electric: usage.is_electric ? usage.usage_kwh : -1,
-					kwh_gas: usage.is_gas ? usage.usage_kwh : -1,
+					start_date: new Date(usage.startDate),
+					end_date: new Date(usage.endDate),
+					kwh_electric: usage.energyType === "electricity" ? usage.kWh : -1,
+					kwh_gas: usage.energyType === "gas" ? usage.kWh : -1,
 				});
 			} else {
 				if (existing.kwh_electric === -1) {
-					existing.kwh_electric = usage.usage_kwh;
+					existing.kwh_electric = usage.kWh;
 				} else if (existing.kwh_gas === -1) {
-					existing.kwh_gas = usage.usage_kwh;
+					existing.kwh_gas = usage.kWh;
 				}
 				combined.splice(existingId, 1);
 				combined.push(existing);
@@ -75,7 +75,7 @@ export default function EnergyIndex() {
 				return;
 			}
 
-			const responseUsage = (await response.json()) as any[];
+			const responseUsage = (await response.json()) as EnergyUsageRow[];
 
 			const combined = combineUsageData(responseUsage);
 			setData(combined);
@@ -99,7 +99,7 @@ export default function EnergyIndex() {
 		let from = new Date();
 		let to = new Date();
 
-		if (selectedMode === "hourly") {
+		if (mode === "hourly") {
 			from = new Date(selectedDate);
 			from.setHours(0);
 			from.setMinutes(0);
@@ -107,9 +107,8 @@ export default function EnergyIndex() {
 			from.setMilliseconds(0);
 			to = new Date(from);
 			to.setDate(from.getDate() + 1);
-		} else if (selectedMode === "daily") {
+		} else if (mode === "daily") {
 			to = new Date(selectedDate);
-			// to.setDate(to.getDate() );
 			to.setHours(0);
 			to.setMinutes(30);
 			to.setSeconds(0);
@@ -118,7 +117,7 @@ export default function EnergyIndex() {
 			from.setDate(to.getDate() - selectedDays);
 		}
 		fetchData(from, to);
-	}, [selectedDate, selectedMode, selectedDays]);
+	}, [selectedDate, mode, selectedDays]);
 
 	const formatDatesToTime = (data: UsageData[]) => {
 		return data
@@ -128,8 +127,8 @@ export default function EnergyIndex() {
 						hour12: false,
 					}),
 					end_date: a.end_date.toLocaleTimeString("en-GB", { hour12: false }),
-					Electric: Number(a.kwh_electric.toFixed(4)),
-					Gas: Number(a.kwh_gas.toFixed(4)),
+					Electric: Number(a.kwh_electric),
+					Gas: Number(a.kwh_gas),
 				};
 			})
 			.filter((a) => a.Electric > -1 && a.Gas > -1);
@@ -143,8 +142,8 @@ export default function EnergyIndex() {
 						hour12: false,
 					}),
 					end_date: a.end_date.toLocaleDateString("en-GB", { hour12: false }),
-					Electric: Number(a.kwh_electric.toFixed(4)),
-					Gas: Number(a.kwh_gas.toFixed(4)),
+					Electric: Number(a.kwh_electric),
+					Gas: Number(a.kwh_gas),
 				};
 			})
 			.filter((a) => a.Electric > -1 && a.Gas > -1);
@@ -182,12 +181,38 @@ export default function EnergyIndex() {
 			.map((a) => {
 				return {
 					Date: a.date.toLocaleDateString("en-GB"),
-					Electric: a.Electric.toFixed(4),
-					Gas: a.Gas.toFixed(4),
+					Electric: a.Electric,
+					Gas: a.Gas,
 				};
 			});
 	};
+	*/
 
+	return (
+		<>
+			<div className="box">
+				<div className="tabs is-fullwidth">
+					<ul>
+						<li
+							onClick={() => setMode("hourly")}
+							className={mode === "hourly" ? "is-active" : ""}
+						>
+							<a>Hourly</a>
+						</li>
+						<li
+							onClick={() => setMode("daily")}
+							className={mode === "daily" ? "is-active" : ""}
+						>
+							<a>Daily</a>
+						</li>
+					</ul>
+					<div></div>
+				</div>
+				{mode === "hourly" ? <HourlyRundownChart /> : <p>To be implemented</p>}
+			</div>
+		</>
+	);
+	/*
 	return (
 		<>
 			<div className="box">
@@ -221,14 +246,14 @@ export default function EnergyIndex() {
 								</p>
 							</div>
 							<div style={{ maxWidth: "50%" }} className="mb-2">
-								{/*<DatePicker
+								<DatePicker
 									name="dateSelector"
 									changeHandler={setSelectedDate}
 									initialDate={selectedDate}
 									minDate={new Date(0)}
 									maxDate={new Date()}
 									isReadOnly={false}
-								/>*/}
+								/>
 								<button
 									className={`button mt-2 ${
 										displayMode === "cummulative" ? "is-info" : ""
@@ -305,14 +330,14 @@ export default function EnergyIndex() {
 								<p>Data may lag between three to twelve hours.</p>
 							</div>
 							<div style={{ maxWidth: "50%" }} className="mb-2">
-								{/*<DatePicker
+								<DatePicker
 									name="dateSelector"
 									changeHandler={setSelectedDate}
 									initialDate={selectedDate}
 									minDate={new Date(0)}
 									maxDate={new Date()}
 									isReadOnly={false}
-								/>*/}
+								/>
 								<Selector
 									possibleValues={[2, 3, 5, 7, 14]}
 									initialValue={selectedDays}
@@ -378,4 +403,5 @@ export default function EnergyIndex() {
 			</div>
 		</>
 	);
+	*/
 }

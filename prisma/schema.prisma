@@ -1,11 +1,3 @@
-generator client {
-  provider = "prisma-client-js"
-}
-
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
 
 model bin_dates {
   bin_type        String   @db.VarChar(12)
@@ -29,42 +21,6 @@ model energy_bill {
   @@id([is_electric, is_gas, billing_start, billing_end])
 }
 
-model energy_usage {
-  is_electric   Boolean  @db.Boolean
-  is_gas        Boolean  @db.Boolean
-  usage_kwh     Float    @db.Real
-  start_date    DateTime @db.Timestamptz(6)
-  end_date      DateTime @db.Timestamptz(6)
-  entry_created DateTime @db.Date
-
-  @@id([is_electric, is_gas, usage_kwh, start_date, end_date])
-}
-
-model stopwatch {
-  username  String   @db.VarChar
-  day_date  DateTime @db.Date
-  timestamp DateTime @db.Time(6)
-  action    String   @db.VarChar(5)
-
-  @@id([username, day_date, timestamp, action])
-}
-
-model timesheet {
-  id               Int                @id @default(autoincrement())
-  username         String
-  day_date         DateTime
-  clock_in         DateTime
-  clock_out        DateTime?
-  timesheet_breaks timesheet_breaks[]
-}
-
-model timesheet_breaks {
-  id          Int       @id @default(autoincrement())
-  break_in    DateTime
-  break_out   DateTime?
-  timesheet   timesheet @relation(fields: [timesheetId], references: [id])
-  timesheetId Int
-}
 
 model usertable {
   ip       String @id @db.VarChar(255)

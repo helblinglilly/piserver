@@ -6,7 +6,7 @@ import {
 	timestamp,
 } from "drizzle-orm/pg-core";
 import PoolFactory from "./poolFactory";
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq, gt, lt } from "drizzle-orm";
 
 export const energyTypeEnum = pgEnum("energy_type", ["electricity", "gas"]);
 
@@ -72,4 +72,26 @@ export async function getLatestUsageEndDate(
 		return defaultDate;
 	}
 	return new Date(result[0].endDate);
+}
+
+export async function getEnergyUsage(
+	kind: "electricity" | "gas" | "all",
+	from: Date,
+	to: Date
+) {
+	const query = db
+		.select({
+			energyType: EnergyUsage.energyType,
+			kWh: EnergyUsage.kWh,
+			startDate: EnergyUsage.startDate,
+			endDate: EnergyUsage.endDate,
+		})
+		.from(EnergyUsage)
+		.where(and(gt(EnergyUsage.startDate, from), lt(EnergyUsage.endDate, to)));
+
+	if (kind !== "all") {
+		query.where(eq(EnergyUsage.energyType, kind));
+	}
+
+	return await query;
 }

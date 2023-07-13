@@ -2,7 +2,7 @@ import React, { useState } from "react";
 
 export default function DatePicker(props: {
 	// eslint-disable-next-line no-unused-vars
-	changeHandler: (date: Date) => any;
+	changeHandler: (_a: Date) => any;
 	name: string;
 	isReadOnly: boolean;
 	initialDate: Date;
