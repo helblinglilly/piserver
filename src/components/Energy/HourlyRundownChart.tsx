@@ -8,8 +8,8 @@ import { useRouter } from "next/router";
 
 export default function HourlyRundownChart() {
 	const router = useRouter();
-	const [mode, setMode] = useState<"spike" | "cummulative">(
-		router.query["mode"] === "cummulative" ? "cummulative" : "spike"
+	const [chartMode, setChartMode] = useState<"spike" | "cummulative">(
+		router.query["chartMode"] === "cummulative" ? "cummulative" : "spike"
 	);
 	const [data, setData] = useState<EnergyUsageRow[]>([]);
 	const [sums, setSums] = useState<
@@ -92,7 +92,9 @@ export default function HourlyRundownChart() {
 						name="dateSelector"
 						changeHandler={(date) => {
 							setDate(date);
-							router.replace("/energy/usage?date=" + date.toISOString());
+							router.replace(
+								`/energy/usage?date=${date.toISOString()}&chartMode=${chartMode}&mode=hourly`
+							);
 						}}
 						initialDate={date}
 						minDate={new Date(0)}
@@ -100,18 +102,20 @@ export default function HourlyRundownChart() {
 						isReadOnly={false}
 					/>
 					<button
-						className={`button mt-2 ${mode === "cummulative" ? "is-link" : ""}`}
+						className={`button mt-2 ${
+							chartMode === "cummulative" ? "is-link" : ""
+						}`}
 						style={{ width: "100%" }}
 						onClick={() => {
-							if (mode === "spike") {
-								setMode("cummulative");
+							if (chartMode === "spike") {
+								setChartMode("cummulative");
 								router.replace(
-									`/energy/usage?date=${date.toISOString()}&mode=cummulative`
+									`/energy/usage?date=${date.toISOString()}&chartMode=cummulative&mode=hourly`
 								);
 							} else {
-								setMode("spike");
+								setChartMode("spike");
 								router.replace(
-									`/energy/usage?date=${date.toISOString()}&mode=spike`
+									`/energy/usage?date=${date.toISOString()}&chartMode=spike&mode=hourly`
 								);
 							}
 						}}
@@ -121,7 +125,7 @@ export default function HourlyRundownChart() {
 				</div>
 			</div>
 			<>
-				{mode === "spike" ? (
+				{chartMode === "spike" ? (
 					<SpikeChart data={data} />
 				) : (
 					<CummulativeChart data={data} />
@@ -142,60 +146,6 @@ export default function HourlyRundownChart() {
 			</>
 		</>
 
-		// 		{selectedMode === "hourly" && (
-		// 			<>
-
-		// 				{displayMode === "individual" ? (
-		// 					<ResponsiveContainer width="100%" height={400} className="mb-3">
-		// 						<AreaChart
-		// 							data={formatDatesToTime(data)}
-		// 							margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
-		// 						>
-		// 							<CartesianGrid strokeDasharray="3 3" />
-		// 							<XAxis dataKey="end_date" />
-		// 							<YAxis />
-		// 							<Tooltip />
-		// 							<Area
-		// 								type="monotone"
-		// 								dataKey="Electric"
-		// 								stroke="#fabf34"
-		// 								fill="#fadc34"
-		// 							/>
-		// 							<Area
-		// 								type="monotone"
-		// 								dataKey="Gas"
-		// 								stroke="#2d5ff7"
-		// 								fill="#7396ff"
-		// 							/>
-		// 						</AreaChart>
-		// 					</ResponsiveContainer>
-		// 				) : (
-		// 					<ResponsiveContainer width="100%" height={400} className="mb-3">
-		// 						<AreaChart
-		// 							data={formatDatesToTime(accumulativeData)}
-		// 							margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
-		// 						>
-		// 							<CartesianGrid strokeDasharray="3 3" />
-		// 							<XAxis dataKey="end_date" />
-		// 							<YAxis />
-		// 							<Tooltip />
-		// 							<Area
-		// 								type="monotone"
-		// 								dataKey="Electric"
-		// 								stroke="#fabf34"
-		// 								fill="#fadc34"
-		// 							/>
-		// 							<Area
-		// 								type="monotone"
-		// 								dataKey="Gas"
-		// 								stroke="#2d5ff7"
-		// 								fill="#7396ff"
-		// 							/>
-		// 						</AreaChart>
-		// 					</ResponsiveContainer>
-		// 				)}
-		// 			</>
-		// 		)}
 		// 		{selectedMode === "daily" && (
 		// 			<>
 		// 				<div style={{ display: "flex", justifyContent: "space-between" }}>

@@ -18,7 +18,7 @@ export default function EnergyIndex() {
 				<div className="column">
 					<RootAppCard
 						link={{
-							url: "energy/usage",
+							url: "energy/usage?mode=hourly",
 							newTab: false,
 						}}
 						title={"Usage"}

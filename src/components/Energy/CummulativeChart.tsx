@@ -57,11 +57,6 @@ export default function CummulativeChart({
 					combinedRow.endTime === (row.endDate as unknown as string)
 			);
 
-			if (existingRowIndex === -1) {
-				console.log("no existing row");
-				return;
-			}
-
 			if (row.energyType === "electricity") {
 				electricityRunning += Number(row.kWh);
 				combinedData[existingRowIndex].Electricity = electricityRunning;
