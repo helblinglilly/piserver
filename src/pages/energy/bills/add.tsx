@@ -49,8 +49,11 @@ export default function EnergyBillAdd() {
 				return;
 			}
 			const body = await result.json();
-			setLastBillEndDate(new Date(body.date));
-			setStartDate(new Date(body.date));
+
+			const date = new Date(body.date);
+			date.setDate(date.getDate() + 1);
+			setLastBillEndDate(date);
+			setStartDate(date);
 		};
 
 		fetchLatestBillEndDate();
