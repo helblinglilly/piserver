@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Selector from "../Selector";
 import { EnergyUsageRow } from "@/db/Energy";
 import SpikeChart from "./SpikeChart";
+import Notification from "../Notification";
 
 export default function DailyRundownChart() {
 	const router = useRouter();
@@ -11,7 +12,7 @@ export default function DailyRundownChart() {
 	const [toDate, setToDate] = useState(
 		router.query["date"] ? new Date(router.query.date as string) : new Date()
 	);
-	const [chartMode, setChartMode] = useState<"spike" | "cummulative">(
+	const [chartMode] = useState<"spike" | "cummulative">(
 		router.query["chartMode"] === "cummulative" ? "cummulative" : "spike"
 	);
 
@@ -62,6 +63,7 @@ export default function DailyRundownChart() {
 
 	return (
 		<>
+			<Notification message={infoNotification} type="warn" />
 			<div style={{ display: "flex", justifyContent: "space-between" }}>
 				<div>
 					<p className="title is-4">Daily usage in kWh</p>
