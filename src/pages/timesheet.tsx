@@ -106,8 +106,32 @@ export default function Timesheet() {
 	}, [currentTime, failureMessages]);
 
 	useEffect(() => {
+		const updatePredictedClockOut = (breakOverride?: IBreak[]) => {
+			if (!clockIn) return;
+			// Assume that 1h has been spent on break
+			let hoursToWork = 8;
+			let minutesToWork = 30;
+	
+			const breakToCheck = breakOverride ? breakOverride : breaks;
+			if (breakToCheck.length > 0) {
+				// Set to the actual amount of hours that need to be worked
+				hoursToWork = 7;
+			}
+	
+			const hoursLeft = hoursToWork - workedTime.getUTCHours();
+			const minutesLeft = minutesToWork - workedTime.getUTCMinutes();
+	
+			const predictedClockout = new Date(currentTime);
+			predictedClockout.setHours(predictedClockout.getHours() + hoursLeft);
+			predictedClockout.setMinutes(predictedClockout.getMinutes() + minutesLeft);
+			predictedClockout.setSeconds(0);
+			predictedClockout.setMilliseconds(0);
+	
+			setPredictedClockout(predictedClockout);
+		};
+
 		updatePredictedClockOut(breaks);
-	}, [breaks, workedTime]);
+	}, [breaks, clockIn, currentTime, workedTime]);
 
 	const calculateAndSetWorkedTime = (
 		currentTime: Date,
@@ -158,30 +182,6 @@ export default function Timesheet() {
 			}
 		});
 		setWorkedTime(accummulator);
-	};
-
-	const updatePredictedClockOut = (breakOverride?: IBreak[]) => {
-		if (!clockIn) return;
-		// Assume that 1h has been spent on break
-		let hoursToWork = 8;
-		let minutesToWork = 30;
-
-		const breakToCheck = breakOverride ? breakOverride : breaks;
-		if (breakToCheck.length > 0) {
-			// Set to the actual amount of hours that need to be worked
-			hoursToWork = 7;
-		}
-
-		const hoursLeft = hoursToWork - workedTime.getUTCHours();
-		const minutesLeft = minutesToWork - workedTime.getUTCMinutes();
-
-		const predictedClockout = new Date(currentTime);
-		predictedClockout.setHours(predictedClockout.getHours() + hoursLeft);
-		predictedClockout.setMinutes(predictedClockout.getMinutes() + minutesLeft);
-		predictedClockout.setSeconds(0);
-		predictedClockout.setMilliseconds(0);
-
-		setPredictedClockout(predictedClockout);
 	};
 
 	setInterval(() => {
