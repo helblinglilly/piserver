@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import Selector from "../Selector";
-import { EnergyUsageRow } from "@/db/Energy";
+import { EnergyUsageRow } from "@/db/EnergyUsage";
 import Notification from "../Notification";
 import DatePicker from "../DatePicker";
 import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";

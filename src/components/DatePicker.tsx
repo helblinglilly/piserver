@@ -4,7 +4,7 @@ export default function DatePicker(props: {
 	// eslint-disable-next-line no-unused-vars
 	changeHandler: (_a: Date) => any;
 	name: string;
-	isReadOnly: boolean;
+	isReadOnly?: boolean;
 	initialDate: Date;
 	minDate: Date;
 	maxDate: Date;

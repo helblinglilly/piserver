@@ -3,3 +3,8 @@
 .centerContent {
 	text-align: center;
 }
+
+.loading {
+	background-color: darkgray;
+	color: darkgray;
+}

@@ -2,7 +2,7 @@ import {
 	EnergyUsageRow,
 	getLatestUsageEndDate,
 	insertEnergyUsage,
-} from "@/db/Energy";
+} from "@/db/EnergyUsage";
 import { NextApiRequest, NextApiResponse } from "next";
 
 const OCTOPUS_BASE_URL = "https://api.octopus.energy/v1/";

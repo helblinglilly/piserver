@@ -15,6 +15,13 @@
       "when": 1689191472835,
       "tag": "0001_bizarre_blue_blade",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1689351508276,
+      "tag": "0002_late_omega_flight",
+      "breakpoints": true
     }
   ]
 }

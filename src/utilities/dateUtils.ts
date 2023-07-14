@@ -131,3 +131,8 @@ export const toMidnightUTC = (date: Date): Date => {
 
 	return dateCopy;
 };
+
+export const daysBetweenDates = (date1: Date, date2: Date): number => {
+	const difference = Math.abs(date2.valueOf() - date1.valueOf());
+	return Math.round((difference / (1000 * 60 * 60 * 24)));
+}

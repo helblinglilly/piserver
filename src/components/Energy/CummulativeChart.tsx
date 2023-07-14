@@ -1,4 +1,4 @@
-import { EnergyUsageRow } from "@/db/Energy";
+import { EnergyUsageRow } from "@/db/EnergyUsage";
 import { useEffect, useState } from "react";
 import {
 	ResponsiveContainer,
