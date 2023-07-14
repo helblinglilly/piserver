@@ -27,83 +27,83 @@ export default function Timesheet() {
 	const breakEndRef = useRef<HTMLButtonElement>();
 	const clockOutRef = useRef<HTMLButtonElement>();
 
-	const fetchData = async () => {
-		const response = await fetch(
-			`/api/timesheet?username=joel&date=${currentTime.toISOString()}`
-		);
-		if (response.status === 204){
-			return;
-		} else if (response.status !== 200) {
-			setFailureMessages([
-				...failureMessages,
-				`Failed to fetch timesheet data`]
-				)
-			return;
-		}
-
-		const body = (await response.json()) as ITimesheet;
-
-		setClockIn(new Date(body.clockIn));
-		if (clockInRef.current) {
-			clockInRef.current.disabled = true;
-		}
-
-		const existingBreaks: IBreak[] = [];
-
-		if (body.breaks) {
-			let isOnBreak = false;
-
-			body.breaks
-				.sort((a, b) => (new Date(a.breakIn) < new Date(b.breakOut ?? -1) ? -1 : 1))
-				.forEach((entry) => {
-					isOnBreak = entry.breakOut === null;
-
-					if (entry.breakIn && entry.breakOut) {
-						existingBreaks.push({
-							break_in: new Date(entry.breakIn),
-							break_out: new Date(entry.breakOut),
-						});
-					} else if (entry.breakIn) {
-						existingBreaks.push({
-							break_in: new Date(entry.breakOut ?? -1),
-							break_out: undefined,
-						});
+	useEffect(() => {
+		const fetchData = async () => {
+			const response = await fetch(
+				`/api/timesheet?username=joel&date=${currentTime.toISOString()}`
+			);
+			if (response.status === 204){
+				return;
+			} else if (response.status !== 200) {
+				setFailureMessages([
+					...failureMessages,
+					`Failed to fetch timesheet data`]
+					)
+				return;
+			}
+	
+			const body = (await response.json()) as ITimesheet;
+	
+			setClockIn(new Date(body.clockIn));
+			if (clockInRef.current) {
+				clockInRef.current.disabled = true;
+			}
+	
+			const existingBreaks: IBreak[] = [];
+	
+			if (body.breaks) {
+				let isOnBreak = false;
+	
+				body.breaks
+					.sort((a, b) => (new Date(a.breakIn) < new Date(b.breakOut ?? -1) ? -1 : 1))
+					.forEach((entry) => {
+						isOnBreak = entry.breakOut === null;
+	
+						if (entry.breakIn && entry.breakOut) {
+							existingBreaks.push({
+								break_in: new Date(entry.breakIn),
+								break_out: new Date(entry.breakOut),
+							});
+						} else if (entry.breakIn) {
+							existingBreaks.push({
+								break_in: new Date(entry.breakOut ?? -1),
+								break_out: undefined,
+							});
+						}
+					});
+	
+				setBreaks(existingBreaks);
+	
+				if (breakEndRef.current && breakStartRef.current) {
+					breakStartRef.current.disabled = isOnBreak;
+					breakEndRef.current.disabled = !isOnBreak;
+				}
+			}
+	
+			if (body.clockOut) {
+				setClockOut(new Date(body.clockOut));
+				[
+					clockInRef.current,
+					breakStartRef.current,
+					breakEndRef.current,
+					clockOutRef.current,
+				].forEach((ref) => {
+					if (ref) {
+						ref.disabled = true;
 					}
 				});
-
-			setBreaks(existingBreaks);
-
-			if (breakEndRef.current && breakStartRef.current) {
-				breakStartRef.current.disabled = isOnBreak;
-				breakEndRef.current.disabled = !isOnBreak;
 			}
-		}
+	
+			calculateAndSetWorkedTime(
+				currentTime,
+				new Date(body.clockIn),
+				existingBreaks,
+				body.clockOut ? new Date(body.clockOut) : undefined
+			);
+		};
 
-		if (body.clockOut) {
-			setClockOut(new Date(body.clockOut));
-			[
-				clockInRef.current,
-				breakStartRef.current,
-				breakEndRef.current,
-				clockOutRef.current,
-			].forEach((ref) => {
-				if (ref) {
-					ref.disabled = true;
-				}
-			});
-		}
-
-		calculateAndSetWorkedTime(
-			currentTime,
-			new Date(body.clockIn),
-			existingBreaks,
-			body.clockOut ? new Date(body.clockOut) : undefined
-		);
-	};
-
-	useEffect(() => {
 		fetchData();
-	}, []);
+	}, [currentTime, failureMessages]);
 
 	useEffect(() => {
 		updatePredictedClockOut(breaks);
@@ -174,8 +174,6 @@ export default function Timesheet() {
 
 		const hoursLeft = hoursToWork - workedTime.getUTCHours();
 		const minutesLeft = minutesToWork - workedTime.getUTCMinutes();
-
-		// console.log(`${workedTime.getUTCHours()}h${workedTime.getUTCMinutes()}min`);
 
 		const predictedClockout = new Date(currentTime);
 		predictedClockout.setHours(predictedClockout.getHours() + hoursLeft);

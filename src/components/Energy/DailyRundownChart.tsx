@@ -1,11 +1,16 @@
 import { useRouter } from "next/router";
-import DatePicker from "../DatePicker";
 import { useEffect, useState } from "react";
 import Selector from "../Selector";
 import { EnergyUsageRow } from "@/db/Energy";
-import SpikeChart from "./SpikeChart";
 import Notification from "../Notification";
+import DatePicker from "../DatePicker";
+import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
+interface DailyChartData {
+	date: string;
+	Electricity: number;
+	Gas: number;
+}
 export default function DailyRundownChart() {
 	const router = useRouter();
 
@@ -17,7 +22,8 @@ export default function DailyRundownChart() {
 	);
 
 	const [days, setDays] = useState(3);
-	const [data, setData] = useState<EnergyUsageRow[]>([]);
+	const [chartData, setChartData] = useState<DailyChartData[]>([]);
+
 	const [infoNotification, setInfoNotification] = useState<string[]>([]);
 
 	// Need to refactor the URL change thingy into a helper function. Currently in index.tsx
@@ -25,8 +31,7 @@ export default function DailyRundownChart() {
 
 	// Should store the amount of days in a queyr param as well
 	useEffect(() => {
-		setData([]);
-		console.log("retrigger");
+		setChartData([]);
 		const to = new Date(toDate);
 		to.setHours(24, 0, 0, 0);
 
@@ -55,8 +60,35 @@ export default function DailyRundownChart() {
 				return;
 			}
 			const body = (await response.json()) as EnergyUsageRow[];
-			setData(body);
 			setInfoNotification([]);
+
+			let accumulatedData: DailyChartData[] = [];
+
+			body.forEach((entry) => {
+				const entryDate = new Date(entry.endDate).toLocaleDateString();
+
+				const existingEntry = accumulatedData.find((a) => a.date === entryDate);
+				if (existingEntry) {
+					existingEntry.Electricity += entry.energyType === "electricity" ? Number(entry.kWh) : 0;
+					existingEntry.Gas += entry.energyType === "gas" ? Number(entry.kWh) : 0;
+				} else {
+					accumulatedData.push({
+						date: entryDate,
+						Electricity: entry.energyType === "electricity" ? Number(entry.kWh) : 0,
+						Gas: entry.energyType === "gas" ? Number(entry.kWh) : 0,
+					});
+				}
+			});
+
+			accumulatedData = accumulatedData.map((a) => {
+				return {
+					date: a.date,
+					Electricity: Number(a.Electricity.toFixed(3)),
+					Gas: Number(a.Gas.toFixed(3)),
+				}
+			}).sort((a, b) => a.date < b.date ? -1 : 1);
+
+			setChartData(accumulatedData);
 		};
 		fetchData(from, to);
 	}, [days, toDate]);
@@ -95,7 +127,18 @@ export default function DailyRundownChart() {
 				</div>
 			</div>
 
-			<SpikeChart data={data} includeDay />
+			<ResponsiveContainer width="100%" height={400} className="mb-3">
+				<BarChart margin={{ top: 20, right: 30, left: 0, bottom: 0 }} data={chartData}>
+					<CartesianGrid strokeDasharray="3 3" />
+					<XAxis dataKey="date" />
+					<YAxis yAxisId="left" orientation="left" />
+					<YAxis yAxisId="right" orientation="right" />
+					<Tooltip />
+					<Legend />
+					<Bar yAxisId="left" dataKey="Electricity" stroke="#fabf34"fill="#fadc34" />
+					<Bar yAxisId="right" dataKey="Gas" stroke="#2d5ff7" fill="#7396ff" />
+				</BarChart>
+			</ResponsiveContainer>
 		</>
 	);
 }

@@ -8,6 +8,7 @@ import {
 	YAxis,
 	Tooltip,
 	Area,
+	Legend,
 } from "recharts";
 
 export default function SpikeChart({
@@ -79,6 +80,7 @@ export default function SpikeChart({
 				<XAxis dataKey="endTime" />
 				<YAxis />
 				<Tooltip />
+				<Legend />
 				<Area
 					type="monotone"
 					dataKey="Electricity"

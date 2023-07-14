@@ -8,6 +8,7 @@ import {
 	YAxis,
 	Tooltip,
 	Area,
+	Legend,
 } from "recharts";
 
 export default function CummulativeChart({
@@ -93,6 +94,7 @@ export default function CummulativeChart({
 				<XAxis dataKey="endTime" />
 				<YAxis />
 				<Tooltip />
+				<Legend />
 				<Area
 					type="monotone"
 					dataKey="Electricity"
