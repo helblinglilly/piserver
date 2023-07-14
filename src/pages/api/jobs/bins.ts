@@ -16,7 +16,7 @@ const downloadSourceFile = async () => {
 	}
 
 	if (!response.body) {
-		log.error(`Response had no body`);
+		log.error("Response had no body");
 		return;
 	}
 
@@ -27,7 +27,7 @@ const downloadSourceFile = async () => {
 
 export default async function handler(
 	req: NextApiRequest,
-	res: NextApiResponse
+	res: NextApiResponse,
 ) {
 	await downloadSourceFile();
 	res.status(200).end();

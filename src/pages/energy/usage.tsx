@@ -16,10 +16,7 @@ export default function EnergyIndex() {
 	const switchMode = (targetMode: string) => {
 		const path = router.asPath;
 		const removeQueryParam = (url: string, param: string) => {
-			const regex = new RegExp(
-				`([?&])${param}=.*?(&|$)|^${param}=.*?(&|$)`,
-				"i"
-			);
+			const regex = new RegExp(`([?&])${param}=.*?(&|$)|^${param}=.*?(&|$)`, "i");
 			const updatedUrl = url.replace(regex, (match, p1, p2) => {
 				if (p2) {
 					return p2;
@@ -37,15 +34,11 @@ export default function EnergyIndex() {
 		};
 
 		if (!path.includes("mode")) {
-			router.replace(
-				`${path}${path.includes("?") ? "&" : "?"}mode=${targetMode}`
-			);
+			router.replace(`${path}${path.includes("?") ? "&" : "?"}mode=${targetMode}`);
 		} else {
 			const cleanedPath = removeQueryParam(path, "mode");
 			router.replace(
-				`${cleanedPath}${
-					cleanedPath.includes("?") ? "&" : "?"
-				}mode=${targetMode}`
+				`${cleanedPath}${cleanedPath.includes("?") ? "&" : "?"}mode=${targetMode}`,
 			);
 		}
 	};

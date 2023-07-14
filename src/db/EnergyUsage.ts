@@ -23,7 +23,7 @@ export const EnergyUsage = pgTable(
 		return {
 			pk: primaryKey(table.energyType, table.startDate, table.endDate),
 		};
-	}
+	},
 );
 
 const db = PoolFactory();
@@ -36,8 +36,8 @@ export interface EnergyUsageRow {
 }
 
 export async function insertEnergyUsage(values: EnergyUsageRow[]) {
-	await db.transaction(async (db) => {
-		await db
+	await db.transaction(async (transactionDb) => {
+		await transactionDb
 			.insert(EnergyUsage)
 			.values(
 				values.map((value) => ({
@@ -46,14 +46,14 @@ export async function insertEnergyUsage(values: EnergyUsageRow[]) {
 					startDate: value.startDate,
 					endDate: value.endDate,
 					createdAt: new Date(),
-				}))
+				})),
 			)
 			.onConflictDoNothing();
 	});
 }
 
 export async function getLatestUsageEndDate(
-	energyType: "electricity" | "gas"
+	energyType: "electricity" | "gas",
 ): Promise<Date> {
 	const result = await db
 		.select({ endDate: EnergyUsage.endDate })
@@ -77,7 +77,7 @@ export async function getLatestUsageEndDate(
 export async function getEnergyUsage(
 	kind: "electricity" | "gas" | "all",
 	from: Date,
-	to: Date
+	to: Date,
 ) {
 	const query = db
 		.select({
@@ -93,5 +93,5 @@ export async function getEnergyUsage(
 		query.where(eq(EnergyUsage.energyType, kind));
 	}
 
-	return await query;
+	return query;
 }

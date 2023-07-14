@@ -24,14 +24,14 @@ const POST = async (req: NextApiRequest, res: NextApiResponse) => {
 		body.electricity.usageRate,
 		body.electricity.standingCharge,
 		body.electricity.cost,
-		body.electricity.charged
+		body.electricity.charged,
 	);
 	const gasResult = validateBillInputBE(
 		body.gas.usage,
 		body.gas.usageRate,
 		body.gas.standingCharge,
 		body.gas.cost,
-		body.gas.charged
+		body.gas.charged,
 	);
 
 	if (!electricResult.isValid || !gasResult.isValid) {
@@ -58,7 +58,7 @@ const POST = async (req: NextApiRequest, res: NextApiResponse) => {
 };
 export default async function handler(
 	req: NextApiRequest,
-	res: NextApiResponse
+	res: NextApiResponse,
 ) {
 	const lookup = {
 		GET: GET,
@@ -66,11 +66,6 @@ export default async function handler(
 	};
 
 	const result = lookup[req.method as "GET" | "POST"];
-
-	if (!result) {
-		res.status(405).end();
-		return;
-	}
 
 	await result(req, res);
 }

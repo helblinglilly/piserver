@@ -8,15 +8,13 @@ export default function Notification(props: {
 	const [dismissedMessages, setDismissedMessages] = useState<string[]>([]);
 
 	useEffect(() => {
-		setMessages(
-			props.message.filter((msg) => !dismissedMessages.includes(msg))
-		);
+		setMessages(props.message.filter((msg) => !dismissedMessages.includes(msg)));
 	}, [props.message, dismissedMessages]);
 
 	let className = "";
 	if (props.type === "success") className = "is-success";
 	else if (props.type === "warn") className = "is-warning";
-	else if (props.type === "fail") className = "is-danger";
+	else className = "is-danger";
 
 	const deleteFromMessages = (messageToDelete: string) => {
 		setDismissedMessages([...dismissedMessages, messageToDelete]);

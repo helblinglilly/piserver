@@ -12,15 +12,13 @@ const GET = async (req: NextApiRequest, res: NextApiResponse) => {
 	let usageType: "all" | "electricity" | "gas" = "all";
 
 	try {
-		fromDate = req.query["from"]
-			? new Date(req.query["from"].toString())
+		fromDate = req.query.from
+			? new Date(req.query.from.toString())
 			: defaultFromDate;
 
-		toDate = req.query["to"]
-			? new Date(req.query["to"].toString())
-			: defaultToDate;
+		toDate = req.query.to ? new Date(req.query.to.toString()) : defaultToDate;
 
-		const usageTypeParam = req.query["type"];
+		const usageTypeParam = req.query.type;
 		if (
 			usageTypeParam &&
 			["electricity", "gas", "all"].includes(usageTypeParam.toString())
@@ -42,7 +40,7 @@ const GET = async (req: NextApiRequest, res: NextApiResponse) => {
 		const results = await getEnergyUsage(
 			usageType,
 			adjustForTimezone(fromDate),
-			adjustForTimezone(toDate)
+			adjustForTimezone(toDate),
 		);
 		if (results.length === 0) {
 			res.status(204).end();
@@ -60,18 +58,13 @@ const GET = async (req: NextApiRequest, res: NextApiResponse) => {
 
 export default async function handler(
 	req: NextApiRequest,
-	res: NextApiResponse
+	res: NextApiResponse,
 ) {
 	const lookup = {
 		GET: GET,
 	};
 
 	const result = lookup[req.method as "GET"];
-
-	if (!result) {
-		res.status(405).end();
-		return;
-	}
 
 	await result(req, res);
 }

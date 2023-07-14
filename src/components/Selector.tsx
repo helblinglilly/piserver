@@ -1,11 +1,11 @@
 import { CSSProperties } from "react";
 
 export default function Selector(props: {
-	possibleValues: any[];
-	initialValue: any;
+	possibleValues: number[];
+	initialValue: number;
 	supplementary: string;
 	// eslint-disable-next-line no-unused-vars
-	onSelectHandler: (amount: any) => any;
+	onSelectHandler: (amount: number) => void;
 	className?: string;
 	style?: CSSProperties;
 }) {
@@ -17,7 +17,9 @@ export default function Selector(props: {
 						<option
 							key={`option-${optionValue}`}
 							value={optionValue}
-							onClick={() => props.onSelectHandler(optionValue)}
+							onClick={() => {
+								props.onSelectHandler(optionValue);
+							}}
 						>
 							{optionValue} {props.supplementary}
 						</option>

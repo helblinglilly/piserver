@@ -2,7 +2,7 @@ import React, { useState } from "react";
 
 export default function DatePicker(props: {
 	// eslint-disable-next-line no-unused-vars
-	changeHandler: (_a: Date) => any;
+	changeHandler: (_a: Date) => void;
 	name: string;
 	isReadOnly?: boolean;
 	initialDate: Date;
@@ -16,7 +16,7 @@ export default function DatePicker(props: {
 		const date = new Date(e.target.value);
 		try {
 			date.toISOString();
-		} catch (e) {
+		} catch {
 			return;
 		}
 

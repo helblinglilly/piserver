@@ -78,6 +78,6 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
 				</nav>
 				<Component {...pageProps} />
 			</div>
-		</>
+		</>,
 	);
 }

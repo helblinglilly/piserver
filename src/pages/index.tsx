@@ -6,7 +6,7 @@ export default function Home() {
 		<main>
 			<div className="columns">
 				<div className="column">
-				<RootAppCard
+					<RootAppCard
 						link={{ url: "/timesheet", newTab: false }}
 						image={{ url: "/clock.png", altText: "Clock" }}
 						title={"Timesheet"}
@@ -14,7 +14,7 @@ export default function Home() {
 				</div>
 
 				<div className="column">
-				<RootAppCard
+					<RootAppCard
 						link={{
 							url: "/energy",
 							newTab: false,
@@ -26,7 +26,7 @@ export default function Home() {
 			</div>
 			<div className="columns">
 				<div className="column">
-				<RootAppCard
+					<RootAppCard
 						link={{ url: "http://192.168.0.10:81/admin", newTab: false }}
 						image={{ url: "/pihole.svg", altText: "Pi Hole Icon" }}
 						title={"Pi Hole"}
@@ -42,7 +42,6 @@ export default function Home() {
 						image={{ url: "/files.png", altText: "File Icon" }}
 						title={"Files"}
 					/>
-					
 				</div>
 			</div>
 
@@ -58,7 +57,7 @@ export default function Home() {
 					/>
 				</div>
 				<div className="column">
-				<RootAppCard
+					<RootAppCard
 						link={{
 							url: "https://192.168.0.10:1234",
 							newTab: false,

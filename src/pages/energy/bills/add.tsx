@@ -22,6 +22,7 @@ export default function EnergyBillAdd() {
 		useState(0);
 	const [electricityCost, setElectricityCost] = useState<number | undefined>();
 	const [electricityCharged, setElectricityCharged] = useState<
+	// eslint-disable-next-line @typescript-eslint/indent
 		number | undefined
 	>();
 
@@ -32,7 +33,7 @@ export default function EnergyBillAdd() {
 	const [gasCharged, setGasCharged] = useState<number | undefined>();
 
 	useEffect(() => {
-		if (startDate && endDate) {
+		if (startDate) {
 			setStandingChargeDays(daysBetweenDates(startDate, endDate) + 1);
 		}
 	}, [startDate, endDate]);
@@ -61,7 +62,7 @@ export default function EnergyBillAdd() {
 	}, []);
 
 	const submitBill = async () => {
-		if (!startDate || !endDate) {
+		if (!startDate) {
 			return;
 		}
 
@@ -115,7 +116,7 @@ export default function EnergyBillAdd() {
 			gasRate,
 			gasStandingChargeRate,
 			gasCost,
-			gasCharged
+			gasCharged,
 		);
 
 		if (!isValid) {
@@ -138,7 +139,9 @@ export default function EnergyBillAdd() {
 					<label className="label">Start date</label>
 					{lastBillEndDate && startDate ? (
 						<DatePicker
-							changeHandler={(date) => setStartDate(date)}
+							changeHandler={(date) => {
+								setStartDate(date);
+							}}
 							name={"startDate"}
 							initialDate={startDate}
 							minDate={lastBillEndDate}
@@ -152,7 +155,9 @@ export default function EnergyBillAdd() {
 					<label className="label">End date</label>
 					{lastBillEndDate && startDate ? (
 						<DatePicker
-							changeHandler={(date) => setEndDate(date)}
+							changeHandler={(date) => {
+								setEndDate(date);
+							}}
 							name={"endDate"}
 							initialDate={endDate}
 							minDate={startDate}

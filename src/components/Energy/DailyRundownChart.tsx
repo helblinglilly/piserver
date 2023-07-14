@@ -4,7 +4,16 @@ import Selector from "../Selector";
 import { EnergyUsageRow } from "@/db/EnergyUsage";
 import Notification from "../Notification";
 import DatePicker from "../DatePicker";
-import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import {
+	Bar,
+	BarChart,
+	CartesianGrid,
+	Legend,
+	ResponsiveContainer,
+	Tooltip,
+	XAxis,
+	YAxis,
+} from "recharts";
 
 interface DailyChartData {
 	date: string;
@@ -15,10 +24,10 @@ export default function DailyRundownChart() {
 	const router = useRouter();
 
 	const [toDate, setToDate] = useState(
-		router.query["date"] ? new Date(router.query.date as string) : new Date()
+		router.query.date ? new Date(router.query.date as string) : new Date(),
 	);
 	const [chartMode] = useState<"spike" | "cummulative">(
-		router.query["chartMode"] === "cummulative" ? "cummulative" : "spike"
+		router.query.chartMode === "cummulative" ? "cummulative" : "spike",
 	);
 
 	const [days, setDays] = useState(3);
@@ -32,29 +41,26 @@ export default function DailyRundownChart() {
 	// Should store the amount of days in a queyr param as well
 	useEffect(() => {
 		setChartData([]);
-		const to = new Date(toDate);
-		to.setHours(24, 0, 0, 0);
+		const toOverride = new Date(toDate);
+		toOverride.setHours(24, 0, 0, 0);
 
-		const from = new Date(to);
-		from.setDate(from.getDate() - days);
-
-		const triggerRefetch = async () => {
-			const response = await fetch("/api/jobs/energy");
-			if (response.status === 204) {
-				setInfoNotification(["No more data available, try again later"]);
-				return;
-			}
-			setInfoNotification([]);
-			await fetchData(from, to);
-		};
+		const fromOverride = new Date(toOverride);
+		fromOverride.setDate(fromOverride.getDate() - days);
 
 		const fetchData = async (from: Date, to: Date) => {
 			let response = await fetch(
-				`/api/energy/usage?from=${from.toISOString()}&to=${to.toISOString()}`
+				`/api/energy/usage?from=${from.toISOString()}&to=${to.toISOString()}`,
 			);
 			if (response.status === 204) {
 				setInfoNotification(["No data available, trying to refetch..."]);
-				await triggerRefetch();
+
+				const refetchResponse = await fetch("/api/jobs/energy");
+				if (refetchResponse.status === 204) {
+					setInfoNotification(["No more data available, try again later"]);
+					return;
+				}
+				setInfoNotification([]);
+				await fetchData(fromOverride, toOverride);
 			}
 			if (response.status !== 200) {
 				return;
@@ -69,7 +75,8 @@ export default function DailyRundownChart() {
 
 				const existingEntry = accumulatedData.find((a) => a.date === entryDate);
 				if (existingEntry) {
-					existingEntry.Electricity += entry.energyType === "electricity" ? Number(entry.kWh) : 0;
+					existingEntry.Electricity +=
+						entry.energyType === "electricity" ? Number(entry.kWh) : 0;
 					existingEntry.Gas += entry.energyType === "gas" ? Number(entry.kWh) : 0;
 				} else {
 					accumulatedData.push({
@@ -80,17 +87,20 @@ export default function DailyRundownChart() {
 				}
 			});
 
-			accumulatedData = accumulatedData.map((a) => {
-				return {
-					date: a.date,
-					Electricity: Number(a.Electricity.toFixed(3)),
-					Gas: Number(a.Gas.toFixed(3)),
-				}
-			}).sort((a, b) => a.date < b.date ? -1 : 1);
+			accumulatedData = accumulatedData
+				.map((a) => {
+					return {
+						date: a.date,
+						Electricity: Number(a.Electricity.toFixed(3)),
+						Gas: Number(a.Gas.toFixed(3)),
+					};
+				})
+				.sort((a, b) => (a.date < b.date ? -1 : 1));
 
 			setChartData(accumulatedData);
 		};
-		fetchData(from, to);
+
+		fetchData(fromOverride, toOverride);
 	}, [days, toDate]);
 
 	return (
@@ -108,7 +118,7 @@ export default function DailyRundownChart() {
 						changeHandler={(date) => {
 							setToDate(date);
 							router.replace(
-								`/energy/usage?date=${date.toISOString()}&chartMode=${chartMode}&mode=daily`
+								`/energy/usage?date=${date.toISOString()}&chartMode=${chartMode}&mode=daily`,
 							);
 						}}
 						initialDate={toDate}
@@ -128,14 +138,22 @@ export default function DailyRundownChart() {
 			</div>
 
 			<ResponsiveContainer width="100%" height={400} className="mb-3">
-				<BarChart margin={{ top: 20, right: 30, left: 0, bottom: 0 }} data={chartData}>
+				<BarChart
+					margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
+					data={chartData}
+				>
 					<CartesianGrid strokeDasharray="3 3" />
 					<XAxis dataKey="date" />
 					<YAxis yAxisId="left" orientation="left" />
 					<YAxis yAxisId="right" orientation="right" />
 					<Tooltip />
 					<Legend />
-					<Bar yAxisId="left" dataKey="Electricity" stroke="#fabf34"fill="#fadc34" />
+					<Bar
+						yAxisId="left"
+						dataKey="Electricity"
+						stroke="#fabf34"
+						fill="#fadc34"
+					/>
 					<Bar yAxisId="right" dataKey="Gas" stroke="#2d5ff7" fill="#7396ff" />
 				</BarChart>
 			</ResponsiveContainer>

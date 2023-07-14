@@ -18,68 +18,110 @@ export default function Timesheet() {
 	const [breaks, setBreaks] = useState<IBreak[]>([]);
 	const [clockOut, setClockOut] = useState<Date | undefined>();
 
-	const [predictedClockout, setPredictedClockout] = useState<
-		Date | undefined
-	>();
+	const [predictedClockout, setPredictedClockout] = useState<Date | undefined>();
 
 	const clockInRef = useRef<HTMLButtonElement>();
 	const breakStartRef = useRef<HTMLButtonElement>();
 	const breakEndRef = useRef<HTMLButtonElement>();
 	const clockOutRef = useRef<HTMLButtonElement>();
 
+	const calculateAndSetWorkedTime = (
+		timeOverride: Date,
+		clockInOverride: Date,
+		breakOverride: IBreak[],
+		clockOutOverride: Date | undefined,
+	) => {
+		if (breakOverride.length === 0) {
+			setWorkedTime(new Date(timeOverride.valueOf() - clockInOverride.valueOf()));
+			return;
+		}
+
+		let accummulator = new Date(0);
+		let previousBreakEnd: Date | undefined | null;
+
+		breakOverride.forEach((breakEntry, i) => {
+			if (i === 0) {
+				accummulator = new Date(
+					breakEntry.break_in.valueOf() - clockInOverride.valueOf(),
+				);
+				previousBreakEnd = breakEntry.break_out;
+			}
+
+			if (
+				i < breakOverride.length - 1 &&
+				!(previousBreakEnd === undefined || previousBreakEnd === null)
+			) {
+				accummulator = new Date(
+					breakEntry.break_in.valueOf() -
+						previousBreakEnd.valueOf() +
+						accummulator.valueOf(),
+				);
+			} else if (
+				// The last entry - add the difference between break end and now / clock out
+				i === breakOverride.length - 1 &&
+				!(previousBreakEnd === undefined || previousBreakEnd === null)
+			) {
+				const lastWorkedTimestamp = clockOutOverride
+					? clockOutOverride
+					: timeOverride;
+				accummulator = new Date(
+					lastWorkedTimestamp.valueOf() -
+						previousBreakEnd.valueOf() +
+						accummulator.valueOf(),
+				);
+			}
+		});
+		setWorkedTime(accummulator);
+	};
+
 	useEffect(() => {
 		const fetchData = async () => {
 			const response = await fetch(
-				`/api/timesheet?username=joel&date=${currentTime.toISOString()}`
+				`/api/timesheet?username=joel&date=${currentTime.toISOString()}`,
 			);
-			if (response.status === 204){
+			if (response.status === 204) {
 				return;
 			} else if (response.status !== 200) {
-				setFailureMessages([
-					...failureMessages,
-					`Failed to fetch timesheet data`]
-					)
+				setFailureMessages([...failureMessages, "Failed to fetch timesheet data"]);
 				return;
 			}
-	
+
 			const body = (await response.json()) as ITimesheet;
-	
+
 			setClockIn(new Date(body.clockIn));
 			if (clockInRef.current) {
 				clockInRef.current.disabled = true;
 			}
-	
+
 			const existingBreaks: IBreak[] = [];
-	
-			if (body.breaks) {
-				let isOnBreak = false;
-	
-				body.breaks
-					.sort((a, b) => (new Date(a.breakIn) < new Date(b.breakOut ?? -1) ? -1 : 1))
-					.forEach((entry) => {
-						isOnBreak = entry.breakOut === null;
-	
-						if (entry.breakIn && entry.breakOut) {
-							existingBreaks.push({
-								break_in: new Date(entry.breakIn),
-								break_out: new Date(entry.breakOut),
-							});
-						} else if (entry.breakIn) {
-							existingBreaks.push({
-								break_in: new Date(entry.breakOut ?? -1),
-								break_out: undefined,
-							});
-						}
-					});
-	
-				setBreaks(existingBreaks);
-	
-				if (breakEndRef.current && breakStartRef.current) {
-					breakStartRef.current.disabled = isOnBreak;
-					breakEndRef.current.disabled = !isOnBreak;
-				}
+
+			let isOnBreak = false;
+
+			body.breaks
+				.sort((a, b) => (new Date(a.breakIn) < new Date(b.breakOut ?? -1) ? -1 : 1))
+				.forEach((entry) => {
+					isOnBreak = entry.breakOut === null;
+
+					if (entry.breakOut) {
+						existingBreaks.push({
+							break_in: new Date(entry.breakIn),
+							break_out: new Date(entry.breakOut),
+						});
+					} else {
+						existingBreaks.push({
+							break_in: new Date(-1),
+							break_out: undefined,
+						});
+					}
+				});
+
+			setBreaks(existingBreaks);
+
+			if (breakEndRef.current && breakStartRef.current) {
+				breakStartRef.current.disabled = isOnBreak;
+				breakEndRef.current.disabled = !isOnBreak;
 			}
-	
+
 			if (body.clockOut) {
 				setClockOut(new Date(body.clockOut));
 				[
@@ -93,12 +135,12 @@ export default function Timesheet() {
 					}
 				});
 			}
-	
+
 			calculateAndSetWorkedTime(
 				currentTime,
 				new Date(body.clockIn),
 				existingBreaks,
-				body.clockOut ? new Date(body.clockOut) : undefined
+				body.clockOut ? new Date(body.clockOut) : undefined,
 			);
 		};
 
@@ -111,78 +153,29 @@ export default function Timesheet() {
 			// Assume that 1h has been spent on break
 			let hoursToWork = 8;
 			let minutesToWork = 30;
-	
+
 			const breakToCheck = breakOverride ? breakOverride : breaks;
 			if (breakToCheck.length > 0) {
 				// Set to the actual amount of hours that need to be worked
 				hoursToWork = 7;
 			}
-	
+
 			const hoursLeft = hoursToWork - workedTime.getUTCHours();
 			const minutesLeft = minutesToWork - workedTime.getUTCMinutes();
-	
-			const predictedClockout = new Date(currentTime);
-			predictedClockout.setHours(predictedClockout.getHours() + hoursLeft);
-			predictedClockout.setMinutes(predictedClockout.getMinutes() + minutesLeft);
-			predictedClockout.setSeconds(0);
-			predictedClockout.setMilliseconds(0);
-	
-			setPredictedClockout(predictedClockout);
+
+			const newPredictedClockout = new Date(currentTime);
+			newPredictedClockout.setHours(newPredictedClockout.getHours() + hoursLeft);
+			newPredictedClockout.setMinutes(
+				newPredictedClockout.getMinutes() + minutesLeft,
+			);
+			newPredictedClockout.setSeconds(0);
+			newPredictedClockout.setMilliseconds(0);
+
+			setPredictedClockout(newPredictedClockout);
 		};
 
 		updatePredictedClockOut(breaks);
 	}, [breaks, clockIn, currentTime, workedTime]);
-
-	const calculateAndSetWorkedTime = (
-		currentTime: Date,
-		clockIn: Date,
-		breaks: IBreak[],
-		clockOut: Date | undefined
-	) => {
-		if (!clockIn) {
-			return;
-		}
-
-		if (breaks.length === 0) {
-			setWorkedTime(new Date(currentTime.valueOf() - clockIn.valueOf()));
-			return;
-		}
-
-		let accummulator = new Date(0);
-		let previousBreakEnd: Date | undefined | null;
-
-		breaks.forEach((breakEntry, i) => {
-			if (i === 0) {
-				accummulator = new Date(
-					breakEntry.break_in.valueOf() - clockIn.valueOf()
-				);
-				previousBreakEnd = breakEntry.break_out;
-			}
-
-			if (
-				i < breaks.length - 1 &&
-				!(previousBreakEnd === undefined || previousBreakEnd === null)
-			) {
-				accummulator = new Date(
-					breakEntry.break_in.valueOf() -
-						previousBreakEnd.valueOf() +
-						accummulator.valueOf()
-				);
-			} else if (
-				// The last entry - add the difference between break end and now / clock out
-				i === breaks.length - 1 &&
-				!(previousBreakEnd === undefined || previousBreakEnd === null)
-			) {
-				const lastWorkedTimestamp = clockOut ? clockOut : currentTime;
-				accummulator = new Date(
-					lastWorkedTimestamp.valueOf() -
-						previousBreakEnd.valueOf() +
-						accummulator.valueOf()
-				);
-			}
-		});
-		setWorkedTime(accummulator);
-	};
 
 	setInterval(() => {
 		const now = new Date();
@@ -203,9 +196,9 @@ export default function Timesheet() {
 
 	const post = async (
 		action: "clockIn" | "breakIn" | "breakOut" | "clockOut",
-		time: Date
+		time: Date,
 	) => {
-		return await fetch("/api/timesheet", {
+		return fetch("/api/timesheet", {
 			method: "POST",
 			body: JSON.stringify({
 				username: "joel",
@@ -226,7 +219,7 @@ export default function Timesheet() {
 			setClockIn(new Date());
 		} catch (error) {
 			console.log(error);
-			setFailureMessages([...failureMessages, `Failed to send Clock In`]);
+			setFailureMessages([...failureMessages, "Failed to send Clock In"]);
 			return;
 		}
 
@@ -247,7 +240,7 @@ export default function Timesheet() {
 			}
 			setBreaks([...breaks, { break_in: new Date(), break_out: undefined }]);
 		} catch (error) {
-			setFailureMessages([...failureMessages, `Failed to send Break In`]);
+			setFailureMessages([...failureMessages, "Failed to send Break In"]);
 			return;
 		}
 		if (breakStartRef.current) breakStartRef.current.disabled = true;
@@ -262,17 +255,17 @@ export default function Timesheet() {
 				throw new Error(JSON.stringify(error));
 			}
 			const incompleteBreakEntry = breaks.filter(
-				(breakEntries) => breakEntries.break_out === undefined
+				(breakEntries) => breakEntries.break_out === undefined,
 			)[0];
 			const breakEntriesCopy = breaks.filter(
-				(entry) => entry.break_out !== undefined
+				(entry) => entry.break_out !== undefined,
 			);
 
 			incompleteBreakEntry.break_out = new Date();
 			breakEntriesCopy.push(incompleteBreakEntry);
 			setBreaks(breakEntriesCopy);
 		} catch (error) {
-			setFailureMessages([...failureMessages, `Failed to send Break Out`]);
+			setFailureMessages([...failureMessages, "Failed to send Break Out"]);
 			return;
 		}
 		if (breakStartRef.current) breakStartRef.current.disabled = false;
@@ -288,7 +281,7 @@ export default function Timesheet() {
 			}
 			setClockOut(new Date());
 		} catch (error) {
-			setFailureMessages([...failureMessages, `Failed to send Clock Out`]);
+			setFailureMessages([...failureMessages, "Failed to send Clock Out"]);
 			return;
 		}
 		if (clockInRef.current) clockInRef.current.disabled = true;
@@ -378,9 +371,7 @@ export default function Timesheet() {
 											>
 												{toHHMM(breakEntry.break_in)}
 											</td>
-											<td
-												key={`${i}-${breakEntry.break_in.toISOString()}-label`}
-											>
+											<td key={`${i}-${breakEntry.break_in.toISOString()}-label`}>
 												Break started
 											</td>
 										</tr>
@@ -393,9 +384,7 @@ export default function Timesheet() {
 												>
 													{toHHMM(breakEntry.break_out)}
 												</td>
-												<td
-													key={`${i}-${breakEntry.break_in.toISOString()}-end-label`}
-												>
+												<td key={`${i}-${breakEntry.break_in.toISOString()}-end-label`}>
 													Break ended
 												</td>
 											</tr>

@@ -30,13 +30,13 @@ export default function SpikeChart({
 		const combinedData: CombinedData[] = [];
 
 		const sorted = inputData.sort((a, b) =>
-			a.startDate < b.startDate ? -1 : 1
+			a.startDate < b.startDate ? -1 : 1,
 		);
 
 		sorted.forEach((row) => {
 			const existingRow = combinedData.find(
 				(combinedRow) =>
-					combinedRow.endTime === (row.endDate as unknown as string)
+					combinedRow.endTime === (row.endDate as unknown as string),
 			);
 
 			if (existingRow) {
@@ -62,7 +62,7 @@ export default function SpikeChart({
 						? new Date(a.endTime).toLocaleString()
 						: new Date(a.endTime).toLocaleTimeString(),
 				};
-			})
+			}),
 		);
 	}, [inputData, includeDay]);
 

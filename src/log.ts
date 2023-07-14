@@ -11,7 +11,7 @@ export default class Log {
 
 	error(message: string) {
 		console.error(
-			`${new Date().toISOString()} INFO ${this.caller} : ${message}`
+			`${new Date().toISOString()} INFO ${this.caller} : ${message}`,
 		);
 	}
 }

@@ -9,24 +9,6 @@ const OCTOPUS_BASE_URL = "https://api.octopus.energy/v1/";
 const ELECTRIC_URL = `https://api.octopus.energy/v1/electricity-meter-points/${process.env.OCTOPUS_ELECTRIC_MPAN}/meters/${process.env.OCTOPUS_ELECTRIC_SERIAL}/consumption`;
 const GAS_URL = `https://api.octopus.energy/v1/gas-meter-points/${process.env.OCTOPUS_GAS_MPRN}/meters/${process.env.OCTOPUS_GAS_SERIAL}/consumption`;
 
-export default async function handler(
-	req: NextApiRequest,
-	res: NextApiResponse
-) {
-	const lookup = {
-		GET: GET,
-	};
-
-	const result = lookup[req.method as "GET"];
-
-	if (!result) {
-		res.status(405).end();
-		return;
-	}
-
-	await result(res);
-}
-
 interface APIResponse {
 	results: {
 		consumption: number;
@@ -38,28 +20,34 @@ interface APIResponse {
 	previous: string;
 }
 
-const GET = async (res: NextApiResponse) => {
-	const [latestElectricityDate, latesetGasDate] = await Promise.all([
-		getLatestUsageEndDate("electricity"),
-		getLatestUsageEndDate("gas"),
-	]);
+async function octopusAuthedRequest(requestURL: string) {
+	const headers = new Headers();
+	headers.set(
+		"Authorization",
+		`Basic ${Buffer.from(
+			`${process.env.OCTOPUS_API_KEY}:${OCTOPUS_BASE_URL}`,
+		).toString("base64")}`,
+	);
 
-	const [electricRows, gasRows] = await Promise.all([
-		fetchEnergyData("electricity", latestElectricityDate),
-		fetchEnergyData("gas", latesetGasDate),
-	]);
+	const response = await fetch(requestURL, {
+		method: "GET",
+		headers,
+	});
 
-	if (electricRows === 0 && gasRows === 0) {
-		res.status(204).end();
-		return;
+	console.log(`${response.status} from ${requestURL}`);
+
+	if (response.status === 200) {
+		const body = await response.json();
+		return body;
+	} else {
+		return response.status;
 	}
-	res.status(200).json({ electricRows: electricRows, gasRows: gasRows });
-};
+}
 
 const fetchEnergyData = async (
 	kind: "electricity" | "gas",
 	startDate: Date,
-	endDate = new Date()
+	endDate = new Date(),
 ) => {
 	let requestURL = `${
 		kind === "electricity" ? ELECTRIC_URL : GAS_URL
@@ -68,6 +56,7 @@ const fetchEnergyData = async (
 	let completed = false;
 	let count = 0;
 
+	// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 	while (!completed) {
 		const response = (await octopusAuthedRequest(requestURL)) as
 			| APIResponse
@@ -89,7 +78,7 @@ const fetchEnergyData = async (
 		await insertEnergyUsage(mapped);
 		count += response.count;
 
-		if (response.next === null) {
+		if (!response.next) {
 			completed = true;
 			break;
 		}
@@ -98,26 +87,33 @@ const fetchEnergyData = async (
 	return count;
 };
 
-async function octopusAuthedRequest(requestURL: string) {
-	const headers = new Headers();
-	headers.set(
-		"Authorization",
-		`Basic ${Buffer.from(
-			`${process.env.OCTOPUS_API_KEY}:${OCTOPUS_BASE_URL}`
-		).toString("base64")}`
-	);
+const GET = async (res: NextApiResponse) => {
+	const [latestElectricityDate, latesetGasDate] = await Promise.all([
+		getLatestUsageEndDate("electricity"),
+		getLatestUsageEndDate("gas"),
+	]);
 
-	const response = await fetch(requestURL, {
-		method: "GET",
-		headers,
-	});
+	const [electricRows, gasRows] = await Promise.all([
+		fetchEnergyData("electricity", latestElectricityDate),
+		fetchEnergyData("gas", latesetGasDate),
+	]);
 
-	console.log(`${response.status} from ${requestURL}`);
-
-	if (response.status === 200) {
-		const body = await response.json();
-		return body;
-	} else {
-		return response.status;
+	if (electricRows === 0 && gasRows === 0) {
+		res.status(204).end();
+		return;
 	}
+	res.status(200).json({ electricRows: electricRows, gasRows: gasRows });
+};
+
+export default async function handler(
+	req: NextApiRequest,
+	res: NextApiResponse,
+) {
+	const lookup = {
+		GET: GET,
+	};
+
+	const result = lookup[req.method as "GET"];
+
+	await result(res);
 }

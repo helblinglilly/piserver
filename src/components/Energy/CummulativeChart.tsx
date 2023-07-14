@@ -29,15 +29,13 @@ export default function CummulativeChart({
 	useEffect(() => {
 		const combinedData: CombinedData[] = [];
 
-		const sorted = inputData.sort((a, b) =>
-			a.startDate < b.startDate ? -1 : 1
-		);
+		const sorted = inputData.sort((a, b) => (a.startDate < b.startDate ? -1 : 1));
 
 		sorted
 			.map((a) => a.endDate)
 			.forEach((date) => {
 				const potentialExistingRow = combinedData.find(
-					(a) => a.endTime === new Date(date).toISOString()
+					(a) => a.endTime === new Date(date).toISOString(),
 				);
 
 				if (potentialExistingRow) return;
@@ -54,14 +52,13 @@ export default function CummulativeChart({
 
 		sorted.forEach((row) => {
 			const existingRowIndex = combinedData.findIndex(
-				(combinedRow) =>
-					combinedRow.endTime === (row.endDate as unknown as string)
+				(combinedRow) => combinedRow.endTime === (row.endDate as unknown as string),
 			);
 
 			if (row.energyType === "electricity") {
 				electricityRunning += Number(row.kWh);
 				combinedData[existingRowIndex].Electricity = electricityRunning;
-			} else if (row.energyType === "gas") {
+			} else {
 				gasRunning += Number(row.kWh);
 				combinedData[existingRowIndex].Gas = gasRunning;
 			}
@@ -76,7 +73,7 @@ export default function CummulativeChart({
 						? new Date(a.endTime).toLocaleString()
 						: new Date(a.endTime).toLocaleTimeString(),
 				};
-			})
+			}),
 		);
 	}, [inputData, includeDay]);
 
@@ -86,10 +83,7 @@ export default function CummulativeChart({
 		</div>
 	) : (
 		<ResponsiveContainer width="100%" height={400} className="mb-3">
-			<AreaChart
-				data={data}
-				margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
-			>
+			<AreaChart data={data} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
 				<CartesianGrid strokeDasharray="3 3" />
 				<XAxis dataKey="endTime" />
 				<YAxis />

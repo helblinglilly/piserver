@@ -19,7 +19,7 @@ export const EnergyBills = pgTable(
 		return {
 			pk: primaryKey(table.energyType, table.startDate),
 		};
-	}
+	},
 );
 
 const db = PoolFactory();
@@ -37,10 +37,10 @@ export interface EnergyBillRow {
 
 export async function insertEnergyBill(
 	gas: EnergyBillRow,
-	electricity: EnergyBillRow
+	electricity: EnergyBillRow,
 ) {
-	await db.transaction(async (db) => {
-		await db
+	await db.transaction(async (transactionDb) => {
+		await transactionDb
 			.insert(EnergyBills)
 			.values([
 				{
@@ -68,11 +68,11 @@ export async function insertEnergyBill(
 	});
 }
 
-export async function getBillByDate(date: Date) {
+export async function getBillByDate(billDate: Date) {
 	const result = await db
 		.select()
 		.from(EnergyBills)
-		.where(eq(EnergyBills.startDate, date));
+		.where(eq(EnergyBills.startDate, billDate));
 	return result;
 }
 
