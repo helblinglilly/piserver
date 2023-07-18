@@ -1,12 +1,11 @@
 name: Main
 on:
- pull_request:
+ push:
   branches:
    - main
 jobs:
  docker:
   runs-on: ubuntu-latest
-  if: github.event_name == 'pull_request'
   strategy:
    matrix:
     runner:
