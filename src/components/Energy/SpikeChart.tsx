@@ -29,14 +29,11 @@ export default function SpikeChart({
 	useEffect(() => {
 		const combinedData: CombinedData[] = [];
 
-		const sorted = inputData.sort((a, b) =>
-			a.startDate < b.startDate ? -1 : 1,
-		);
+		const sorted = inputData.sort((a, b) => (a.startDate < b.startDate ? -1 : 1));
 
 		sorted.forEach((row) => {
 			const existingRow = combinedData.find(
-				(combinedRow) =>
-					combinedRow.endTime === (row.endDate as unknown as string),
+				(combinedRow) => combinedRow.endTime === (row.endDate as unknown as string),
 			);
 
 			if (existingRow) {
@@ -72,10 +69,7 @@ export default function SpikeChart({
 		</div>
 	) : (
 		<ResponsiveContainer width="100%" height={400} className="mb-3">
-			<AreaChart
-				data={data}
-				margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
-			>
+			<AreaChart data={data} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
 				<CartesianGrid strokeDasharray="3 3" />
 				<XAxis dataKey="endTime" />
 				<YAxis />

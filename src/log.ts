@@ -10,8 +10,6 @@ export default class Log {
 	}
 
 	error(message: string) {
-		console.error(
-			`${new Date().toISOString()} INFO ${this.caller} : ${message}`,
-		);
+		console.error(`${new Date().toISOString()} INFO ${this.caller} : ${message}`);
 	}
 }

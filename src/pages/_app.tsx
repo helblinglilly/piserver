@@ -29,11 +29,8 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
 	if (router.asPath !== "/") {
 		pages = routes.map((route, i, arr) => {
 			return {
-				link: !route
-					? "/"
-					: arr.filter((a) => routes.indexOf(a) <= i).join("/"),
-				name:
-					route.length > 0 ? route[0].toUpperCase() + route.slice(1) : "Home",
+				link: !route ? "/" : arr.filter((a) => routes.indexOf(a) <= i).join("/"),
+				name: route.length > 0 ? route[0].toUpperCase() + route.slice(1) : "Home",
 			};
 		});
 	}
@@ -46,19 +43,10 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
 			<nav className="navbar" role={"navigation"} id="navbar">
 				<div className="navbar-brand" style={{ display: "inline-flex" }}>
 					<a className="navbar-item">
-						<Image
-							src={"/pi.svg"}
-							height={32}
-							width={32}
-							alt={"Raspberry Pi Logo"}
-						/>
+						<Image src={"/pi.svg"} height={32} width={32} alt={"Raspberry Pi Logo"} />
 					</a>
 				</div>
-				<Link
-					className="navbar-item"
-					href="/"
-					style={{ display: "inline-flex" }}
-				>
+				<Link className="navbar-item" href="/" style={{ display: "inline-flex" }}>
 					Look Mum No WiFi
 				</Link>
 			</nav>

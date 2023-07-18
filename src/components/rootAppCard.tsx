@@ -14,10 +14,7 @@ export default function RootAppCard(props: {
 			<div className="card">
 				<div className="card-content">
 					{props.image ? (
-						<figure
-							className="container card-icon-text"
-							style={{ display: "flex" }}
-						>
+						<figure className="container card-icon-text" style={{ display: "flex" }}>
 							<Image
 								className="icon mr-1"
 								src={`${props.image.url}`}

@@ -13,7 +13,7 @@ export default function HourlyRundownChart() {
 	);
 	const [data, setData] = useState<EnergyUsageRow[]>([]);
 	const [sums, setSums] = useState<
-	{ gas: number; electricity: number } | undefined
+		{ gas: number; electricity: number } | undefined
 	>();
 	const [date, setDate] = useState(
 		router.query.date ? new Date(router.query.date as string) : new Date(),
