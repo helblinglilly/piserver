@@ -1,29 +1,27 @@
-name: Build Docker Image
-
+name: Build image
 on:
-  pull_request:
-    branches:
-      - main
  pull_request:
   branches:
    - main
-
 jobs:
- build:
+ docker:
   runs-on: ubuntu-latest
   if: github.event_name == 'pull_request'
+  strategy:
+   matrix:
+    runner:
+     - arm64v8
+ steps:
+  - name: Checkout Repository
+    uses: actions/checkout@v2
 
-  steps:
-   - name: Checkout Repository
-     uses: actions/checkout@v2
+  - name: Set up QEMU
+    uses: docker/setup-qemu-action@v1
 
-   - name: Set up QEMU
-     uses: docker/setup-qemu-action@v1
+  - name: Set up Docker Buildx
+    uses: docker/setup-buildx-action@v1
 
-   - name: Set up Docker Buildx
-     uses: docker/setup-buildx-action@v1
-
-   - name: Build Docker Image
-     run: |
-      docker buildx create --use
-      docker buildx build --platform linux/arm64/v8 .
+  - name: Build Docker Image
+    run: |
+     docker buildx create --use
+     docker buildx build --platform linux/arm64/v8 .
