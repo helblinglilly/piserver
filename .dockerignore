@@ -1,6 +1,6 @@
-./dashboard/.vscode
-./dashboard/cache
-./dashboard/dist
-./dashboard/tests
-./dashboard/jest.config.js
-./dashboard/README.md
+.next
+node_modules
+.env
+.gitignore
+README.md
+.github

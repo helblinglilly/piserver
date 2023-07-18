@@ -1,0 +1,10 @@
+@import "../../node_modules/bulma/css/bulma.min.css";
+
+.centerContent {
+	text-align: center;
+}
+
+.loading {
+	background-color: darkgray;
+	color: darkgray;
+}

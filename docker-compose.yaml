@@ -10,15 +10,28 @@ services:
       - portainer_data:/data
 
   dashboard:
-    image: helblingjoel/piserver:TIMESTAMP
+    depends_on:
+      - "db"
+    image: helblingjoel/piserver:20230407
     container_name: dashboard
     ports:
-      - "80:8080"
+      - "80:3000"
     restart: unless-stopped
     environment:
-      POSTGRES_PASSWORD: "PASSWORD"
+      DATABASE_URL: ""
+      OCTOPUS_ACCOUNT_NUMBER: ""
+      TZ: "Europe/London"
+      OCTOPUS_API_KEY: ""
+      OCTOPUS_ELECTRIC_MPAN: ""
+      OCTOPUS_ELECTRIC_SERIAL: ""
+      OCTOPUS_GAS_MPRN: ""
+      OCTOPUS_GAS_SERIAL: ""
+      MOVE_IN_DATE: ""
+      ADDRESS_CODE: ""
 
   pihole:
+    depends_on:
+      - "db"
     container_name: pihole
     image: pihole/pihole:latest
     hostname: pihole
@@ -29,7 +42,7 @@ services:
       - "81:80/tcp"
       - "443:443/tcp"
     environment:
-      TZ: "Europe/London" #this is the time zone
+      TZ: "Europe/London"
     volumes:
       - "pihole-data:/etc/pihole/"
       - "pihole-dns:/etc/dnsmasq.d/"
@@ -45,14 +58,16 @@ services:
     container_name: postgres
     restart: always
     environment:
-      POSTGRES_USER: "postgres"
-      POSTGRES_PASSWORD: "PASSWORD"
+      POSTGRES_USER: ""
+      POSTGRES_PASSWORD: ""
     ports:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
 
   plex:
+    depends_on:
+      - "db"
     image: lscr.io/linuxserver/plex:latest
     container_name: plex
     network_mode: host
@@ -78,15 +93,16 @@ services:
       - MUTE_ADS=true
 
   filebrowser:
-    image: hurlenko/filebrowser
+    image: filebrowser/filebrowser
     container_name: filebrowser
     restart: unless-stopped
     ports:
-      - "5000:5000"
+      - "5000:80"
     volumes:
-      - /home/joel/filebrowser/files:/data
-      - /home/joel/filebrowser/branding:/branding
-      - /home/joel/filebrowser/config:/config
+      - /home/joel/filebrowser/files:/srv
+      - /home/joel/filebrowser/config/filebrowser.db:/database.db
+      - /home/joel/filebrowser/config/branding:/config/branding
+      - /home/joel/filebrowser/config/settings.json:/.filebrowser.json
     environment:
       FB_BASEURL: "/files"
 

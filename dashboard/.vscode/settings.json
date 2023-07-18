@@ -1,9 +1,0 @@
-{
-  "cSpell.words": ["appenders", "pino", "Pokedex", "ROOTDIR"],
-  "jest.jestCommandLine": "jest test",
-  "jest.autoRun": {
-    "watch": false
-    // "onSave": "test-file"
-  },
-  "jest.showCoverageOnLoad": true
-}
