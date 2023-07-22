@@ -50,7 +50,6 @@ jobs:
   needs: docker
   name: Redeploy
   runs-on: strawberry
-  if: github.event_name == 'pull_request'
   steps:
    - name: Login to DockerHub
      uses: docker/login-action@v1
