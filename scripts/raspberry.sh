@@ -1,7 +1,8 @@
 # Support for exFAT
 sudo apt-get install exfat-fuse exfat-utils -y
 
-# Use sudo fdisk -l to identify HDD
+# Mount drive - check that this is supported
+sudo mkdir /media/hdd
 sudo mount -t exfat /dev/sda2 /media/hdd
 
 
