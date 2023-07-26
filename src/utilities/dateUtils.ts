@@ -136,3 +136,13 @@ export const daysBetweenDates = (date1: Date, date2: Date): number => {
 	const difference = Math.abs(date2.valueOf() - date1.valueOf());
 	return Math.round(difference / (1000 * 60 * 60 * 24));
 };
+
+export const getPreviousMonday = (date: Date) => {
+	const dayOfWeek = date.getDay();
+
+	const daysToSubtract = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+
+	const previousMonday = new Date(date);
+	previousMonday.setDate(date.getDate() - daysToSubtract);
+	return previousMonday;
+};

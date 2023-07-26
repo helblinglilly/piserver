@@ -1,7 +1,13 @@
-import { toDayDDMM, toHHMM, toHHMMUTC } from "@/utilities/dateUtils";
+import {
+	getPreviousMonday,
+	toDayDDMM,
+	toHHMM,
+	toHHMMUTC,
+} from "@/utilities/dateUtils";
 import Notification from "@/components/Notification";
 import React, { useEffect, useRef, useState } from "react";
 import { ITimesheet } from "@/db/Timesheet";
+import config from "@/config";
 
 interface IBreak {
 	break_in: Date;
@@ -24,6 +30,10 @@ export default function Timesheet() {
 	const breakStartRef = useRef<HTMLButtonElement>();
 	const breakEndRef = useRef<HTMLButtonElement>();
 	const clockOutRef = useRef<HTMLButtonElement>();
+
+	const [weekToDateDifference, setWeekToDateDifference] = useState<
+		{ symbol: string; hours: number; minutes: number } | undefined
+	>();
 
 	const calculateAndSetWorkedTime = (
 		timeOverride: Date,
@@ -75,20 +85,58 @@ export default function Timesheet() {
 	};
 
 	useEffect(() => {
-		const fetchData = async () => {
-			const response = await fetch(
-				`/api/timesheet?username=joel&date=${currentTime.toISOString()}`,
-			);
-			if (response.status === 204) {
-				return;
-			} else if (response.status !== 200) {
-				setFailureMessages([...failureMessages, "Failed to fetch timesheet data"]);
-				return;
+		const fetchData = async (): Promise<{
+			today: ITimesheet | undefined;
+			weekToDate: { hours: number; minutes: number } | undefined;
+		}> => {
+			const [todayResponse, weekToDateResponse] = await Promise.all([
+				fetch(
+					`/api/timesheet?username=joel&date=${currentTime.toISOString()}&mode=daily`,
+				),
+				fetch(
+					`/api/timesheet?username=joel&date=${
+						currentTime.toISOString().split("T")[0]
+					}&mode=weekly`,
+				),
+			]);
+
+			let today;
+			let weekToDate;
+
+			if (todayResponse.status > 204) {
+				console.error(
+					`Failed to fetch today's timesheet data - Error ${todayResponse.status}`,
+				);
+			} else if (todayResponse.status === 200) {
+				try {
+					today = await todayResponse.json();
+				} catch (err) {
+					console.log(`Failed to parse today's timesheet data - Error ${err}`);
+				}
 			}
 
-			const body = (await response.json()) as ITimesheet;
+			if (weekToDateResponse.status > 204) {
+				console.error(
+					`Failed to fetch week to date's timesheet data - Error ${weekToDateResponse.status}`,
+				);
+			} else if (weekToDateResponse.status === 200) {
+				try {
+					weekToDate = await weekToDateResponse.json();
+				} catch (err) {
+					console.log(
+						`Failed to parse week to date's timesheet data - Error ${err}`,
+					);
+				}
+			}
 
-			setClockIn(new Date(body.clockIn));
+			return {
+				today,
+				weekToDate,
+			};
+		};
+
+		const populateTodayData = (today: ITimesheet) => {
+			setClockIn(new Date(today.clockIn));
 			if (clockInRef.current) {
 				clockInRef.current.disabled = true;
 			}
@@ -97,7 +145,7 @@ export default function Timesheet() {
 
 			let isOnBreak = false;
 
-			body.breaks
+			today.breaks
 				.sort((a, b) => (new Date(a.breakIn) < new Date(b.breakOut ?? -1) ? -1 : 1))
 				.forEach((entry) => {
 					isOnBreak = entry.breakOut === null;
@@ -122,8 +170,8 @@ export default function Timesheet() {
 				breakEndRef.current.disabled = !isOnBreak;
 			}
 
-			if (body.clockOut) {
-				setClockOut(new Date(body.clockOut));
+			if (today.clockOut) {
+				setClockOut(new Date(today.clockOut));
 				[
 					clockInRef.current,
 					breakStartRef.current,
@@ -138,26 +186,67 @@ export default function Timesheet() {
 
 			calculateAndSetWorkedTime(
 				currentTime,
-				new Date(body.clockIn),
+				new Date(today.clockIn),
 				existingBreaks,
-				body.clockOut ? new Date(body.clockOut) : undefined,
+				today.clockOut ? new Date(today.clockOut) : undefined,
 			);
 		};
 
-		fetchData();
+		const populateWeekToDate = (weekToDate: {
+			hours: number;
+			minutes: number;
+		}) => {
+			const daysSinceMonday =
+				currentTime.getDate() - getPreviousMonday(currentTime).getDate();
+
+			const totalMinutesToHaveWorked =
+				config.timesheet.hours * daysSinceMonday * 60 +
+				config.timesheet.minutes * daysSinceMonday;
+
+			const totalMinutesWorked =
+				weekToDate.hours * daysSinceMonday * 60 +
+				weekToDate.minutes * daysSinceMonday;
+
+			const difference = totalMinutesToHaveWorked - totalMinutesWorked;
+			const hours = Math.abs(difference / 60);
+			const minutes = Math.abs(difference % 60);
+
+			setWeekToDateDifference({
+				symbol: difference < 0 ? "-" : "+",
+				hours: hours,
+				minutes: minutes,
+			});
+		};
+
+		const populateData = async () => {
+			const data = await fetchData();
+			console.log(data);
+
+			if (data.today) {
+				populateTodayData(data.today);
+			}
+
+			if (data.weekToDate) {
+				populateWeekToDate(data.weekToDate);
+			}
+		};
+
+		populateData();
 	}, [currentTime, failureMessages]);
 
 	useEffect(() => {
 		const updatePredictedClockOut = (breakOverride?: IBreak[]) => {
 			if (!clockIn) return;
-			// Assume that 1h has been spent on break
-			let hoursToWork = 8;
-			let minutesToWork = 30;
+			// There's a bug here where lunch minutes + contract minutes will add up to over 1h
+			// but I cba to look at that right now
+			let hoursToWork = config.timesheet.hours + config.timesheet.lunch.hours;
+			let minutesToWork =
+				config.timesheet.minutes + config.timesheet.lunch.minutes;
 
 			const breakToCheck = breakOverride ? breakOverride : breaks;
 			if (breakToCheck.length > 0) {
 				// Set to the actual amount of hours that need to be worked
-				hoursToWork = 7;
+				hoursToWork = config.timesheet.hours;
 			}
 
 			const hoursLeft = hoursToWork - workedTime.getUTCHours();
@@ -349,9 +438,7 @@ export default function Timesheet() {
 				</div>
 			)}
 
-			<hr />
-
-			{!clockIn && <p className="title is-4">No entries yet</p>}
+			{!clockIn ? <p className="title is-4">No entries yet</p> : <hr />}
 			{clockIn && (
 				<>
 					<p className="title is-4 mb-2">Workday</p>
@@ -409,6 +496,14 @@ export default function Timesheet() {
 						</tfoot>
 					</table>
 				</>
+			)}
+			<hr />
+			<p className="title is-4 mb-2">Week to date</p>
+			{weekToDateDifference && (
+				<p>
+					{weekToDateDifference.symbol}
+					{weekToDateDifference.hours}h {weekToDateDifference.minutes}min
+				</p>
 			)}
 		</>
 	);

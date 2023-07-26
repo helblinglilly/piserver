@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-loop-func */
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import {
 	getTimesheet,
@@ -6,11 +7,69 @@ import {
 	insertBreakOut,
 	setClockOut,
 } from "@/db/Timesheet";
+import { getPreviousMonday } from "@/utilities/dateUtils";
 import type { NextApiRequest, NextApiResponse } from "next";
+
+const getTimings = async (username: string, date: Date) => {
+	const data = await getTimesheet(username, date);
+	return data;
+};
+
+const getWeeklyHours = async (username: string, date: Date) => {
+	let hours = 0;
+	let minutes = 0;
+	let currentIterationDate = getPreviousMonday(date);
+
+	while (currentIterationDate <= date) {
+		const data = await getTimesheet(username, currentIterationDate);
+		currentIterationDate.setDate(currentIterationDate.getDate() + 1);
+
+		if (!data) {
+			break;
+		}
+
+		if (data.breaks.length === 0) {
+			if (!data.clockOut) {
+				break;
+			}
+			const diff = data.clockOut.getTime() - data.clockIn.getTime();
+			hours += Math.floor(diff / (1000 * 60 * 60));
+			minutes += Math.floor((diff / (1000 * 60)) % 60);
+		}
+
+		data.breaks.forEach((brk, i) => {
+			if (i === 0) {
+				const diff = brk.breakIn.getTime() - data.clockIn.getTime();
+				hours += Math.floor(diff / (1000 * 60 * 60));
+				minutes += Math.floor((diff / (1000 * 60)) % 60);
+			}
+			if (i > 0) {
+				const previous = data.breaks[i - 1];
+				if (previous.breakOut) {
+					const diff = brk.breakIn.getTime() - previous.breakOut.getTime();
+					hours += Math.floor(diff / (1000 * 60 * 60));
+					minutes += Math.floor((diff / (1000 * 60)) % 60);
+				}
+			}
+
+			if (i === data.breaks.length - 1 && brk.breakOut) {
+				const diff = data.clockIn.getTime() - brk.breakOut.getTime();
+				hours += Math.floor(diff / (1000 * 60 * 60));
+				minutes += Math.floor((diff / (1000 * 60)) % 60);
+			}
+		});
+	}
+
+	return {
+		hours: hours,
+		minutes: minutes,
+	};
+};
 
 const GET = async (req: NextApiRequest, res: NextApiResponse) => {
 	const username = req.query.username as string | undefined;
 	const dateQuery = req.query.date as string | undefined;
+	const mode = req.query.mode as string | undefined;
 
 	if (!username || !dateQuery) {
 		res.status(400).json({ error: "Missing username or date" });
@@ -25,13 +84,17 @@ const GET = async (req: NextApiRequest, res: NextApiResponse) => {
 		return;
 	}
 
+	var data;
 	try {
-		const timesheet = await getTimesheet(username, date);
-		if (!timesheet) {
+		if (mode === "weekly") {
+			data = await getWeeklyHours(username, date);
+		} else if (mode === "daily") {
+			data = await getTimings(username, date);
+		}
+		if (!data) {
 			return res.status(204).end();
 		}
-
-		res.status(200).json(timesheet);
+		res.status(200).json(data);
 		return;
 	} catch (error) {
 		console.error(error);
