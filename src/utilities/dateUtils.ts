@@ -1,3 +1,5 @@
+import { IBreak, ITimesheet } from "@/db/Timesheet";
+
 export const Weekdays = [
 	"Sunday",
 	"Monday",
@@ -86,9 +88,8 @@ export const toDayHHMM = (date: Date): string => {
  * @returns Monday, 1 January
  */
 export const toDayDDMM = (date: Date): string => {
-	return `${Weekdays[date.getDay()]}, ${date.getDate()} ${
-		Months[date.getMonth()].long
-	}`;
+	return `${Weekdays[date.getDay()]}, ${date.getDate()} ${Months[date.getMonth()].long
+		}`;
 };
 
 /**
@@ -146,3 +147,47 @@ export const getPreviousMonday = (date: Date) => {
 	previousMonday.setDate(date.getDate() - daysToSubtract);
 	return previousMonday;
 };
+
+export const minutesBetweenDates = (a: Date, b: Date): number => {
+	const diffInMs = Math.abs(b.getTime() - a.getTime());
+	const diffInMinutes = Math.floor(diffInMs / 1000 / 60);
+	return diffInMinutes;
+};
+
+export const minutesWorkedInDay = (clockIn: Date | undefined | null, breaks: IBreak[] | undefined | null, clockOut: Date | undefined | null) => {
+	if (clockIn === undefined || clockIn === null) return 0;
+
+	let count = 0;
+	let previousClockIn = clockIn;
+
+	if (breaks && breaks.length > 0) {
+		breaks.forEach((entry) => {
+			count += minutesBetweenDates(previousClockIn, entry.breakIn);
+
+			if (!entry.breakOut) {
+				return count;
+			}
+			previousClockIn = entry.breakOut;
+		});
+	}
+
+	if (!clockOut) return count + minutesBetweenDates(previousClockIn, new Date());
+
+	count += minutesBetweenDates(clockOut, previousClockIn);
+
+	return count;
+}
+
+export const addMinutesToDate = (date: Date, minutesToAdd: number) => {
+	// Convert minutes to milliseconds
+	const millisecondsToAdd = minutesToAdd * 60000;
+
+	// Calculate the new timestamp
+	const newTimestamp = date.getTime() + millisecondsToAdd;
+
+	// Create a new Date object with the updated timestamp
+	const newDate = new Date(newTimestamp);
+
+	return newDate;
+}
+

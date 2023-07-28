@@ -6,8 +6,9 @@ import {
 	setBreakIn,
 	insertBreakOut,
 	setClockOut,
+	ITimesheet,
 } from "@/db/Timesheet";
-import { getPreviousMonday } from "@/utilities/dateUtils";
+import { getPreviousMonday, minutesWorkedInDay } from "@/utilities/dateUtils";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 const getTimings = async (username: string, date: Date) => {
@@ -16,54 +17,47 @@ const getTimings = async (username: string, date: Date) => {
 };
 
 const getWeeklyHours = async (username: string, date: Date) => {
-	let hours = 0;
-	let minutes = 0;
 	let currentIterationDate = getPreviousMonday(date);
 
-	while (currentIterationDate <= date) {
-		const data = await getTimesheet(username, currentIterationDate);
-		currentIterationDate.setDate(currentIterationDate.getDate() + 1);
-
-		if (!data) {
-			break;
-		}
-
-		if (data.breaks.length === 0) {
-			if (!data.clockOut) {
-				break;
-			}
-			const diff = data.clockOut.getTime() - data.clockIn.getTime();
-			hours += Math.floor(diff / (1000 * 60 * 60));
-			minutes += Math.floor((diff / (1000 * 60)) % 60);
-		}
-
-		data.breaks.forEach((brk, i) => {
-			if (i === 0) {
-				const diff = brk.breakIn.getTime() - data.clockIn.getTime();
-				hours += Math.floor(diff / (1000 * 60 * 60));
-				minutes += Math.floor((diff / (1000 * 60)) % 60);
-			}
-			if (i > 0) {
-				const previous = data.breaks[i - 1];
-				if (previous.breakOut) {
-					const diff = brk.breakIn.getTime() - previous.breakOut.getTime();
-					hours += Math.floor(diff / (1000 * 60 * 60));
-					minutes += Math.floor((diff / (1000 * 60)) % 60);
-				}
-			}
-
-			if (i === data.breaks.length - 1 && brk.breakOut) {
-				const diff = data.clockIn.getTime() - brk.breakOut.getTime();
-				hours += Math.floor(diff / (1000 * 60 * 60));
-				minutes += Math.floor((diff / (1000 * 60)) % 60);
-			}
-		});
+	const result: { mon: null | ITimesheet, tue: null | ITimesheet, wed: null | ITimesheet, thu: null | ITimesheet, fri: null | ITimesheet } = {
+		mon: null,
+		tue: null,
+		wed: null,
+		thu: null,
+		fri: null,
 	}
 
-	return {
-		hours: hours,
-		minutes: minutes,
-	};
+	let i = 0;
+	while (currentIterationDate <= date) {
+		const timesheet = await getTimesheet(username, currentIterationDate);
+		if (!timesheet) {
+			i++;
+			currentIterationDate.setDate(currentIterationDate.getDate() + 1);
+			continue;
+		}
+
+		switch (i) {
+			case 0:
+				result.mon = timesheet;
+				break;
+			case 1:
+				result.tue = timesheet;
+				break;
+			case 2:
+				result.wed = timesheet;
+				break;
+			case 3:
+				result.thu = timesheet;
+				break;
+			case 4:
+				result.fri = timesheet;
+				break;
+		}
+		i++;
+		currentIterationDate.setDate(currentIterationDate.getDate() + 1);
+	}
+
+	return result;
 };
 
 const GET = async (req: NextApiRequest, res: NextApiResponse) => {
