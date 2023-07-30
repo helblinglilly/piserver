@@ -1,4 +1,4 @@
-import { IBreak, ITimesheet } from "@/db/Timesheet";
+import { IBreak } from "@/db/Timesheet";
 
 export const Weekdays = [
 	"Sunday",
@@ -88,8 +88,9 @@ export const toDayHHMM = (date: Date): string => {
  * @returns Monday, 1 January
  */
 export const toDayDDMM = (date: Date): string => {
-	return `${Weekdays[date.getDay()]}, ${date.getDate()} ${Months[date.getMonth()].long
-		}`;
+	return `${Weekdays[date.getDay()]}, ${date.getDate()} ${
+		Months[date.getMonth()].long
+	}`;
 };
 
 /**
@@ -149,34 +150,42 @@ export const getPreviousMonday = (date: Date) => {
 };
 
 export const minutesBetweenDates = (a: Date, b: Date): number => {
-	const diffInMs = Math.abs(b.getTime() - a.getTime());
+	const diffInMs = Math.abs(new Date(b).getTime() - new Date(a).getTime());
 	const diffInMinutes = Math.floor(diffInMs / 1000 / 60);
 	return diffInMinutes;
 };
 
-export const minutesWorkedInDay = (clockIn: Date | undefined | null, breaks: IBreak[] | undefined | null, clockOut: Date | undefined | null) => {
+export const minutesWorkedInDay = (
+	clockIn: Date | undefined | null,
+	breaks: IBreak[] | undefined | null,
+	clockOut: Date | undefined | null,
+) => {
 	if (clockIn === undefined || clockIn === null) return 0;
 
 	let count = 0;
 	let previousClockIn = clockIn;
+	let isCurrentlyOnBreak = false;
 
 	if (breaks && breaks.length > 0) {
 		breaks.forEach((entry) => {
-			count += minutesBetweenDates(previousClockIn, entry.breakIn);
+			count += minutesBetweenDates(previousClockIn, new Date(entry.breakIn));
 
 			if (!entry.breakOut) {
+				isCurrentlyOnBreak = true;
 				return count;
 			}
-			previousClockIn = entry.breakOut;
+			previousClockIn = new Date(entry.breakOut);
 		});
 	}
 
-	if (!clockOut) return count + minutesBetweenDates(previousClockIn, new Date());
-
-	count += minutesBetweenDates(clockOut, previousClockIn);
-
+	// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+	if (!clockOut && !isCurrentlyOnBreak)
+		return count + minutesBetweenDates(previousClockIn, new Date());
+	else if (clockOut) {
+		count += minutesBetweenDates(new Date(clockOut), previousClockIn);
+	}
 	return count;
-}
+};
 
 export const addMinutesToDate = (date: Date, minutesToAdd: number) => {
 	// Convert minutes to milliseconds
@@ -189,5 +198,4 @@ export const addMinutesToDate = (date: Date, minutesToAdd: number) => {
 	const newDate = new Date(newTimestamp);
 
 	return newDate;
-}
-
+};

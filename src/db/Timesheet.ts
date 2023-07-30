@@ -39,8 +39,8 @@ export const TimesheetBreaks = pgTable(
 );
 
 export interface IBreak {
-	breakIn: Date,
-	breakOut: Date | null
+	breakIn: Date;
+	breakOut: Date | null;
 }
 
 /**
@@ -156,10 +156,8 @@ export interface ITimesheet {
 	breaks: {
 		breakIn: Date;
 		breakOut: Date | null;
-	}[]
+	}[];
 }
-
-
 
 export async function getTimesheet(
 	username: string,
