@@ -2,7 +2,8 @@ import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 require("dotenv").config();
 
-var client: postgres.Sql<{}> | undefined;
+let client: postgres.Sql<{}> | undefined;
+let db: ReturnType<typeof drizzle>;
 
 export default function PoolFactory() {
 	if (!process.env.DATABASE_URL) {
@@ -11,7 +12,7 @@ export default function PoolFactory() {
 	}
 	if (!client) {
 		client = postgres(process.env.DATABASE_URL);
+		db = drizzle(client);
 	}
-	const db = drizzle(client);
 	return db;
 }

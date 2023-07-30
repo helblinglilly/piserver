@@ -38,6 +38,11 @@ export const TimesheetBreaks = pgTable(
 	},
 );
 
+export interface IBreak {
+	breakIn: Date;
+	breakOut: Date | null;
+}
+
 /**
  * Returns a date that has stUTC[Hours|Minutes|Seconds|Milliseconds] applied to it. Meant to be used to get a consistent Date value out of a Date object
  * @param input
@@ -147,7 +152,7 @@ export async function setClockOut(username: string, day: Date, clockOut: Date) {
 
 export interface ITimesheet {
 	clockIn: Date;
-	clockOut: Date | null;
+	clockOut: Date | null | undefined;
 	breaks: {
 		breakIn: Date;
 		breakOut: Date | null;
