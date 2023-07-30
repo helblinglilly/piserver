@@ -8,7 +8,7 @@ import {
 	setClockOut,
 	ITimesheet,
 } from "@/db/Timesheet";
-import { getPreviousMonday, minutesWorkedInDay } from "@/utilities/dateUtils";
+import { getPreviousMonday } from "@/utilities/dateUtils";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 const getTimings = async (username: string, date: Date) => {
@@ -19,13 +19,19 @@ const getTimings = async (username: string, date: Date) => {
 const getWeeklyHours = async (username: string, date: Date) => {
 	let currentIterationDate = getPreviousMonday(date);
 
-	const result: { mon: null | ITimesheet, tue: null | ITimesheet, wed: null | ITimesheet, thu: null | ITimesheet, fri: null | ITimesheet } = {
+	const result: {
+		mon: null | ITimesheet;
+		tue: null | ITimesheet;
+		wed: null | ITimesheet;
+		thu: null | ITimesheet;
+		fri: null | ITimesheet;
+	} = {
 		mon: null,
 		tue: null,
 		wed: null,
 		thu: null,
 		fri: null,
-	}
+	};
 
 	let i = 0;
 	while (currentIterationDate <= date) {
