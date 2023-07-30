@@ -1,24 +1,29 @@
-import {
-	toDayDDMM,
-	toHHMM,
-} from "@/utilities/dateUtils";
+import { toDayDDMM, toHHMM } from "@/utilities/dateUtils";
 import Notification from "@/components/Notification";
 import React, { useEffect, useRef, useState } from "react";
 import { IBreak, ITimesheet } from "@/db/Timesheet";
 import TodaysEntries from "@/components/timesheet/TodayEntries";
 import PredictedFinish from "@/components/timesheet/PredictedFinish";
 import useTime from "@/hooks/useTime";
+import WeeklyHourSummary from "@/components/timesheet/WeeklyHourSummary";
 
 export interface TodaysTimesheet {
-  clockIn: Date | undefined | null,
-  breaks: IBreak[] | undefined | null,
-  clockOut: Date | undefined | null,
+	clockIn: Date | undefined | null;
+	breaks: IBreak[] | undefined | null;
+	clockOut: Date | undefined | null;
 }
 
+export interface WeeklyTimesheet {
+	mon: ITimesheet | null;
+	tue: ITimesheet | null;
+	wed: ITimesheet | null;
+	thu: ITimesheet | null;
+	fri: ITimesheet | null;
+}
 
 export default function Timesheet() {
 	const [failureMessages, setFailureMessages] = useState<string[]>([]);
-	
+
 	const currentTime = useTime();
 	const [clockIn, setClockIn] = useState<Date | undefined>();
 	const [breaks, setBreaks] = useState<IBreak[]>([]);
@@ -28,6 +33,14 @@ export default function Timesheet() {
 	const breakStartRef = useRef<HTMLButtonElement>();
 	const breakEndRef = useRef<HTMLButtonElement>();
 	const clockOutRef = useRef<HTMLButtonElement>();
+
+	const [weekToDate, setWeekToDate] = useState<WeeklyTimesheet>({
+		mon: null,
+		tue: null,
+		wed: null,
+		thu: null,
+		fri: null,
+	});
 
 	const fetchInitialData = async () => {
 		const [todayResponse, weekToDateResponse] = await Promise.all([
@@ -41,8 +54,8 @@ export default function Timesheet() {
 			),
 		]);
 
-		let today : ITimesheet | undefined;
-		let weekToDate;
+		let today: ITimesheet | undefined;
+		let week: WeeklyTimesheet | undefined;
 
 		if (todayResponse.status > 204) {
 			console.error(
@@ -62,22 +75,21 @@ export default function Timesheet() {
 			);
 		} else if (weekToDateResponse.status === 200) {
 			try {
-				weekToDate = await weekToDateResponse.json();
+				week = await weekToDateResponse.json();
 			} catch (err) {
-				console.log(
-					`Failed to parse week to date's timesheet data - Error ${err}`,
-				);
+				console.log(`Failed to parse week to date's timesheet data - Error ${err}`);
 			}
 		}
 
 		return {
 			today: today,
-			weekToDate: weekToDate
-		}
-	}
+			week: week,
+		};
+	};
+
 	useEffect(() => {
 		const run = async () => {
-			const { today, weekToDate } = await fetchInitialData();
+			const { today, week } = await fetchInitialData();
 			if (today) {
 				setClockIn(new Date(today.clockIn));
 				setBreaks(
@@ -86,21 +98,24 @@ export default function Timesheet() {
 							breakIn: new Date(entry.breakIn),
 							breakOut: entry.breakOut ? new Date(entry.breakOut) : null,
 						};
-					})
+					}),
 				);
 				setClockOut(today.clockOut ? new Date(today.clockOut) : undefined);
 			}
-			console.log("Week to date", weekToDate)
+
+			if (week) {
+				setWeekToDate(week);
+			}
 		};
 		run();
-	}, [clockInRef]);
+	}, []);
 
 	useEffect(() => {
-		if (clockIn && clockInRef.current){
+		if (clockIn && clockInRef.current) {
 			clockInRef.current.disabled = true;
 		}
-		if (breaks.length > 0 && breakStartRef.current && breakEndRef.current){
-			if (breaks[breaks.length - 1].breakOut){
+		if (breaks.length > 0 && breakStartRef.current && breakEndRef.current) {
+			if (breaks[breaks.length - 1].breakOut) {
 				breakStartRef.current.disabled = false;
 				breakEndRef.current.disabled = true;
 			} else {
@@ -108,10 +123,17 @@ export default function Timesheet() {
 				breakEndRef.current.disabled = false;
 			}
 		}
-		if (clockOut && clockOutRef.current){
+		if (
+			clockOut &&
+			clockOutRef.current &&
+			breakStartRef.current &&
+			breakEndRef.current
+		) {
 			clockOutRef.current.disabled = true;
+			breakStartRef.current.disabled = true;
+			breakEndRef.current.disabled = true;
 		}
-	}, [clockIn, breaks, clockOut])
+	}, [clockIn, breaks, clockOut]);
 
 	const actionButtonStyle = {
 		minWidth: "9em",
@@ -177,11 +199,9 @@ export default function Timesheet() {
 				throw new Error(JSON.stringify(error));
 			}
 			const incompleteBreakEntry = breaks.filter(
-				(breakEntries) => breakEntries.breakOut === undefined,
+				(breakEntries) => breakEntries.breakOut === null,
 			)[0];
-			const breakEntriesCopy = breaks.filter(
-				(entry) => entry.breakOut !== undefined,
-			);
+			const breakEntriesCopy = breaks.filter((entry) => entry.breakOut !== null);
 
 			incompleteBreakEntry.breakOut = new Date();
 			breakEntriesCopy.push(incompleteBreakEntry);
@@ -196,7 +216,7 @@ export default function Timesheet() {
 
 	const onClockOutHandle = async () => {
 		try {
-			const response = await post("clockOut", new Date);
+			const response = await post("clockOut", new Date());
 			if (response.status !== 200) {
 				const error = response.json();
 				throw new Error(JSON.stringify(error));
@@ -265,11 +285,21 @@ export default function Timesheet() {
 
 			<hr />
 
-			<PredictedFinish clockIn={clockIn} breaks={breaks} clockOut={clockOut} />
+			<div className="columns">
+				<div className="column">
+					<PredictedFinish
+						timesheet={{ clockIn: clockIn, breaks: breaks, clockOut: clockOut }}
+						currentTime={currentTime}
+					/>
+				</div>
+				<div className="column">
+					<WeeklyHourSummary weeklySummary={weekToDate} />
+				</div>
+			</div>
 
 			<hr />
-			
-			<TodaysEntries  clockIn={clockIn} breaks={breaks} clockOut={clockOut}/>
+
+			<TodaysEntries clockIn={clockIn} breaks={breaks} clockOut={clockOut} />
 			<hr />
 		</>
 	);
