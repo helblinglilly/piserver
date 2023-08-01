@@ -52,7 +52,10 @@ export default function BillSummary({
 				<div className="columns">
 					<div className="column">Standing charges</div>
 					<div className="column">
-						{daysBetweenDates(electricityBill.startDate, electricityBill.endDate)}{" "}
+						{daysBetweenDates(
+							new Date(electricityBill.startDate),
+							new Date(electricityBill.endDate),
+						)}{" "}
 						days @ {electricityBill.standingCharge}p/day
 					</div>
 				</div>
@@ -73,8 +76,8 @@ export default function BillSummary({
 				<div className="columns">
 					<div className="column">Standing charges</div>
 					<div className="column">
-						{daysBetweenDates(gasBill.startDate, gasBill.endDate)} days @{" "}
-						{gasBill.standingCharge}p/day
+						{daysBetweenDates(new Date(gasBill.startDate), new Date(gasBill.endDate))}{" "}
+						days @ {gasBill.standingCharge}p/day
 					</div>
 				</div>
 
