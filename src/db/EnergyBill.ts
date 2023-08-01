@@ -68,6 +68,12 @@ export async function insertEnergyBill(
 	});
 }
 
+export async function getAllBills() {
+	const result = await db.select().from(EnergyBills);
+
+	return result;
+}
+
 export async function getBillByDate(billDate: Date) {
 	const result = await db
 		.select()
