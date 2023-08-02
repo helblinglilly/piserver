@@ -8,10 +8,11 @@ let db: ReturnType<typeof drizzle>;
 export default function PoolFactory() {
 	if (!process.env.DATABASE_URL) {
 		console.error("Missing DATABASE_URL environment variable");
-		process.exit(1);
 	}
 	if (!client) {
-		client = postgres(process.env.DATABASE_URL);
+		client = postgres(
+			process.env.DATABASE_URL ?? "postgresql://postgres@localhost/test_db",
+		);
 		db = drizzle(client);
 	}
 	return db;
