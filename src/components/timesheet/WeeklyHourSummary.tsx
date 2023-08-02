@@ -11,7 +11,6 @@ export default function WeeklyHourSummary({
 	const [difference, setDifference] = useState(0);
 
 	useEffect(() => {
-		console.log(weeklySummary);
 		let daysRecorded = 0;
 		let minutesWorked = 0;
 		if (weeklySummary.mon !== null) {
@@ -58,14 +57,12 @@ export default function WeeklyHourSummary({
 		const targetMinutes =
 			(config.timesheet.hours * 60 + config.timesheet.minutes) * daysRecorded;
 
-		console.log(targetMinutes);
-		console.log(minutesWorked);
 		setDifference(targetMinutes - minutesWorked);
 	}, [setDifference, weeklySummary]);
 
 	return (
 		<p>
-			{`Weekly Difference: ${difference > 0 ? "+" : ""}`}
+			{`Weekly Difference: ${difference === 0 ? "" : difference > 0 ? "-" : "+"}`}
 			{Math.abs(difference) > 59
 				? `${Math.floor(difference / 60)}h ${Math.abs(difference % 60)}min`
 				: `${difference}min`}
