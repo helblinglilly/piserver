@@ -45,6 +45,8 @@ jobs:
       push: true
       platforms: linux/arm/v8
       tags: helblingjoel/piserver:${{ steps.date.outputs.date }}
+      cache-from: type=gha
+      cache-to: type=gha,mode=max
 
  restart:
   needs: docker
