@@ -1,7 +1,7 @@
 import { date, decimal, pgTable, primaryKey } from "drizzle-orm/pg-core";
 import { energyTypeEnum } from "./EnergyUsage";
 import PoolFactory from "./poolFactory";
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 
 export const EnergyBills = pgTable(
 	"energy_bills",
@@ -68,17 +68,80 @@ export async function insertEnergyBill(
 	});
 }
 
+export async function updateEnergyBill(
+	startDate: Date,
+	endDate: Date,
+	newBills: { gas: EnergyBillRow; electricity: EnergyBillRow },
+) {
+	let electricityReturned: unknown[] | undefined;
+	let gasReturned: unknown[] | undefined;
+
+	await db.transaction(async (transactionDBb) => {
+		electricityReturned = await transactionDBb
+			.update(EnergyBills)
+			.set({
+				startDate: new Date(newBills.electricity.startDate),
+				endDate: new Date(newBills.electricity.endDate),
+				usage: Number(newBills.electricity.usage).toString(),
+				usageRate: Number(newBills.electricity.usage).toString(),
+				standingCharge: Number(newBills.electricity.standingCharge).toString(),
+				cost: Number(newBills.electricity.cost).toString(),
+				charged: Number(newBills.electricity.charged).toString(),
+			})
+			.where(
+				and(
+					eq(EnergyBills.energyType, "electricity"),
+					eq(EnergyBills.startDate, new Date(startDate)),
+					/*
+						This should also include but there's an issue with it
+						eq(EnergyBills.endDate, new Date(endDate)),
+					 */
+				),
+			)
+			.returning();
+
+		gasReturned = await transactionDBb
+			.update(EnergyBills)
+			.set({
+				startDate: new Date(newBills.gas.startDate),
+				endDate: new Date(newBills.gas.endDate),
+				usage: Number(newBills.gas.usage).toString(),
+				usageRate: Number(newBills.gas.usage).toString(),
+				standingCharge: Number(newBills.gas.standingCharge).toString(),
+				cost: Number(newBills.gas.cost).toString(),
+				charged: Number(newBills.gas.charged).toString(),
+			})
+			.where(
+				and(
+					eq(EnergyBills.energyType, "gas"),
+					eq(EnergyBills.startDate, new Date(startDate)),
+					/*
+						This should also include but there's an issue with it
+						eq(EnergyBills.endDate, new Date(endDate)),
+					 */
+				),
+			)
+			.returning();
+	});
+	return {
+		electricity: electricityReturned,
+		gas: gasReturned,
+	};
+}
+
 export async function getAllBills() {
 	const result = await db.select().from(EnergyBills);
 
 	return result;
 }
 
-export async function getBillByDate(billDate: Date) {
+export async function getBillByDate(startDate: Date, endDate: Date) {
 	const result = await db
 		.select()
 		.from(EnergyBills)
-		.where(eq(EnergyBills.startDate, billDate));
+		.where(
+			and(eq(EnergyBills.startDate, startDate), eq(EnergyBills.endDate, endDate)),
+		);
 	return result;
 }
 

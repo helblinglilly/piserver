@@ -22,7 +22,7 @@ export default function EnergyBillAdd() {
 		useState(0);
 	const [electricityCost, setElectricityCost] = useState<number | undefined>();
 	const [electricityCharged, setElectricityCharged] = useState<
-	// eslint-disable-next-line @typescript-eslint/indent
+		// eslint-disable-next-line @typescript-eslint/indent
 		number | undefined
 	>();
 
@@ -95,7 +95,7 @@ export default function EnergyBillAdd() {
 			if (response.status !== 200) {
 				throw new Error("Failed to submit bill.");
 			}
-			setSuccessMessages([...successMessages, "Bill as been added"]);
+			setSuccessMessages([...successMessages, "Bill has been added"]);
 			setTimeout(() => {
 				router.push("/energy/bills");
 			}, 2000);

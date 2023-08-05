@@ -12,6 +12,7 @@ export default function BillInput({
 	standingChargeRate,
 	cost,
 	standingChargeDays,
+	charged,
 }: {
 	setUsage: (_a: number) => void;
 	setRate: (_a: number) => void;
@@ -23,6 +24,7 @@ export default function BillInput({
 	standingChargeRate: number;
 	cost: number | undefined;
 	standingChargeDays: number;
+	charged?: number | undefined;
 }) {
 	useEffect(() => {
 		if (usage > 0 && rate > 0 && standingChargeRate > 0) {
@@ -51,6 +53,7 @@ export default function BillInput({
 						onChange={(e) => {
 							setUsage(Number(e.currentTarget.value));
 						}}
+						defaultValue={usage ? usage : ""}
 					/>
 				</div>
 
@@ -66,6 +69,7 @@ export default function BillInput({
 						onChange={(e) => {
 							setRate(Number(e.currentTarget.value));
 						}}
+						defaultValue={rate ? rate : ""}
 					/>
 				</div>
 
@@ -81,6 +85,7 @@ export default function BillInput({
 						onChange={(e) => {
 							setStandingChargeRate(Number(e.currentTarget.value));
 						}}
+						defaultValue={standingChargeRate ? standingChargeRate : ""}
 					/>
 				</div>
 			</div>
@@ -109,6 +114,7 @@ export default function BillInput({
 						onChange={(e) => {
 							setCharged(Number(e.currentTarget.value));
 						}}
+						defaultValue={charged ? charged : ""}
 					/>
 				</div>
 			</div>
