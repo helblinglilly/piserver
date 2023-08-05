@@ -8,6 +8,11 @@ const config = {
 		},
 		workDays: 5,
 	},
+	energy: {
+		moveInDate: process.env.MOVE_IN_DATE
+			? new Date(process.env.MOVE_IN_DATE)
+			: new Date(0),
+	},
 };
 
 export default config;
