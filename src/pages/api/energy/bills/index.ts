@@ -1,5 +1,6 @@
 import {
 	EnergyBillRow,
+	getStandingChargeRates,
 	insertEnergyBill,
 	updateEnergyBill,
 } from "@/db/EnergyBill";
@@ -7,7 +8,10 @@ import { validateBillInputBE } from "@/utilities/energyUtils";
 import { NextApiRequest, NextApiResponse } from "next";
 
 const GET = async (req: NextApiRequest, res: NextApiResponse) => {
-	res.status(200).end();
+	const standingCharges = await getStandingChargeRates();
+	res.status(200).json({
+		standingCharges: [...standingCharges],
+	});
 	return;
 };
 

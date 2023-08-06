@@ -158,3 +158,29 @@ export async function getLatestBillEndDate() {
 	console.log(result, moveIndate);
 	return result.length === 0 ? moveIndate : result[0].date;
 }
+
+export async function getStandingChargeRates(since?: Date) {
+	if (!since) {
+		const today = new Date();
+		today.setFullYear(today.getFullYear() - 1);
+		since = today;
+	}
+
+	const results = await db
+		.select({
+			standingCharge: EnergyBills.standingCharge,
+			endDate: EnergyBills.endDate,
+			type: EnergyBills.energyType,
+		})
+		.from(EnergyBills)
+		.orderBy(EnergyBills.endDate);
+
+	const parsedResults = results.map((entry) => {
+		return {
+			standingCharge: Number(entry.standingCharge),
+			endDate: entry.endDate.toISOString(),
+			type: entry.type,
+		};
+	});
+	return parsedResults;
+}
