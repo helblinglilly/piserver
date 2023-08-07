@@ -62,6 +62,13 @@ export const Months = [
 	},
 ];
 
+/**
+ * Pads a given character to the left of an input string to achieve a certain length
+ * @param input The original input
+ * @param padChar The character that should be used to pad up to the given length
+ * @param targetLength The length to aim for
+ * @returns
+ */
 export const padLeft = (
 	input: string | number,
 	padChar: string,
@@ -74,6 +81,11 @@ export const padLeft = (
 	return inputCopy;
 };
 
+/**
+ * Returns the day, hour and minutes from a given date
+ * @param date The date to parse
+ * @returns `Wednesday, 13:42`
+ */
 export const toDayHHMM = (date: Date): string => {
 	return `${Weekdays[date.getDay()]}, ${padLeft(
 		date.getHours(),
@@ -85,7 +97,7 @@ export const toDayHHMM = (date: Date): string => {
 /**
  * Returns a day, date string at the current timezone
  * @param date
- * @returns Monday, 1 January
+ * @returns `Monday, 1 January`
  */
 export const toDayDDMM = (date: Date): string => {
 	return `${Weekdays[date.getDay()]}, ${date.getDate()} ${
@@ -96,7 +108,7 @@ export const toDayDDMM = (date: Date): string => {
 /**
  * Returns the current hour and minutes of the provided date at the current timezone, padded to two digits
  * @param date
- * @returns HH:MM
+ * @returns `13:42`
  */
 export const toHHMM = (date: Date): string => {
 	return `${padLeft(date.getHours(), "0", 2)}:${padLeft(
@@ -109,7 +121,7 @@ export const toHHMM = (date: Date): string => {
 /**
  * Returns the current hour and minutes of the provided date at UTC, padded to two digits
  * @param date
- * @returns HH:MM
+ * @returns `13:42`
  */
 export const toHHMMUTC = (date: Date): string => {
 	return `${padLeft(date.getUTCHours(), "0", 2)}:${padLeft(
