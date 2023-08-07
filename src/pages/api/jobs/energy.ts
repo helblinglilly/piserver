@@ -5,9 +5,8 @@ import {
 } from "@/db/EnergyUsage";
 import { NextApiRequest, NextApiResponse } from "next";
 
-const OCTOPUS_BASE_URL = "https://api.octopus.energy/v1/";
-const ELECTRIC_URL = `https://api.octopus.energy/v1/electricity-meter-points/${process.env.OCTOPUS_ELECTRIC_MPAN}/meters/${process.env.OCTOPUS_ELECTRIC_SERIAL}/consumption`;
-const GAS_URL = `https://api.octopus.energy/v1/gas-meter-points/${process.env.OCTOPUS_GAS_MPRN}/meters/${process.env.OCTOPUS_GAS_SERIAL}/consumption`;
+const ELECTRIC_URL = `${process.env.OCTOPUS_BASE_URL}/electricity-meter-points/${process.env.OCTOPUS_ELECTRIC_MPAN}/meters/${process.env.OCTOPUS_ELECTRIC_SERIAL}/consumption`;
+const GAS_URL = `${process.env.OCTOPUS_BASE_URL}/gas-meter-points/${process.env.OCTOPUS_GAS_MPRN}/meters/${process.env.OCTOPUS_GAS_SERIAL}/consumption`;
 
 interface APIResponse {
 	results: {
@@ -25,7 +24,7 @@ async function octopusAuthedRequest(requestURL: string) {
 	headers.set(
 		"Authorization",
 		`Basic ${Buffer.from(
-			`${process.env.OCTOPUS_API_KEY}:${OCTOPUS_BASE_URL}`,
+			`${process.env.OCTOPUS_API_KEY}:${process.env.OCTOPUS_BASE_URL}`,
 		).toString("base64")}`,
 	);
 
