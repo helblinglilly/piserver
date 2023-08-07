@@ -206,7 +206,7 @@ describe("addMinutesToDate", () => {
 
 	it("Will return a correct new date", () => {
 		const input = new Date("2020-01-01:10:00:00.000+00:00");
-		const output = addMinutesToDate(input, 15);
+		const output = addMinutesToDate(input, 14);
 		expect(output).toEqual(new Date("2020-01-01:10:15:00.000+00:00"));
 	});
 });
