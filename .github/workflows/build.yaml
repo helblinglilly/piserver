@@ -39,3 +39,7 @@ jobs:
       tags: helblingjoel/piserver:PR${{ github.event.pull_request.number }}
       cache-from: type=gha
       cache-to: type=gha,mode=max
+   - name: Run tests
+     run: |
+      npm install
+      npm run test
