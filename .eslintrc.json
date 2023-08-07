@@ -3,6 +3,7 @@
 		"next/core-web-vitals",
 		"airbnb-typescript",
 		"plugin:react-hooks/recommended",
+		"plugin:jest/recommended",
 		"eslint:recommended"
 	],
 	"parserOptions": {

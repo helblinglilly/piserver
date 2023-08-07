@@ -4,12 +4,14 @@
 	"private": true,
 	"eslintConfig": "/.eslintrc.json",
 	"scripts": {
-		"dev": "next dev",
 		"build": "next build",
-		"start": "next start",
+		"dev": "next dev",
+		"generate": "drizzle-kit generate:pg",
 		"lint": "next lint",
 		"jobs": "node src/jobs.ts",
-		"generate": "drizzle-kit generate:pg"
+		"start": "next start",
+		"test": "jest",
+		"test:watch": "jest --watch"
 	},
 	"dependencies": {
 		"@antv/g2plot": "^2.4.28",
@@ -29,14 +31,21 @@
 		"sharp": "^0.32.0"
 	},
 	"devDependencies": {
+		"@babel/preset-typescript": "^7.22.5",
+		"@jest/globals": "^29.6.2",
 		"@types/cron": "^2.0.1",
+		"@types/jest": "^29.5.3",
 		"@typescript-eslint/eslint-plugin": "^5.62.0",
 		"@typescript-eslint/parser": "^5.62.0",
 		"drizzle-kit": "^0.19.3",
 		"eslint": "^8.36.0",
 		"eslint-config-airbnb-typescript": "^17.1.0",
+		"eslint-plugin-jest": "^27.2.3",
 		"eslint-plugin-react-hooks": "^4.6.0",
+		"jest": "^29.6.2",
 		"prettier": "^2.8.7",
+		"ts-jest": "^29.1.1",
+		"ts-node": "^10.9.1",
 		"typescript": "^4.9.5"
 	}
 }
