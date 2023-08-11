@@ -7,7 +7,8 @@ import BillInput from "@/components/Energy/BillInput";
 import DatePicker from "@/components/DatePicker";
 import config from "@/config";
 import { daysBetweenDates } from "@/utilities/dateUtils";
-import { validateBillInputFE } from "@/utilities/energyUtils";
+import { validateBillInput } from "@/utilities/energyUtils";
+import { toDate } from "@/utilities/formatting";
 
 interface IBillWeb {
 	charged: number;
@@ -57,18 +58,18 @@ export default function EnergyBillEdit({
 
 	const getExistingStartDate = () => {
 		if (bills.electricity) {
-			return new Date(bills.electricity.startDate);
+			return toDate(bills.electricity.startDate);
 		} else if (bills.gas) {
-			return new Date(bills.gas.startDate);
+			return toDate(bills.gas.startDate);
 		}
 		return new Date();
 	};
 
 	const getExistingEndDate = () => {
 		if (bills.electricity) {
-			return new Date(bills.electricity.endDate);
+			return toDate(bills.electricity.endDate);
 		} else if (bills.gas) {
-			return new Date(bills.gas.endDate);
+			return toDate(bills.gas.endDate);
 		}
 		return new Date();
 	};
@@ -129,22 +130,29 @@ export default function EnergyBillEdit({
 	};
 
 	const handleSubmitClick = async () => {
-		const { isValid, messages } = validateBillInputFE(
-			standingChargeDays,
-			electricityUsage,
-			electricityRate,
-			electricityStandingChargeRate,
-			electricityCharged,
-			electricityCost,
-			gasUsage,
-			gasRate,
-			gasStandingChargeRate,
-			gasCost,
-			gasCharged,
+		const electricityValidation = validateBillInput({
+			type: "Electricity",
+			usage: electricityUsage,
+			rate: electricityRate,
+			standingChargeDays: daysBetweenDates(newStartDate, newEndDate),
+			standingChargeRate: electricityStandingChargeRate,
+			cost: electricityCost,
+			charged: electricityCharged,
+		});
+
+		const gasValidation = validateBillInput({
+			type: "Gas",
+			usage: gasUsage,
+			rate: gasRate,
+			standingChargeDays: daysBetweenDates(newStartDate, newEndDate),
+			standingChargeRate: gasStandingChargeRate,
+			cost: gasCost,
+			charged: gasCharged,
+		},
 		);
 
-		if (!isValid) {
-			setFailureMessages(messages);
+		if (!(electricityValidation.isValid && gasValidation.isValid)) {
+			setFailureMessages([...electricityValidation.messages, ...gasValidation.messages]);
 			return;
 		}
 
@@ -165,7 +173,7 @@ export default function EnergyBillEdit({
 						changeHandler={setNewStartDate}
 						name={"startDate"}
 						initialDate={getExistingStartDate()}
-						minDate={new Date(moveInDate)}
+						minDate={toDate(moveInDate)}
 						maxDate={new Date()}
 					/>
 				</div>
@@ -175,7 +183,7 @@ export default function EnergyBillEdit({
 						changeHandler={setNewEndDate}
 						name={"endDate"}
 						initialDate={getExistingEndDate()}
-						minDate={new Date(moveInDate)}
+						minDate={toDate(moveInDate)}
 						maxDate={new Date()}
 					/>
 				</div>

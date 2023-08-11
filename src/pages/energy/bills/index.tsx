@@ -1,5 +1,6 @@
 import StandingChargeChart from "@/components/Energy/StandingChargeChart";
 import RootAppCard from "@/components/rootAppCard";
+import { toDate } from "@/utilities/formatting";
 import { useEffect, useState } from "react";
 
 export interface StandingCharges {
@@ -27,7 +28,7 @@ export default function EnergyBillsIndex() {
 				const parsedStandingCharges = body.standingCharges.map((entry) => {
 					return {
 						standingCharge: entry.standingCharge,
-						endDate: new Date(entry.endDate),
+						endDate: toDate(entry.endDate),
 						type: entry.type,
 					};
 				}) as unknown as StandingCharges[];

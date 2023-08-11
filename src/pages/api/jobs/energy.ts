@@ -3,6 +3,7 @@ import {
 	getLatestUsageEndDate,
 	insertEnergyUsage,
 } from "@/db/EnergyUsage";
+import { toDate } from "@/utilities/formatting";
 import { NextApiRequest, NextApiResponse } from "next";
 
 const ELECTRIC_URL = `${process.env.OCTOPUS_BASE_URL}/electricity-meter-points/${process.env.OCTOPUS_ELECTRIC_MPAN}/meters/${process.env.OCTOPUS_ELECTRIC_SERIAL}/consumption`;
@@ -48,8 +49,7 @@ const fetchEnergyData = async (
 	startDate: Date,
 	endDate = new Date(),
 ) => {
-	let requestURL = `${
-		kind === "electricity" ? ELECTRIC_URL : GAS_URL
+	let requestURL = `${kind === "electricity" ? ELECTRIC_URL : GAS_URL
 	}?page_size=1000&period_from=${startDate.toISOString()}&period_to=${endDate.toISOString()}&order_by=period`;
 
 	let completed = false;
@@ -70,8 +70,8 @@ const fetchEnergyData = async (
 			return {
 				energyType: kind,
 				kWh: item.consumption,
-				startDate: new Date(item.interval_start),
-				endDate: new Date(item.interval_end),
+				startDate: toDate(item.interval_start),
+				endDate: toDate(item.interval_end),
 			};
 		});
 		await insertEnergyUsage(mapped);

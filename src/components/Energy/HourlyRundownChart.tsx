@@ -5,6 +5,7 @@ import SpikeChart from "./SpikeChart";
 import CummulativeChart from "./CummulativeChart";
 import Notification from "../Notification";
 import { useRouter } from "next/router";
+import { toDate } from "@/utilities/formatting";
 
 export default function HourlyRundownChart() {
 	const router = useRouter();
@@ -13,16 +14,16 @@ export default function HourlyRundownChart() {
 	);
 	const [data, setData] = useState<EnergyUsageRow[]>([]);
 	const [sums, setSums] = useState<
-		{ gas: number; electricity: number } | undefined
+	{ gas: number; electricity: number } | undefined
 	>();
 	const [date, setDate] = useState(
-		router.query.date ? new Date(router.query.date as string) : new Date(),
+		router.query.date ? toDate(router.query.date as string) : new Date(),
 	);
 	const [infoNotification, setInfoNotification] = useState<string[]>([]);
 
 	useEffect(() => {
-		const fromOverride = new Date(date);
-		const toOverride = new Date(date);
+		const fromOverride = toDate(date);
+		const toOverride = toDate(date);
 
 		fromOverride.setHours(0, 0, 0, 0);
 		toOverride.setDate(toOverride.getDate() + 1);

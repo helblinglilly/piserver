@@ -6,6 +6,7 @@ import TodaysEntries from "@/components/timesheet/TodayEntries";
 import PredictedFinish from "@/components/timesheet/PredictedFinish";
 import useTime from "@/hooks/useTime";
 import WeeklyHourSummary from "@/components/timesheet/WeeklyHourSummary";
+import { toDate } from "@/utilities/formatting";
 
 export interface TodaysTimesheet {
 	clockIn: Date | undefined | null;
@@ -91,16 +92,16 @@ export default function Timesheet() {
 		const run = async () => {
 			const { today, week } = await fetchInitialData();
 			if (today) {
-				setClockIn(new Date(today.clockIn));
+				setClockIn(toDate(today.clockIn));
 				setBreaks(
 					today.breaks.map((entry) => {
 						return {
-							breakIn: new Date(entry.breakIn),
-							breakOut: entry.breakOut ? new Date(entry.breakOut) : null,
+							breakIn: toDate(entry.breakIn),
+							breakOut: entry.breakOut ? toDate(entry.breakOut) : null,
 						};
 					}),
 				);
-				setClockOut(today.clockOut ? new Date(today.clockOut) : undefined);
+				setClockOut(today.clockOut ? toDate(today.clockOut) : undefined);
 			}
 
 			if (week) {

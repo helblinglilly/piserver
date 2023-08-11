@@ -1,6 +1,6 @@
 import { TodaysTimesheet } from "@/pages/timesheet";
 import { minutesWorkedInDay, toHHMM } from "@/utilities/dateUtils";
-import leftPad from "@/utilities/formatting";
+import { leftPad } from "@/utilities/formatting";
 import { Fragment } from "react";
 
 export default function TodaysEntries({

@@ -1,4 +1,4 @@
-export default function leftPad(
+export function leftPad(
 	str: string | number,
 	len: number,
 	ch: string | number,
@@ -15,3 +15,5 @@ export default function leftPad(
 	}
 	return pad + str;
 }
+
+export const toDate = (input: string | Date | number) => new Date(input);

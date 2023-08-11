@@ -1,4 +1,5 @@
 import { IBreak } from "@/db/Timesheet";
+import { toDate } from "./formatting";
 
 export const Weekdays = [
 	"Sunday",
@@ -100,8 +101,7 @@ export const toDayHHMM = (date: Date): string => {
  * @returns `Monday, 1 January`
  */
 export const toDayDDMM = (date: Date): string => {
-	return `${Weekdays[date.getDay()]}, ${date.getDate()} ${
-		Months[date.getMonth()].long
+	return `${Weekdays[date.getDay()]}, ${date.getDate()} ${Months[date.getMonth()].long
 	}`;
 };
 
@@ -136,8 +136,8 @@ export const toHHMMUTC = (date: Date): string => {
  * @param date
  * @returns Date
  */
-export const toMidnightUTC = (date: Date): Date => {
-	const dateCopy = new Date(date);
+export const toMidnightUTC = (date: Date | string): Date => {
+	const dateCopy = new Date(toDate(date));
 	dateCopy.setUTCHours(0);
 	dateCopy.setUTCMinutes(0);
 	dateCopy.setUTCSeconds(0);
@@ -146,23 +146,26 @@ export const toMidnightUTC = (date: Date): Date => {
 	return dateCopy;
 };
 
-export const daysBetweenDates = (date1: Date, date2: Date): number => {
-	const difference = Math.abs(date2.valueOf() - date1.valueOf());
+export const daysBetweenDates = (date1: Date | string, date2: Date | string): number => {
+	const difference = Math.abs(toDate(date2).valueOf() - toDate(date1).valueOf());
 	return Math.round(difference / (1000 * 60 * 60 * 24));
 };
 
-export const getPreviousMonday = (date: Date) => {
+export const getPreviousMonday = (date: Date | string) => {
+	date = toDate(date);
 	const dayOfWeek = date.getDay();
 
 	const daysToSubtract = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
 
-	const previousMonday = new Date(date);
+	const previousMonday = toDate(date);
 	previousMonday.setDate(date.getDate() - daysToSubtract);
 	return previousMonday;
 };
 
-export const minutesBetweenDates = (a: Date, b: Date): number => {
-	const diffInMs = Math.abs(new Date(b).getTime() - new Date(a).getTime());
+export const minutesBetweenDates = (a: Date | string, b: Date | string): number => {
+	a = toDate(a);
+	b = toDate(b);
+	const diffInMs = Math.abs(b.getTime() - a.getTime());
 	const diffInMinutes = Math.floor(diffInMs / 1000 / 60);
 	return diffInMinutes;
 };
@@ -180,13 +183,13 @@ export const minutesWorkedInDay = (
 
 	if (breaks && breaks.length > 0) {
 		breaks.forEach((entry) => {
-			count += minutesBetweenDates(previousClockIn, new Date(entry.breakIn));
+			count += minutesBetweenDates(previousClockIn, toDate(entry.breakIn));
 
 			if (!entry.breakOut) {
 				isCurrentlyOnBreak = true;
 				return count;
 			}
-			previousClockIn = new Date(entry.breakOut);
+			previousClockIn = toDate(entry.breakOut);
 		});
 	}
 
@@ -194,20 +197,20 @@ export const minutesWorkedInDay = (
 	if (!clockOut && !isCurrentlyOnBreak)
 		return count + minutesBetweenDates(previousClockIn, new Date());
 	else if (clockOut) {
-		count += minutesBetweenDates(new Date(clockOut), previousClockIn);
+		count += minutesBetweenDates(toDate(clockOut), previousClockIn);
 	}
 	return count;
 };
 
-export const addMinutesToDate = (date: Date, minutesToAdd: number) => {
+export const addMinutesToDate = (date: Date | string, minutesToAdd: number) => {
 	// Convert minutes to milliseconds
 	const millisecondsToAdd = minutesToAdd * 60000;
 
 	// Calculate the new timestamp
-	const newTimestamp = date.getTime() + millisecondsToAdd;
+	const newTimestamp = toDate(date).getTime() + millisecondsToAdd;
 
 	// Create a new Date object with the updated timestamp
-	const newDate = new Date(newTimestamp);
+	const newDate = toDate(newTimestamp);
 
 	return newDate;
 };

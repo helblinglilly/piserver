@@ -9,6 +9,7 @@ import {
 	ITimesheet,
 } from "@/db/Timesheet";
 import { getPreviousMonday } from "@/utilities/dateUtils";
+import { toDate } from "@/utilities/formatting";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 const getTimings = async (username: string, date: Date) => {
@@ -78,7 +79,7 @@ const GET = async (req: NextApiRequest, res: NextApiResponse) => {
 
 	let date = new Date(0);
 	try {
-		date = new Date(dateQuery);
+		date = toDate(dateQuery);
 	} catch {
 		res.status(400).json({ error: "Invalid date" });
 		return;
@@ -124,13 +125,13 @@ const POST = async (req: NextApiRequest, res: NextApiResponse) => {
 		return;
 	}
 
-	const existing = await getTimesheet(body.username, new Date(body.date));
+	const existing = await getTimesheet(body.username, toDate(body.date));
 	if (!existing && body.action !== "clockIn") {
 		res.status(400).json({ error: "No entry exists yet - must clock in first" });
 		return;
 	} else if (!existing && body.action === "clockIn") {
 		try {
-			await insertTimesheet(body.username, new Date(body.date));
+			await insertTimesheet(body.username, toDate(body.date));
 			res.status(200).end();
 			return;
 		} catch (error) {
@@ -143,7 +144,7 @@ const POST = async (req: NextApiRequest, res: NextApiResponse) => {
 	switch (body.action) {
 		case "breakIn":
 			try {
-				await setBreakIn(body.username, new Date(body.date), new Date(body.time));
+				await setBreakIn(body.username, toDate(body.date), toDate(body.time));
 				res.status(200).end();
 				return;
 			} catch (error) {
@@ -155,8 +156,8 @@ const POST = async (req: NextApiRequest, res: NextApiResponse) => {
 			try {
 				await insertBreakOut(
 					body.username,
-					new Date(body.date),
-					new Date(body.time),
+					toDate(body.date),
+					toDate(body.time),
 				);
 				res.status(200).end();
 				return;
@@ -167,7 +168,7 @@ const POST = async (req: NextApiRequest, res: NextApiResponse) => {
 			}
 		case "clockOut":
 			try {
-				await setClockOut(body.username, new Date(body.date), new Date(body.time));
+				await setClockOut(body.username, toDate(body.date), toDate(body.time));
 				res.status(200).end();
 				return;
 			} catch (error) {

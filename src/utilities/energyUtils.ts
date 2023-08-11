@@ -1,11 +1,11 @@
 export interface IValidationInput {
 	standingChargeDays: number;
-	usage: number,
-	rate: number,
-	standingChargeRate: number,
-	cost: number | undefined,
-	charged: number | undefined,
-	type?: string
+	usage: number;
+	rate: number;
+	standingChargeRate: number;
+	cost: number | undefined;
+	charged: number | undefined;
+	type?: string;
 }
 export const validateBillInput = ({
 	standingChargeDays,
@@ -15,12 +15,12 @@ export const validateBillInput = ({
 	cost,
 	charged,
 	type,
-}: IValidationInput
+}: IValidationInput,
 ) => {
 	let isValid = true;
 	const messages: string[] = [];
 
-	const prefix = type ? `${type}: ` : '';
+	const prefix = type ? `${type}: ` : "";
 
 	if (standingChargeDays >= 93) {
 		messages.push(`${prefix}Standing charge days were above 93 days (3 months)`);

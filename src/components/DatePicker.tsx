@@ -1,3 +1,4 @@
+import { toDate } from "@/utilities/formatting";
 import React, { useState } from "react";
 
 export default function DatePicker(props: {
@@ -13,7 +14,7 @@ export default function DatePicker(props: {
 	const [hasChanged, setHasChanged] = useState(false);
 
 	const internalChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const date = new Date(e.target.value);
+		const date = toDate(e.target.value);
 		try {
 			date.toISOString();
 		} catch {

@@ -7,6 +7,7 @@ import {
 } from "drizzle-orm/pg-core";
 import PoolFactory from "./poolFactory";
 import { and, desc, eq, gt, lt } from "drizzle-orm";
+import { toDate } from "@/utilities/formatting";
 
 export const energyTypeEnum = pgEnum("energy_type", ["electricity", "gas"]);
 
@@ -64,14 +65,14 @@ export async function getLatestUsageEndDate(
 	if (result.length === 0) {
 		if (!process.env.MOVE_IN_DATE) throw new Error("MOVE_IN_DATE not set");
 
-		const defaultDate = new Date(process.env.MOVE_IN_DATE);
+		const defaultDate = toDate(process.env.MOVE_IN_DATE);
 		defaultDate.setHours(0);
 		defaultDate.setMinutes(0);
 		defaultDate.setSeconds(0);
 		defaultDate.setMilliseconds(0);
 		return defaultDate;
 	}
-	return new Date(result[0].endDate);
+	return toDate(result[0].endDate);
 }
 
 export async function getEnergyUsage(

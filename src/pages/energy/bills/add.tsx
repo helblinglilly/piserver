@@ -3,6 +3,7 @@ import BillInput from "@/components/Energy/BillInput";
 import Notification from "@/components/Notification";
 import { daysBetweenDates } from "@/utilities/dateUtils";
 import { validateBillInput } from "@/utilities/energyUtils";
+import { toDate } from "@/utilities/formatting";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
@@ -22,7 +23,7 @@ export default function EnergyBillAdd() {
 		useState(0);
 	const [electricityCost, setElectricityCost] = useState<number | undefined>();
 	const [electricityCharged, setElectricityCharged] = useState<
-		// eslint-disable-next-line @typescript-eslint/indent
+	// eslint-disable-next-line @typescript-eslint/indent
 		number | undefined
 	>();
 
@@ -51,7 +52,7 @@ export default function EnergyBillAdd() {
 			}
 			const body = await result.json();
 
-			const date = new Date(body.date);
+			const date = toDate(body.date);
 			date.setDate(date.getDate() + 1);
 			setLastBillEndDate(date);
 			setStartDate(date);
@@ -112,8 +113,8 @@ export default function EnergyBillAdd() {
 			standingChargeRate: gasStandingChargeRate,
 			cost: gasCost,
 			charged: gasCharged,
-			type: "Gas"
-		}
+			type: "Gas",
+		},
 		);
 
 		const gasValidation = validateBillInput({
@@ -123,8 +124,8 @@ export default function EnergyBillAdd() {
 			standingChargeRate: gasStandingChargeRate,
 			cost: gasCost,
 			charged: gasCharged,
-			type: "Gas"
-		}
+			type: "Gas",
+		},
 		);
 
 		if (!(electricValidation.isValid && gasValidation.isValid)) {

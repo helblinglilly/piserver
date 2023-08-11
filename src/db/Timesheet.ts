@@ -7,6 +7,7 @@ import {
 } from "drizzle-orm/pg-core";
 import PoolFactory from "./poolFactory";
 import { and, eq, isNull } from "drizzle-orm";
+import { toDate } from "@/utilities/formatting";
 
 export const Timesheet = pgTable(
 	"timesheet",
@@ -48,8 +49,8 @@ export interface IBreak {
  * @param input
  * @returns Date
  */
-const toMidnightUTC = (input: Date): Date => {
-	const dateCopy = new Date(input);
+const toMidnightUTC = (input: Date | string): Date => {
+	const dateCopy = toDate(input);
 	dateCopy.setUTCHours(0);
 	dateCopy.setUTCMinutes(0);
 	dateCopy.setUTCSeconds(0);

@@ -6,6 +6,7 @@ import {
 } from "@/db/EnergyBill";
 import { daysBetweenDates } from "@/utilities/dateUtils";
 import { validateBillInput } from "@/utilities/energyUtils";
+import { toDate } from "@/utilities/formatting";
 import { NextApiRequest, NextApiResponse } from "next";
 
 const GET = async (req: NextApiRequest, res: NextApiResponse) => {
@@ -33,24 +34,24 @@ const POST = async (req: NextApiRequest, res: NextApiResponse) => {
 		rate: body.electricity.usageRate,
 		standingChargeRate: body.electricity.standingCharge,
 		standingChargeDays: daysBetweenDates(
-			new Date(body.electricity.startDate),
-			new Date(body.electricity.endDate)
+			toDate(body.electricity.startDate),
+			toDate(body.electricity.endDate),
 		),
 		cost: body.electricity.cost,
 		charged: body.electricity.charged,
-	}
+	},
 	);
 	const gasResult = validateBillInput({
 		usage: body.gas.usage,
 		rate: body.gas.usageRate,
 		standingChargeRate: body.gas.standingCharge,
 		standingChargeDays: daysBetweenDates(
-			new Date(body.gas.startDate),
-			new Date(body.gas.endDate)
+			toDate(body.gas.startDate),
+			toDate(body.gas.endDate),
 		),
 		cost: body.gas.cost,
 		charged: body.gas.charged,
-	}
+	},
 	);
 
 	if (!electricResult.isValid || !gasResult.isValid) {
@@ -62,10 +63,10 @@ const POST = async (req: NextApiRequest, res: NextApiResponse) => {
 	}
 
 	try {
-		body.gas.startDate = new Date(body.gas.startDate);
-		body.gas.endDate = new Date(body.gas.endDate);
-		body.electricity.startDate = new Date(body.electricity.startDate);
-		body.electricity.endDate = new Date(body.electricity.endDate);
+		body.gas.startDate = toDate(body.gas.startDate);
+		body.gas.endDate = toDate(body.gas.endDate);
+		body.electricity.startDate = toDate(body.electricity.startDate);
+		body.electricity.endDate = toDate(body.electricity.endDate);
 
 		await insertEnergyBill(body.gas, body.electricity);
 		res.status(200).end();
@@ -100,12 +101,12 @@ const PATCH = async (req: NextApiRequest, res: NextApiResponse) => {
 			rate: body.newBills.electricity.usageRate,
 			standingChargeRate: body.newBills.electricity.standingCharge,
 			standingChargeDays: daysBetweenDates(
-				new Date(body.newBills.electricity.startDate),
-				new Date(body.newBills.electricity.endDate)
+				toDate(body.newBills.electricity.startDate),
+				toDate(body.newBills.electricity.endDate),
 			),
 			cost: body.newBills.electricity.cost,
 			charged: body.newBills.electricity.charged,
-		}
+		},
 	);
 	const gasResult = validateBillInput(
 		{
@@ -113,12 +114,12 @@ const PATCH = async (req: NextApiRequest, res: NextApiResponse) => {
 			rate: body.newBills.gas.usageRate,
 			standingChargeRate: body.newBills.gas.standingCharge,
 			standingChargeDays: daysBetweenDates(
-				new Date(body.newBills.gas.startDate),
-				new Date(body.newBills.gas.endDate)
+				toDate(body.newBills.gas.startDate),
+				toDate(body.newBills.gas.endDate),
 			),
 			cost: body.newBills.gas.cost,
 			charged: body.newBills.gas.charged,
-		}
+		},
 	);
 
 	if (!electricResult.isValid || !gasResult.isValid) {
@@ -130,18 +131,18 @@ const PATCH = async (req: NextApiRequest, res: NextApiResponse) => {
 	}
 
 	try {
-		body.newBills.gas.startDate = new Date(body.newBills.gas.startDate);
-		body.newBills.gas.endDate = new Date(body.newBills.gas.endDate);
-		body.newBills.electricity.startDate = new Date(
+		body.newBills.gas.startDate = toDate(body.newBills.gas.startDate);
+		body.newBills.gas.endDate = toDate(body.newBills.gas.endDate);
+		body.newBills.electricity.startDate = toDate(
 			body.newBills.electricity.startDate,
 		);
-		body.newBills.electricity.endDate = new Date(
+		body.newBills.electricity.endDate = toDate(
 			body.newBills.electricity.endDate,
 		);
 
 		const updatedEntries = await updateEnergyBill(
-			new Date(body.originalBills.startDate),
-			new Date(body.originalBills.startDate),
+			toDate(body.originalBills.startDate),
+			toDate(body.originalBills.startDate),
 			body.newBills,
 		);
 
