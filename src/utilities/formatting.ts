@@ -22,7 +22,7 @@ export const toDate = (input: string | Date | number) => {
 	}
 	const date = new Date(input);
 	if (Number.isNaN(date.getTime())) {
-		console.error(`${input} is not a valid date`)
+		console.error(`${input} is not a valid date`);
 	}
 	return date;
-}
+};

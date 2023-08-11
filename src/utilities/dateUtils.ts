@@ -102,7 +102,7 @@ export const toDayHHMM = (date: Date): string => {
  */
 export const toDayDDMM = (date: Date): string => {
 	return `${Weekdays[date.getDay()]}, ${date.getDate()} ${Months[date.getMonth()].long
-		}`;
+	}`;
 };
 
 /**
