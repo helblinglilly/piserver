@@ -4,7 +4,8 @@ import {
 	insertEnergyBill,
 	updateEnergyBill,
 } from "@/db/EnergyBill";
-import { validateBillInputBE } from "@/utilities/energyUtils";
+import { daysBetweenDates } from "@/utilities/dateUtils";
+import { validateBillInput } from "@/utilities/energyUtils";
 import { NextApiRequest, NextApiResponse } from "next";
 
 const GET = async (req: NextApiRequest, res: NextApiResponse) => {
@@ -27,19 +28,29 @@ const POST = async (req: NextApiRequest, res: NextApiResponse) => {
 		return;
 	}
 
-	const electricResult = validateBillInputBE(
-		body.electricity.usage,
-		body.electricity.usageRate,
-		body.electricity.standingCharge,
-		body.electricity.cost,
-		body.electricity.charged,
+	const electricResult = validateBillInput({
+		usage: body.electricity.usage,
+		rate: body.electricity.usageRate,
+		standingChargeRate: body.electricity.standingCharge,
+		standingChargeDays: daysBetweenDates(
+			new Date(body.electricity.startDate),
+			new Date(body.electricity.endDate)
+		),
+		cost: body.electricity.cost,
+		charged: body.electricity.charged,
+	}
 	);
-	const gasResult = validateBillInputBE(
-		body.gas.usage,
-		body.gas.usageRate,
-		body.gas.standingCharge,
-		body.gas.cost,
-		body.gas.charged,
+	const gasResult = validateBillInput({
+		usage: body.gas.usage,
+		rate: body.gas.usageRate,
+		standingChargeRate: body.gas.standingCharge,
+		standingChargeDays: daysBetweenDates(
+			new Date(body.gas.startDate),
+			new Date(body.gas.endDate)
+		),
+		cost: body.gas.cost,
+		charged: body.gas.charged,
+	}
 	);
 
 	if (!electricResult.isValid || !gasResult.isValid) {
@@ -83,19 +94,31 @@ const PATCH = async (req: NextApiRequest, res: NextApiResponse) => {
 		return;
 	}
 
-	const electricResult = validateBillInputBE(
-		body.newBills.electricity.usage,
-		body.newBills.electricity.usageRate,
-		body.newBills.electricity.standingCharge,
-		body.newBills.electricity.cost,
-		body.newBills.electricity.charged,
+	const electricResult = validateBillInput(
+		{
+			usage: body.newBills.electricity.usage,
+			rate: body.newBills.electricity.usageRate,
+			standingChargeRate: body.newBills.electricity.standingCharge,
+			standingChargeDays: daysBetweenDates(
+				new Date(body.newBills.electricity.startDate),
+				new Date(body.newBills.electricity.endDate)
+			),
+			cost: body.newBills.electricity.cost,
+			charged: body.newBills.electricity.charged,
+		}
 	);
-	const gasResult = validateBillInputBE(
-		body.newBills.gas.usage,
-		body.newBills.gas.usageRate,
-		body.newBills.gas.standingCharge,
-		body.newBills.gas.cost,
-		body.newBills.gas.charged,
+	const gasResult = validateBillInput(
+		{
+			usage: body.newBills.gas.usage,
+			rate: body.newBills.gas.usageRate,
+			standingChargeRate: body.newBills.gas.standingCharge,
+			standingChargeDays: daysBetweenDates(
+				new Date(body.newBills.gas.startDate),
+				new Date(body.newBills.gas.endDate)
+			),
+			cost: body.newBills.gas.cost,
+			charged: body.newBills.gas.charged,
+		}
 	);
 
 	if (!electricResult.isValid || !gasResult.isValid) {
