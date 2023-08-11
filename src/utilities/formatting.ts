@@ -16,4 +16,13 @@ export function leftPad(
 	return pad + str;
 }
 
-export const toDate = (input: string | Date | number) => new Date(input);
+export const toDate = (input: string | Date | number) => {
+	if (input instanceof Date) {
+		return input;
+	}
+	const date = new Date(input);
+	if (Number.isNaN(date.getTime())) {
+		console.error(`${input} is not a valid date`)
+	}
+	return date;
+}
