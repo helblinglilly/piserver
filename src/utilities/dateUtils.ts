@@ -102,7 +102,7 @@ export const toDayHHMM = (date: Date): string => {
  */
 export const toDayDDMM = (date: Date): string => {
 	return `${Weekdays[date.getDay()]}, ${date.getDate()} ${Months[date.getMonth()].long
-	}`;
+		}`;
 };
 
 /**
@@ -152,7 +152,7 @@ export const daysBetweenDates = (date1: Date | string, date2: Date | string): nu
 };
 
 export const getPreviousMonday = (date: Date | string) => {
-	date = toDate(date);
+	date = new Date(toDate(date));
 	const dayOfWeek = date.getDay();
 
 	const daysToSubtract = dayOfWeek === 0 ? 6 : dayOfWeek - 1;

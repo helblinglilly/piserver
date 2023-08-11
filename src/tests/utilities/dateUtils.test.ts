@@ -95,9 +95,9 @@ describe("daysBetweenDates", () => {
 
 describe("getPreviousMonday", () => {
 	it("Will not modify the original input", () => {
-		const original = new Date("2020-01-01:10:00:00.000+00:00");
+		const original = new Date("2020-01-01T10:00:00.000+00:00");
 		getPreviousMonday(original);
-		expect(original).toEqual(new Date("2020-01-01:10:00:00.000+00:00"));
+		expect(original).toEqual(new Date("2020-01-01T10:00:00.000+00:00"));
 	});
 
 	it("Will return the previous Monday (Wednesday)", () => {
