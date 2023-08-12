@@ -1,5 +1,5 @@
 import { IBreak } from "@/db/Timesheet";
-import { toDate } from "./formatting";
+import { padLeft, toDate } from "./formatting";
 
 export const Weekdays = [
 	"Sunday",
@@ -62,26 +62,6 @@ export const Months = [
 		long: "December",
 	},
 ];
-
-/**
- * Pads a given character to the left of an input string to achieve a certain length
- * @param input The original input
- * @param padChar The character that should be used to pad up to the given length
- * @param targetLength The length to aim for
- * @returns
- */
-export const padLeft = (
-	input: string | number,
-	padChar: string,
-	targetLength: number,
-): string => {
-	let inputCopy = input.toString();
-	while (inputCopy.length < targetLength) {
-		inputCopy = `${padChar}${inputCopy}`;
-	}
-	return inputCopy;
-};
-
 /**
  * Returns the day, hour and minutes from a given date
  * @param date The date to parse
@@ -101,7 +81,8 @@ export const toDayHHMM = (date: Date): string => {
  * @returns `Monday, 1 January`
  */
 export const toDayDDMM = (date: Date): string => {
-	return `${Weekdays[date.getDay()]}, ${date.getDate()} ${Months[date.getMonth()].long
+	return `${Weekdays[date.getDay()]}, ${date.getDate()} ${
+		Months[date.getMonth()].long
 	}`;
 };
 
@@ -146,7 +127,10 @@ export const toMidnightUTC = (date: Date | string): Date => {
 	return dateCopy;
 };
 
-export const daysBetweenDates = (date1: Date | string, date2: Date | string): number => {
+export const daysBetweenDates = (
+	date1: Date | string,
+	date2: Date | string,
+): number => {
 	const difference = Math.abs(toDate(date2).valueOf() - toDate(date1).valueOf());
 	return Math.round(difference / (1000 * 60 * 60 * 24));
 };
@@ -162,7 +146,10 @@ export const getPreviousMonday = (date: Date | string) => {
 	return previousMonday;
 };
 
-export const minutesBetweenDates = (a: Date | string, b: Date | string): number => {
+export const minutesBetweenDates = (
+	a: Date | string,
+	b: Date | string,
+): number => {
 	a = toDate(a);
 	b = toDate(b);
 	const diffInMs = Math.abs(b.getTime() - a.getTime());

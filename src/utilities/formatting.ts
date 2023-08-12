@@ -1,20 +1,21 @@
-export function leftPad(
-	str: string | number,
-	len: number,
-	ch: string | number,
-) {
-	str = String(str);
-	ch = ch || " ";
-	len = len - str.length;
-	if (len <= 0) {
-		return str;
+/**
+ * Pads a given character to the left of an input string to achieve a certain length
+ * @param input The original input
+ * @param padChar The character that should be used to pad up to the given length
+ * @param targetLength The length to aim for
+ * @returns
+ */
+export const padLeft = (
+	input: string | number,
+	padChar: string,
+	targetLength: number,
+): string => {
+	let inputCopy = input.toString();
+	while (inputCopy.length < targetLength) {
+		inputCopy = `${padChar}${inputCopy}`;
 	}
-	var pad = "";
-	while (pad.length < len) {
-		pad += ch;
-	}
-	return pad + str;
-}
+	return inputCopy;
+};
 
 export const toDate = (input: string | Date | number) => {
 	if (input instanceof Date) {

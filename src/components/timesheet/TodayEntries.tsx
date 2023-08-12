@@ -1,6 +1,6 @@
 import { TodaysTimesheet } from "@/pages/timesheet";
 import { minutesWorkedInDay, toHHMM } from "@/utilities/dateUtils";
-import { leftPad } from "@/utilities/formatting";
+import { padLeft } from "@/utilities/formatting";
 import { Fragment } from "react";
 
 export default function TodaysEntries({
@@ -51,12 +51,12 @@ export default function TodaysEntries({
 							<tr>
 								<td style={summaryTableCellStyle}>
 									<b>
-										{leftPad(
+										{padLeft(
 											Math.floor(minutesWorkedInDay(clockIn, breaks, clockOut) / 60),
-											2,
 											"0",
+											2,
 										)}
-										:{leftPad(minutesWorkedInDay(clockIn, breaks, clockOut) % 60, 2, "0")}
+										:{padLeft(minutesWorkedInDay(clockIn, breaks, clockOut) % 60, "0", 2)}
 									</b>
 								</td>
 								<td>Worked</td>
