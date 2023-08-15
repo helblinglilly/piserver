@@ -65,7 +65,7 @@ export default function WeeklyHourSummary({
 			{`${difference === 0 ? "Even" : difference > 0 ? "Owe: " : "Overtime: "}`}
 			{Math.abs(difference) > 59
 				? `${Math.floor(difference / 60)}h ${Math.abs(difference % 60)}min`
-				: `${difference}min`}
+				: `${Math.abs(difference)}min`}
 		</p>
 	);
 }
