@@ -41,3 +41,5 @@ next-env.d.ts
 
 proddata.sql
 .vscode
+
+newrelic_agent.log

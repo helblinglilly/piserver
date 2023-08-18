@@ -2,6 +2,9 @@ FROM node:18
 
 WORKDIR /app
 
+ENV NEW_RELIC_APP_NAME=piserver
+ENV NODE_ENV=production
+
 COPY package*.json ./
 
 RUN npm install
