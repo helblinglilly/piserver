@@ -3,6 +3,7 @@ import {
 	getLatestUsageEndDate,
 	insertEnergyUsage,
 } from "@/db/EnergyUsage";
+import Log from "@/log";
 import { NextApiRequest, NextApiResponse } from "next";
 
 const ELECTRIC_URL = `${process.env.OCTOPUS_BASE_URL}/electricity-meter-points/${process.env.OCTOPUS_ELECTRIC_MPAN}/meters/${process.env.OCTOPUS_ELECTRIC_SERIAL}/consumption`;
@@ -39,6 +40,7 @@ async function octopusAuthedRequest(requestURL: string) {
 		const body = await response.json();
 		return body;
 	} else {
+		Log.error([{ message: "Request to octopus API failed", statusCode: response.status, body: response.body }]);
 		return response.status;
 	}
 }
@@ -48,8 +50,7 @@ const fetchEnergyData = async (
 	startDate: Date,
 	endDate = new Date(),
 ) => {
-	let requestURL = `${
-		kind === "electricity" ? ELECTRIC_URL : GAS_URL
+	let requestURL = `${kind === "electricity" ? ELECTRIC_URL : GAS_URL
 	}?page_size=1000&period_from=${startDate.toISOString()}&period_to=${endDate.toISOString()}&order_by=period`;
 
 	let completed = false;
@@ -74,7 +75,12 @@ const fetchEnergyData = async (
 				endDate: new Date(item.interval_end),
 			};
 		});
-		await insertEnergyUsage(mapped);
+		try {
+			await insertEnergyUsage(mapped);
+		} catch (error) {
+			Log.error([{ message: "Failed to insert into energy usage", error: error }]);
+			return Promise.reject();
+		}
 		count += response.count;
 
 		if (!response.next) {
@@ -98,9 +104,11 @@ const GET = async (res: NextApiResponse) => {
 	]);
 
 	if (electricRows === 0 && gasRows === 0) {
+		Log.info("Got no new energy usage rows");
 		res.status(204).end();
 		return;
 	}
+	Log.info([{ message: "Completed energy usage job", electricityRows: electricRows, gasRows: gasRows }]);
 	res.status(200).json({ electricRows: electricRows, gasRows: gasRows });
 };
 
