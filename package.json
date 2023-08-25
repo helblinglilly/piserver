@@ -34,6 +34,7 @@
 	"devDependencies": {
 		"@babel/preset-typescript": "^7.22.5",
 		"@jest/globals": "^29.6.2",
+		"@testing-library/jest-dom": "^6.1.2",
 		"@testing-library/react": "^14.0.0",
 		"@types/cron": "^2.0.1",
 		"@types/jest": "^29.5.3",
