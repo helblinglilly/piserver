@@ -8,6 +8,7 @@ import {
 import PoolFactory from "./poolFactory";
 import { and, desc, eq, gt, lt } from "drizzle-orm";
 import { toDate } from "@/utilities/formatting";
+import Log from "@/log";
 
 export const energyTypeEnum = pgEnum("energy_type", ["electricity", "gas"]);
 
@@ -56,23 +57,28 @@ export async function insertEnergyUsage(values: EnergyUsageRow[]) {
 export async function getLatestUsageEndDate(
 	energyType: "electricity" | "gas",
 ): Promise<Date> {
-	const result = await db
-		.select({ endDate: EnergyUsage.endDate })
-		.from(EnergyUsage)
-		.where(eq(EnergyUsage.energyType, energyType))
-		.orderBy(desc(EnergyUsage.endDate))
-		.limit(1);
-	if (result.length === 0) {
-		if (!process.env.MOVE_IN_DATE) throw new Error("MOVE_IN_DATE not set");
+	try {
+		const result = await db
+			.select({ endDate: EnergyUsage.endDate })
+			.from(EnergyUsage)
+			.where(eq(EnergyUsage.energyType, energyType))
+			.orderBy(desc(EnergyUsage.endDate))
+			.limit(1);
+		if (result.length === 0) {
+			if (!process.env.MOVE_IN_DATE) throw new Error("MOVE_IN_DATE not set");
 
-		const defaultDate = toDate(process.env.MOVE_IN_DATE);
-		defaultDate.setHours(0);
-		defaultDate.setMinutes(0);
-		defaultDate.setSeconds(0);
-		defaultDate.setMilliseconds(0);
-		return defaultDate;
+			const defaultDate = new Date(process.env.MOVE_IN_DATE);
+			defaultDate.setHours(0);
+			defaultDate.setMinutes(0);
+			defaultDate.setSeconds(0);
+			defaultDate.setMilliseconds(0);
+			return defaultDate;
+		}
+		return new Date(result[0].endDate);
+	} catch (error) {
+		Log.error([{ message: `Failed to retrieve latest date for ${energyType}`, error: error }]);
+		return Promise.reject(error);
 	}
-	return toDate(result[0].endDate);
 }
 
 export async function getEnergyUsage(
@@ -80,19 +86,24 @@ export async function getEnergyUsage(
 	from: Date,
 	to: Date,
 ) {
-	const query = db
-		.select({
-			energyType: EnergyUsage.energyType,
-			kWh: EnergyUsage.kWh,
-			startDate: EnergyUsage.startDate,
-			endDate: EnergyUsage.endDate,
-		})
-		.from(EnergyUsage)
-		.where(and(gt(EnergyUsage.startDate, from), lt(EnergyUsage.endDate, to)));
+	try {
+		const query = db
+			.select({
+				energyType: EnergyUsage.energyType,
+				kWh: EnergyUsage.kWh,
+				startDate: EnergyUsage.startDate,
+				endDate: EnergyUsage.endDate,
+			})
+			.from(EnergyUsage)
+			.where(and(gt(EnergyUsage.startDate, from), lt(EnergyUsage.endDate, to)));
 
-	if (kind !== "all") {
-		query.where(eq(EnergyUsage.energyType, kind));
+		if (kind !== "all") {
+			query.where(eq(EnergyUsage.energyType, kind));
+		}
+
+		return await query;
+	} catch (error) {
+		Log.error([{ message: `Failed to retrieve energy usge for ${kind} between ${from.toISOString()} and ${to.toISOString()} `, error: error }]);
+		return Promise.reject(error);
 	}
-
-	return query;
 }
