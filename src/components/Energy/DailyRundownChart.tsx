@@ -92,7 +92,7 @@ export default function DailyRundownChart() {
 					return {
 						date: a.date,
 						Electricity: Number(a.Electricity.toFixed(3)),
-						Gas: Number(a.Gas.toFixed(3)),
+						Gas: (Number(a.Gas.toFixed(3)) * 1.02264 * 38.0) / 3.6,
 					};
 				})
 				.sort((a, b) => (a.date < b.date ? -1 : 1));

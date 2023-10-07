@@ -14,7 +14,7 @@ export default function HourlyRundownChart() {
 	);
 	const [data, setData] = useState<EnergyUsageRow[]>([]);
 	const [sums, setSums] = useState<
-	{ gas: number; electricity: number } | undefined
+		{ gas: number; electricity: number } | undefined
 	>();
 	const [date, setDate] = useState(
 		router.query.date ? toDate(router.query.date as string) : new Date(),
@@ -47,15 +47,19 @@ export default function HourlyRundownChart() {
 			}
 			const body = (await response.json()) as EnergyUsageRow[];
 			setData(body);
-			let gasSum = Number(
-				body
-					.reduce(
-						(prev, curr) =>
-							curr.energyType === "gas" ? prev + Number(curr.kWh) : prev,
-						0,
-					)
-					.toFixed(3),
-			);
+			let gasSum =
+				(Number(
+					body
+						.reduce(
+							(prev, curr) =>
+								curr.energyType === "gas" ? prev + Number(curr.kWh) : prev,
+							0,
+						)
+						.toFixed(3),
+				) *
+					1.02264 *
+					38.0) /
+				3.6;
 			let electricitySum = Number(
 				body
 					.reduce(
