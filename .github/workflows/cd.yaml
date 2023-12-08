@@ -90,12 +90,12 @@ jobs:
         run: echo "::set-output name=date::$(date +'%Y%m%d')"
         id: date
       - name: Identify image of old container
-        run: docker inspect --format='{{.Config.Image}}' dashboard
+        run: docker inspect --format='{{.Config.Image}}' dashboard || true
         id: OLD_DASHBOARD_IMAGE
       - name: Stop running container
         run: docker stop dashboard || true && docker rm dashboard || true
       - name: Remove old image
-        run: docker image rm ${{ steps.OLD_DASHBOARD_IMAGE.outputs.stdout }}
+        run: docker image rm ${{ steps.OLD_DASHBOARD_IMAGE.outputs.stdout }} || true
       - name: Pull new image
         run: docker image pull helblingjoel/piserver:${{steps.date.outputs.date}}
 
