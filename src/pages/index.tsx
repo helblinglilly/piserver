@@ -67,6 +67,17 @@ export default function Home() {
 					/>
 				</div>
 			</div>
+
+			<div className="columns">
+				<div className="column">
+					<RootAppCard
+						link={{ url: "http://blackberry.local:8080/", newTab: true }}
+						image={{ url: "/qbittorrent.png", altText: "qBittorent Icon" }}
+						title={"qBittorrent"}
+					/>
+				</div>
+				<div className="column" />
+			</div>
 		</main>
 	);
 }
