@@ -1,5 +1,6 @@
 import { EnergyBillRow } from "@/db/EnergyBill";
 import { daysBetweenDates } from "@/utilities/dateUtils";
+import { toDate } from "@/utilities/formatting";
 import Link from "next/link";
 import { useRef } from "react";
 
@@ -23,13 +24,13 @@ export default function BillSummary({
 		<div className="card">
 			<div className="card-header">
 				<div className="card-header-title" onClick={handleTitleClick}>
-					{new Date(electricityBill.startDate).toLocaleDateString("en-GB")} -{" "}
-					{new Date(electricityBill.endDate).toLocaleDateString("en-GB")}
+					{toDate(electricityBill.startDate).toLocaleDateString("en-GB")} -{" "}
+					{toDate(electricityBill.endDate).toLocaleDateString("en-GB")}
 					<Link
 						href={`/energy/bills/edit?startDate=${
-							new Date(electricityBill.startDate).toISOString().split("T")[0]
+							toDate(electricityBill.startDate).toISOString().split("T")[0]
 						}&endDate=${
-							new Date(electricityBill.endDate).toISOString().split("T")[0]
+							toDate(electricityBill.endDate).toISOString().split("T")[0]
 						}`}
 						style={{ marginLeft: "auto" }}
 					>
@@ -52,10 +53,7 @@ export default function BillSummary({
 				<div className="columns">
 					<div className="column">Standing charges</div>
 					<div className="column">
-						{daysBetweenDates(
-							new Date(electricityBill.startDate),
-							new Date(electricityBill.endDate),
-						)}{" "}
+						{daysBetweenDates(electricityBill.startDate, electricityBill.endDate)}{" "}
 						days @ {electricityBill.standingCharge}p/day
 					</div>
 				</div>
@@ -76,7 +74,7 @@ export default function BillSummary({
 				<div className="columns">
 					<div className="column">Standing charges</div>
 					<div className="column">
-						{daysBetweenDates(new Date(gasBill.startDate), new Date(gasBill.endDate))}{" "}
+						{daysBetweenDates(gasBill.startDate, gasBill.endDate)}{" "}
 						days @ {gasBill.standingCharge}p/day
 					</div>
 				</div>

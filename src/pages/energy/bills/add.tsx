@@ -2,7 +2,8 @@ import DatePicker from "@/components/DatePicker";
 import BillInput from "@/components/Energy/BillInput";
 import Notification from "@/components/Notification";
 import { daysBetweenDates } from "@/utilities/dateUtils";
-import { validateBillInputFE } from "@/utilities/energyUtils";
+import { validateBillInput } from "@/utilities/energyUtils";
+import { toDate } from "@/utilities/formatting";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
@@ -22,7 +23,7 @@ export default function EnergyBillAdd() {
 		useState(0);
 	const [electricityCost, setElectricityCost] = useState<number | undefined>();
 	const [electricityCharged, setElectricityCharged] = useState<
-		// eslint-disable-next-line @typescript-eslint/indent
+	// eslint-disable-next-line @typescript-eslint/indent
 		number | undefined
 	>();
 
@@ -51,7 +52,7 @@ export default function EnergyBillAdd() {
 			}
 			const body = await result.json();
 
-			const date = new Date(body.date);
+			const date = toDate(body.date);
 			date.setDate(date.getDate() + 1);
 			setLastBillEndDate(date);
 			setStartDate(date);
@@ -105,22 +106,30 @@ export default function EnergyBillAdd() {
 	};
 
 	const handleSubmitClick = async () => {
-		const { isValid, messages } = validateBillInputFE(
-			standingChargeDays,
-			electricityUsage,
-			electricityRate,
-			electricityStandingChargeRate,
-			electricityCharged,
-			electricityCost,
-			gasUsage,
-			gasRate,
-			gasStandingChargeRate,
-			gasCost,
-			gasCharged,
+		const electricValidation = validateBillInput({
+			standingChargeDays: standingChargeDays,
+			usage: gasUsage,
+			rate: gasRate,
+			standingChargeRate: gasStandingChargeRate,
+			cost: gasCost,
+			charged: gasCharged,
+			type: "Gas",
+		},
 		);
 
-		if (!isValid) {
-			setFailureMessages(messages);
+		const gasValidation = validateBillInput({
+			standingChargeDays: standingChargeDays,
+			usage: gasUsage,
+			rate: gasRate,
+			standingChargeRate: gasStandingChargeRate,
+			cost: gasCost,
+			charged: gasCharged,
+			type: "Gas",
+		},
+		);
+
+		if (!(electricValidation.isValid && gasValidation.isValid)) {
+			setFailureMessages([...electricValidation.messages, ...gasValidation.messages]);
 			return;
 		}
 

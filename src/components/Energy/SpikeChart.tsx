@@ -1,4 +1,5 @@
 import { EnergyUsageRow } from "@/db/EnergyUsage";
+import { toDate } from "@/utilities/formatting";
 import { useEffect, useState } from "react";
 import {
 	ResponsiveContainer,
@@ -56,8 +57,8 @@ export default function SpikeChart({
 				return {
 					...a,
 					endTime: includeDay
-						? new Date(a.endTime).toLocaleString()
-						: new Date(a.endTime).toLocaleTimeString(),
+						? toDate(a.endTime).toLocaleString()
+						: toDate(a.endTime).toLocaleTimeString(),
 				};
 			}),
 		);

@@ -1,4 +1,5 @@
 import { IBreak } from "@/db/Timesheet";
+import { padLeft, toDate } from "./formatting";
 
 export const Weekdays = [
 	"Sunday",
@@ -61,26 +62,6 @@ export const Months = [
 		long: "December",
 	},
 ];
-
-/**
- * Pads a given character to the left of an input string to achieve a certain length
- * @param input The original input
- * @param padChar The character that should be used to pad up to the given length
- * @param targetLength The length to aim for
- * @returns
- */
-export const padLeft = (
-	input: string | number,
-	padChar: string,
-	targetLength: number,
-): string => {
-	let inputCopy = input.toString();
-	while (inputCopy.length < targetLength) {
-		inputCopy = `${padChar}${inputCopy}`;
-	}
-	return inputCopy;
-};
-
 /**
  * Returns the day, hour and minutes from a given date
  * @param date The date to parse
@@ -136,8 +117,8 @@ export const toHHMMUTC = (date: Date): string => {
  * @param date
  * @returns Date
  */
-export const toMidnightUTC = (date: Date): Date => {
-	const dateCopy = new Date(date);
+export const toMidnightUTC = (date: Date | string): Date => {
+	const dateCopy = new Date(toDate(date));
 	dateCopy.setUTCHours(0);
 	dateCopy.setUTCMinutes(0);
 	dateCopy.setUTCSeconds(0);
@@ -146,23 +127,32 @@ export const toMidnightUTC = (date: Date): Date => {
 	return dateCopy;
 };
 
-export const daysBetweenDates = (date1: Date, date2: Date): number => {
-	const difference = Math.abs(date2.valueOf() - date1.valueOf());
+export const daysBetweenDates = (
+	date1: Date | string,
+	date2: Date | string,
+): number => {
+	const difference = Math.abs(toDate(date2).valueOf() - toDate(date1).valueOf());
 	return Math.round(difference / (1000 * 60 * 60 * 24));
 };
 
-export const getPreviousMonday = (date: Date) => {
+export const getPreviousMonday = (date: Date | string) => {
+	date = new Date(toDate(date));
 	const dayOfWeek = date.getDay();
 
 	const daysToSubtract = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
 
-	const previousMonday = new Date(date);
+	const previousMonday = toDate(date);
 	previousMonday.setDate(date.getDate() - daysToSubtract);
 	return previousMonday;
 };
 
-export const minutesBetweenDates = (a: Date, b: Date): number => {
-	const diffInMs = Math.abs(new Date(b).getTime() - new Date(a).getTime());
+export const minutesBetweenDates = (
+	a: Date | string,
+	b: Date | string,
+): number => {
+	a = toDate(a);
+	b = toDate(b);
+	const diffInMs = Math.abs(b.getTime() - a.getTime());
 	const diffInMinutes = Math.floor(diffInMs / 1000 / 60);
 	return diffInMinutes;
 };
@@ -180,13 +170,13 @@ export const minutesWorkedInDay = (
 
 	if (breaks && breaks.length > 0) {
 		breaks.forEach((entry) => {
-			count += minutesBetweenDates(previousClockIn, new Date(entry.breakIn));
+			count += minutesBetweenDates(previousClockIn, toDate(entry.breakIn));
 
 			if (!entry.breakOut) {
 				isCurrentlyOnBreak = true;
 				return count;
 			}
-			previousClockIn = new Date(entry.breakOut);
+			previousClockIn = toDate(entry.breakOut);
 		});
 	}
 
@@ -194,20 +184,20 @@ export const minutesWorkedInDay = (
 	if (!clockOut && !isCurrentlyOnBreak)
 		return count + minutesBetweenDates(previousClockIn, new Date());
 	else if (clockOut) {
-		count += minutesBetweenDates(new Date(clockOut), previousClockIn);
+		count += minutesBetweenDates(toDate(clockOut), previousClockIn);
 	}
 	return count;
 };
 
-export const addMinutesToDate = (date: Date, minutesToAdd: number) => {
+export const addMinutesToDate = (date: Date | string, minutesToAdd: number) => {
 	// Convert minutes to milliseconds
 	const millisecondsToAdd = minutesToAdd * 60000;
 
 	// Calculate the new timestamp
-	const newTimestamp = date.getTime() + millisecondsToAdd;
+	const newTimestamp = toDate(date).getTime() + millisecondsToAdd;
 
 	// Create a new Date object with the updated timestamp
-	const newDate = new Date(newTimestamp);
+	const newDate = toDate(newTimestamp);
 
 	return newDate;
 };

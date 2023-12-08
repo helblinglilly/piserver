@@ -1,4 +1,5 @@
 import { EnergyUsageRow } from "@/db/EnergyUsage";
+import { toDate } from "@/utilities/formatting";
 import { useEffect, useState } from "react";
 import {
 	ResponsiveContainer,
@@ -35,13 +36,13 @@ export default function CummulativeChart({
 			.map((a) => a.endDate)
 			.forEach((date) => {
 				const potentialExistingRow = combinedData.find(
-					(a) => a.endTime === new Date(date).toISOString(),
+					(a) => a.endTime === toDate(date).toISOString(),
 				);
 
 				if (potentialExistingRow) return;
 
 				combinedData.push({
-					endTime: new Date(date).toISOString(),
+					endTime: toDate(date).toISOString(),
 					Electricity: 0,
 					Gas: 0,
 				});
@@ -70,8 +71,8 @@ export default function CummulativeChart({
 					Gas: Number(a.Gas.toFixed(3)),
 					Electricity: Number(a.Electricity.toFixed(3)),
 					endTime: includeDay
-						? new Date(a.endTime).toLocaleString()
-						: new Date(a.endTime).toLocaleTimeString(),
+						? toDate(a.endTime).toLocaleString()
+						: toDate(a.endTime).toLocaleTimeString(),
 				};
 			}),
 		);

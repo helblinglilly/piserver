@@ -4,27 +4,12 @@ import {
 	getPreviousMonday,
 	minutesBetweenDates,
 	minutesWorkedInDay,
-	padLeft,
 	toDayDDMM,
 	toDayHHMM,
 	toHHMM,
 	toHHMMUTC,
 	toMidnightUTC,
 } from "@/utilities/dateUtils";
-
-describe("padLeft", () => {
-	it("Will pad number to 5 characters", () => {
-		const output = padLeft(1, "0", 5);
-		expect(output.length).toBe(5);
-		expect(output).toBe("00001");
-	});
-
-	it("Will ignore if existing length is met", () => {
-		const output = padLeft("long", "0", 2);
-		expect(output.length).toBe(4);
-		expect(output).toBe("long");
-	});
-});
 
 describe("toDayHHMM", () => {
 	const date = new Date("2020-01-01T00:00:00.000Z");
@@ -95,9 +80,9 @@ describe("daysBetweenDates", () => {
 
 describe("getPreviousMonday", () => {
 	it("Will not modify the original input", () => {
-		const original = new Date("2020-01-01:10:00:00.000+00:00");
+		const original = new Date("2020-01-01T10:00:00.000+00:00");
 		getPreviousMonday(original);
-		expect(original).toEqual(new Date("2020-01-01:10:00:00.000+00:00"));
+		expect(original).toEqual(new Date("2020-01-01T10:00:00.000+00:00"));
 	});
 
 	it("Will return the previous Monday (Wednesday)", () => {

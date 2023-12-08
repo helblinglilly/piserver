@@ -7,6 +7,7 @@ import {
 } from "drizzle-orm/pg-core";
 import PoolFactory from "./poolFactory";
 import { and, desc, eq, gt, lt } from "drizzle-orm";
+import { toDate } from "@/utilities/formatting";
 import Log from "@/log";
 
 export const energyTypeEnum = pgEnum("energy_type", ["electricity", "gas"]);
