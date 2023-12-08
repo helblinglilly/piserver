@@ -41,7 +41,13 @@ async function octopusAuthedRequest(requestURL: string) {
 		const body = await response.json();
 		return body;
 	} else {
-		Log.error([{ message: "Request to octopus API failed", statusCode: response.status, body: response.body }]);
+		Log.error([
+			{
+				message: "Request to octopus API failed",
+				statusCode: response.status,
+				body: response.body,
+			},
+		]);
 		return response.status;
 	}
 }
@@ -51,7 +57,8 @@ const fetchEnergyData = async (
 	startDate: Date,
 	endDate = new Date(),
 ) => {
-	let requestURL = `${kind === "electricity" ? ELECTRIC_URL : GAS_URL
+	let requestURL = `${
+		kind === "electricity" ? ELECTRIC_URL : GAS_URL
 	}?page_size=1000&period_from=${startDate.toISOString()}&period_to=${endDate.toISOString()}&order_by=period`;
 
 	let completed = false;
@@ -109,7 +116,13 @@ const GET = async (res: NextApiResponse) => {
 		res.status(204).end();
 		return;
 	}
-	Log.info([{ message: "Completed energy usage job", electricityRows: electricRows, gasRows: gasRows }]);
+	Log.info([
+		{
+			message: "Completed energy usage job",
+			electricityRows: electricRows,
+			gasRows: gasRows,
+		},
+	]);
 	res.status(200).json({ electricRows: electricRows, gasRows: gasRows });
 };
 
