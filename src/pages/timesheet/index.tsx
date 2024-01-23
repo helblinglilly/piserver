@@ -6,6 +6,7 @@ import TodaysEntries from "@/components/timesheet/TodayEntries";
 import PredictedFinish from "@/components/timesheet/PredictedFinish";
 import useTime from "@/hooks/useTime";
 import WeeklyHourSummary from "@/components/timesheet/WeeklyHourSummary";
+import Link from "next/link";
 
 export interface TodaysTimesheet {
 	clockIn: Date | undefined | null;
@@ -48,8 +49,7 @@ export default function Timesheet() {
 				`/api/timesheet?username=joel&date=${new Date().toISOString()}&mode=daily`,
 			),
 			fetch(
-				`/api/timesheet?username=joel&date=${
-					new Date().toISOString().split("T")[0]
+				`/api/timesheet?username=joel&date=${new Date().toISOString().split("T")[0]
 				}&mode=weekly`,
 			),
 		]);
@@ -300,7 +300,14 @@ export default function Timesheet() {
 			<hr />
 
 			<TodaysEntries clockIn={clockIn} breaks={breaks} clockOut={clockOut} />
+
 			<hr />
+
+			<button className="button">
+				<Link href="/timesheet/weekly">
+					Weekly view
+				</Link>
+			</button>
 		</>
 	);
 }

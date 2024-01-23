@@ -6,6 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import Head from "next/head";
+import { QueryClient, QueryClientProvider } from "react-query";
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
 	// eslint-disable-next-line no-unused-vars
@@ -23,6 +24,8 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
 	// Generate the links and names for breadcrumbs
 	const router = useRouter();
 	const routes = router.asPath.split("/");
+
+	const queryClient = new QueryClient();
 
 	let pages: { link: string; name: string }[] = [];
 
@@ -64,7 +67,10 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
 						))}
 					</ul>
 				</nav>
-				<Component {...pageProps} />
+
+				<QueryClientProvider client={queryClient}>
+					<Component {...pageProps} />
+				</QueryClientProvider>
 			</div>
 		</>,
 	);
