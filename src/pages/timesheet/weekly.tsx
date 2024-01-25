@@ -1,12 +1,30 @@
 import TodaysEntries from "@/components/timesheet/TodayEntries";
 import { ITimesheet } from "@/db/Timesheet";
-import { toHHMM } from "@/utilities/dateUtils";
-import { useQuery } from "react-query"
+import { useQuery } from "react-query";
+
+
+const Day = ({ day, data }: { day: string; data: ITimesheet | undefined }) => {
+	return <div className="card">
+		<div className="card-header">
+			<div className="card-header-title">
+				<h1 className="title is-5">{day}</h1>
+			</div>
+		</div>
+		<div className="card-content">
+			{data ? <TodaysEntries clockIn={new Date(data.clockIn)} breaks={data.breaks.map((a) => {
+				return {
+					breakIn: new Date(a.breakIn),
+					breakOut: a.breakOut ? new Date(a.breakOut) : null,
+				};
+			})} clockOut={data.clockOut ? new Date(data.clockOut) : undefined} /> : <p>No data</p>}
+		</div>
+	</div>;
+};
 
 export default function Weekly() {
 	const date = new Date().toISOString().split("T")[0];
 	const { isLoading, error, data } = useQuery({
-		queryKey: ['repoData'],
+		queryKey: ["repoData"],
 		queryFn: () =>
 			fetch(`/api/timesheet?username=joel&mode=weekly&date=${date}`).then(
 				(res) => res.json() as Promise<{
@@ -17,13 +35,13 @@ export default function Weekly() {
 					fri: null | ITimesheet;
 				}>,
 			),
-	})
+	});
 
 	console.log(data);
 
-	if (isLoading) return 'Loading...'
+	if (isLoading) return "Loading...";
 
-	if (error) return 'An error has occurred: ' + error;
+	if (error) return "An error has occurred: " + error;
 
 	return <>
 		<div className="columns">
@@ -49,23 +67,5 @@ export default function Weekly() {
 		</div>
 
 
-	</>
-}
-
-const Day = ({ day, data }: { day: string, data: ITimesheet | undefined }) => {
-	return <div className="card">
-		<div className="card-header">
-			<div className="card-header-title">
-				<h1 className="title is-5">{day}</h1>
-			</div>
-		</div>
-		<div className="card-content">
-			{data ? <TodaysEntries clockIn={data.clockIn ? new Date(data.clockIn) : undefined} breaks={data.breaks ? data.breaks.map((a) => {
-				return {
-					breakIn: new Date(a.breakIn),
-					breakOut: a.breakOut ? new Date(a.breakOut) : null
-				}
-			}) : []} clockOut={data.clockOut ? new Date(data.clockOut) : undefined} /> : <p>No data</p>}
-		</div>
-	</div>
+	</>;
 }
