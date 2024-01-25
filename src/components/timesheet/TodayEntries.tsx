@@ -16,7 +16,6 @@ export default function TodaysEntries({
 		<>
 			{clockIn ? (
 				<>
-					<p className="title is-4 mb-2">Workday</p>
 					<table className="ml-3">
 						<tbody>
 							<tr>

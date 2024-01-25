@@ -49,7 +49,8 @@ export default function Timesheet() {
 				`/api/timesheet?username=joel&date=${new Date().toISOString()}&mode=daily`,
 			),
 			fetch(
-				`/api/timesheet?username=joel&date=${new Date().toISOString().split("T")[0]
+				`/api/timesheet?username=joel&date=${
+					new Date().toISOString().split("T")[0]
 				}&mode=weekly`,
 			),
 		]);
@@ -299,14 +300,13 @@ export default function Timesheet() {
 
 			<hr />
 
+			<p className="title is-4 mb-2">Workday</p>
 			<TodaysEntries clockIn={clockIn} breaks={breaks} clockOut={clockOut} />
 
 			<hr />
 
 			<button className="button">
-				<Link href="/timesheet/weekly">
-					Weekly view
-				</Link>
+				<Link href="/timesheet/weekly">Weekly view</Link>
 			</button>
 		</>
 	);
