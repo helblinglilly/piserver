@@ -161,6 +161,39 @@ export const getPreviousMonday = (date: Date) => {
 	return previousMonday;
 };
 
+export const previousWeek = (date: Date) => {
+	const newDate = new Date(date);
+	newDate.setDate(newDate.getDate() - 7);
+	return newDate;
+};
+
+export const addWeek = (date: Date) => {
+	const newDate = new Date(date);
+	newDate.setDate(newDate.getDate() + 7);
+	return newDate;
+};
+
+export const getClosestMonday = (date: Date): Date => {
+	const dayOfWeek = date.getDay();
+
+	if (dayOfWeek === 1) {
+		// If it's already Monday, return the input date
+		return date;
+	} else {
+		const daysToSubtract = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+		const closestMonday = new Date(date);
+		closestMonday.setDate(date.getDate() - daysToSubtract);
+		closestMonday.setHours(12);
+		return closestMonday;
+	}
+};
+
+export const addDays = (date: Date, days: number): Date => {
+	const newDate = new Date(date);
+	newDate.setDate(newDate.getDate() + days);
+	return newDate;
+};
+
 export const minutesBetweenDates = (a: Date, b: Date): number => {
 	const diffInMs = Math.abs(new Date(b).getTime() - new Date(a).getTime());
 	const diffInMinutes = Math.floor(diffInMs / 1000 / 60);

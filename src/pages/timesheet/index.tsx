@@ -2,11 +2,11 @@ import { toDayDDMM, toHHMM } from "@/utilities/dateUtils";
 import Notification from "@/components/Notification";
 import React, { useEffect, useRef, useState } from "react";
 import { IBreak, ITimesheet } from "@/db/Timesheet";
-import TodaysEntries from "@/components/timesheet/TodayEntries";
-import PredictedFinish from "@/components/timesheet/PredictedFinish";
 import useTime from "@/hooks/useTime";
-import WeeklyHourSummary from "@/components/timesheet/WeeklyHourSummary";
 import Link from "next/link";
+import PredictedFinish from "@/components/Timesheet/PredictedFinish";
+import TodaysEntries from "@/components/Timesheet/TodayEntries";
+import WeeklyHourSummary from "@/components/Timesheet/WeeklyHourSummary";
 
 export interface TodaysTimesheet {
 	clockIn: Date | undefined | null;
