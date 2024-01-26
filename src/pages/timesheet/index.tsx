@@ -4,9 +4,9 @@ import React, { useEffect, useRef, useState } from "react";
 import { IBreak, ITimesheet } from "@/db/Timesheet";
 import useTime from "@/hooks/useTime";
 import Link from "next/link";
-import PredictedFinish from "@/components/Timesheet/PredictedFinish";
 import TodaysEntries from "@/components/Timesheet/TodayEntries";
 import WeeklyHourSummary from "@/components/Timesheet/WeeklyHourSummary";
+import PredictedFinish from "@/components/Timesheet/PredictedFinish";
 
 export interface TodaysTimesheet {
 	clockIn: Date | undefined | null;

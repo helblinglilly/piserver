@@ -48,3 +48,8 @@ README.md
 LICENSE
 drizzle
 scripts
+.github
+drizzle
+.gitignore
+.npmrc
+coverage
