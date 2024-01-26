@@ -1,5 +1,5 @@
-import TodaysEntries from "@/components/Timesheet/TodayEntries";
 import { ITimesheet } from "@/db/Timesheet";
+import TodaysEntries from "./TodayEntries";
 
 const Day = ({ day, data }: { day: string; data: ITimesheet | undefined }) => {
 	return (
