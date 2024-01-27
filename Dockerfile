@@ -6,6 +6,7 @@ ENV NODE_ENV production
 COPY package*.json ./
 
 RUN npm install --no-audit --no-cache
+RUN npm install drizzle-kit --save-dev
 
 COPY . .
 
