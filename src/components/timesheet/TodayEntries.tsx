@@ -3,11 +3,7 @@ import { minutesWorkedInDay, toHHMM } from "@/utilities/dateUtils";
 import leftPad from "@/utilities/formatting";
 import { Fragment } from "react";
 
-export default function TodaysEntries({
-	clockIn,
-	breaks,
-	clockOut,
-}: TodaysTimesheet) {
+const TodaysEntries = ({ clockIn, breaks, clockOut }: TodaysTimesheet) => {
 	const summaryTableCellStyle = {
 		minWidth: "4em",
 	};
@@ -68,4 +64,6 @@ export default function TodaysEntries({
 			)}
 		</>
 	);
-}
+};
+
+export default TodaysEntries;

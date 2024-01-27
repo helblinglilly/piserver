@@ -3,11 +3,11 @@ import { WeeklyTimesheet } from "@/pages/timesheet";
 import { minutesWorkedInDay } from "@/utilities/dateUtils";
 import { useEffect, useState } from "react";
 
-export default function WeeklyHourSummary({
+const WeeklyHourSummary = ({
 	weeklySummary,
 }: {
 	weeklySummary: WeeklyTimesheet;
-}) {
+}) => {
 	const [difference, setDifference] = useState(0);
 
 	useEffect(() => {
@@ -68,4 +68,6 @@ export default function WeeklyHourSummary({
 				: `${Math.abs(difference)}min`}
 		</p>
 	);
-}
+};
+
+export default WeeklyHourSummary;

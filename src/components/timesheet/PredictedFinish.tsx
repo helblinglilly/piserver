@@ -3,13 +3,13 @@ import { TodaysTimesheet } from "@/pages/timesheet";
 import { addMinutesToDate, toHHMM } from "@/utilities/dateUtils";
 import { useEffect, useState } from "react";
 
-export default function PredictedFinish({
+const PredictedFinish = ({
 	timesheet,
 	currentTime,
 }: {
 	timesheet: TodaysTimesheet;
 	currentTime: Date;
-}) {
+}) => {
 	const targetMinutes =
 		config.timesheet.hours * 60 +
 		config.timesheet.minutes +
@@ -27,4 +27,6 @@ export default function PredictedFinish({
 	}, [currentTime, targetMinutes, timesheet.clockIn]);
 
 	return <p>Predicted Finish: {toHHMM(finish)} </p>;
-}
+};
+
+export default PredictedFinish;
