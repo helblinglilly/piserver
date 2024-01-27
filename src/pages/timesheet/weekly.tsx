@@ -1,6 +1,5 @@
 import Day from "@/components/Timesheet/Day";
 import { useQuery } from "react-query";
-import { WeeklyTimesheet } from ".";
 import WeeklyHourSummary from "@/components/Timesheet/WeeklyHourSummary";
 import { useState } from "react";
 import {
@@ -9,6 +8,7 @@ import {
 	getClosestMonday,
 	previousWeek,
 } from "@/utilities/dateUtils";
+import { IWeeklyResponse } from "../api/timesheet";
 
 export default function Weekly() {
 	const [date, setDate] = useState(getClosestMonday(new Date()));
@@ -20,7 +20,7 @@ export default function Weekly() {
 				`/api/timesheet?username=joel&mode=weekly&date=${
 					addDays(date, 6).toISOString().split("T")[0]
 				}`,
-			).then((res) => res.json() as Promise<WeeklyTimesheet>),
+			).then((res) => res.json() as Promise<IWeeklyResponse>),
 	});
 
 	if (error) return "An error has occurred: " + error;
@@ -59,25 +59,25 @@ export default function Weekly() {
 			</div>
 			<div className="columns">
 				<div className="column">
-					<Day day="Monday" data={data?.mon ?? undefined} />
+					<Day day={data?.mon.date} data={data?.mon.timesheet} />
 				</div>
 
 				<div className="column">
-					<Day day="Tuesday" data={data?.tue ?? undefined} />
+					<Day day={data?.tue.date} data={data?.tue.timesheet} />
 				</div>
 			</div>
 			<div className="columns">
 				<div className="column">
-					<Day day="Wednesday" data={data?.wed ?? undefined} />
+					<Day day={data?.wed.date} data={data?.wed.timesheet} />
 				</div>
 
 				<div className="column">
-					<Day day="Thursday" data={data?.thu ?? undefined} />
+					<Day day={data?.thu.date} data={data?.thu.timesheet} />
 				</div>
 			</div>
 			<div className="columns">
 				<div className="column">
-					<Day day="Friday" data={data?.fri ?? undefined} />
+					<Day day={data?.fri.date} data={data?.fri.timesheet} />
 				</div>
 
 				<div className="column">

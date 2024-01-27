@@ -11,6 +11,19 @@ import {
 import { getPreviousMonday } from "@/utilities/dateUtils";
 import type { NextApiRequest, NextApiResponse } from "next";
 
+interface IWeeklyResponseDay {
+	date: Date | undefined;
+	timesheet: ITimesheet | undefined;
+}
+
+export interface IWeeklyResponse {
+	mon: IWeeklyResponseDay;
+	tue: IWeeklyResponseDay;
+	wed: IWeeklyResponseDay;
+	thu: IWeeklyResponseDay;
+	fri: IWeeklyResponseDay;
+}
+
 const getTimings = async (username: string, date: Date) => {
 	const data = await getTimesheet(username, date);
 	return data;
@@ -20,17 +33,32 @@ const getWeeklyHours = async (username: string, date: Date) => {
 	let currentIterationDate = getPreviousMonday(date);
 
 	const result: {
-		mon: null | ITimesheet;
-		tue: null | ITimesheet;
-		wed: null | ITimesheet;
-		thu: null | ITimesheet;
-		fri: null | ITimesheet;
+		mon: IWeeklyResponseDay;
+		tue: IWeeklyResponseDay;
+		wed: IWeeklyResponseDay;
+		thu: IWeeklyResponseDay;
+		fri: IWeeklyResponseDay;
 	} = {
-		mon: null,
-		tue: null,
-		wed: null,
-		thu: null,
-		fri: null,
+		mon: {
+			date: currentIterationDate,
+			timesheet: undefined,
+		},
+		tue: {
+			date: new Date(currentIterationDate.getDate() + 1),
+			timesheet: undefined,
+		},
+		wed: {
+			date: new Date(currentIterationDate.getDate() + 2),
+			timesheet: undefined,
+		},
+		thu: {
+			date: new Date(currentIterationDate.getDate() + 3),
+			timesheet: undefined,
+		},
+		fri: {
+			date: new Date(currentIterationDate.getDate() + 4),
+			timesheet: undefined,
+		},
 	};
 
 	let i = 0;
@@ -44,19 +72,19 @@ const getWeeklyHours = async (username: string, date: Date) => {
 
 		switch (i) {
 			case 0:
-				result.mon = timesheet;
+				result.mon.timesheet = timesheet;
 				break;
 			case 1:
-				result.tue = timesheet;
+				result.tue.timesheet = timesheet;
 				break;
 			case 2:
-				result.wed = timesheet;
+				result.wed.timesheet = timesheet;
 				break;
 			case 3:
-				result.thu = timesheet;
+				result.thu.timesheet = timesheet;
 				break;
 			case 4:
-				result.fri = timesheet;
+				result.fri.timesheet = timesheet;
 				break;
 		}
 		i++;

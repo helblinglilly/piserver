@@ -7,6 +7,7 @@ import Link from "next/link";
 import PredictedFinish from "@/components/Timesheet/PredictedFinish";
 import TodaysEntries from "@/components/Timesheet/TodayEntries";
 import WeeklyHourSummary from "@/components/Timesheet/WeeklyHourSummary";
+import { IWeeklyResponse } from "../api/timesheet";
 
 export interface TodaysTimesheet {
 	clockIn: Date | undefined | null;
@@ -35,12 +36,27 @@ export default function Timesheet() {
 	const breakEndRef = useRef<HTMLButtonElement>();
 	const clockOutRef = useRef<HTMLButtonElement>();
 
-	const [weekToDate, setWeekToDate] = useState<WeeklyTimesheet>({
-		mon: null,
-		tue: null,
-		wed: null,
-		thu: null,
-		fri: null,
+	const [weekToDate, setWeekToDate] = useState<IWeeklyResponse>({
+		mon: {
+			date: undefined,
+			timesheet: undefined,
+		},
+		tue: {
+			date: undefined,
+			timesheet: undefined,
+		},
+		wed: {
+			date: undefined,
+			timesheet: undefined,
+		},
+		thu: {
+			date: undefined,
+			timesheet: undefined,
+		},
+		fri: {
+			date: undefined,
+			timesheet: undefined,
+		},
 	});
 
 	const fetchInitialData = async () => {
