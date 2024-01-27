@@ -3,12 +3,9 @@ FROM node:20
 WORKDIR /app
 ENV NODE_ENV production
 
-COPY package*.json ./
+COPY . .
 
 RUN npm install --no-audit --no-cache
-RUN npm install drizzle-kit --save-dev
-
-COPY . .
 
 RUN npm run build
 
