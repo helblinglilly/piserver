@@ -72,7 +72,7 @@ export default function Timesheet() {
 		]);
 
 		let today: ITimesheet | undefined;
-		let week: WeeklyTimesheet | undefined;
+		let week: IWeeklyResponse | undefined;
 
 		if (todayResponse.status > 204) {
 			console.error(
