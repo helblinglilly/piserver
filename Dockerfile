@@ -7,7 +7,7 @@ COPY . .
 
 RUN npm install --no-audit --no-cache
 
-RUN npm run build
+RUN ls -a && ls -a node_modules/drizzl-ekit && node_modulesnpm run build
 
 EXPOSE 3000
 
