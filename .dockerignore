@@ -53,3 +53,5 @@
 # .npmrc
 # coverage
 # .vscode
+
+drizzle.config.ts
