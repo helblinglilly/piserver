@@ -5,7 +5,7 @@ ENV NODE_ENV production
 
 COPY package*.json ./
 
-RUN npm install --no-audit --only=prod
+RUN npm install --no-audit
 
 COPY . .
 
