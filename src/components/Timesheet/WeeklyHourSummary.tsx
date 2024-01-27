@@ -13,7 +13,7 @@ const WeeklyHourSummary = ({
 	useEffect(() => {
 		let daysRecorded = 0;
 		let minutesWorked = 0;
-		if (weeklySummary.mon !== null) {
+		if (weeklySummary.mon) {
 			daysRecorded++;
 			minutesWorked += minutesWorkedInDay(
 				weeklySummary.mon.clockIn,
@@ -21,7 +21,7 @@ const WeeklyHourSummary = ({
 				weeklySummary.mon.clockOut,
 			);
 		}
-		if (weeklySummary.tue !== null) {
+		if (weeklySummary.tue) {
 			daysRecorded++;
 			minutesWorked += minutesWorkedInDay(
 				weeklySummary.tue.clockIn,
@@ -29,7 +29,7 @@ const WeeklyHourSummary = ({
 				weeklySummary.tue.clockOut,
 			);
 		}
-		if (weeklySummary.wed !== null) {
+		if (weeklySummary.wed) {
 			daysRecorded++;
 			minutesWorked += minutesWorkedInDay(
 				weeklySummary.wed.clockIn,
@@ -37,7 +37,7 @@ const WeeklyHourSummary = ({
 				weeklySummary.wed.clockOut,
 			);
 		}
-		if (weeklySummary.thu !== null) {
+		if (weeklySummary.thu) {
 			daysRecorded++;
 			minutesWorked += minutesWorkedInDay(
 				weeklySummary.thu.clockIn,
@@ -45,7 +45,7 @@ const WeeklyHourSummary = ({
 				weeklySummary.thu.clockOut,
 			);
 		}
-		if (weeklySummary.fri !== null) {
+		if (weeklySummary.fri) {
 			daysRecorded++;
 			minutesWorked += minutesWorkedInDay(
 				weeklySummary.fri.clockIn,

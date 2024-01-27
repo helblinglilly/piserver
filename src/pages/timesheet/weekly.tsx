@@ -41,16 +41,20 @@ export default function Weekly() {
 						setDate(previousWeek(date));
 					}}
 				>
-					Previous week
+					<p className="mobile">Prev</p>
+					<p className="desktop">Previous Week</p>
 				</button>
-				<p>w/c {date.toLocaleDateString("en-GB")}</p>
+				<p style={{ marginTop: "auto", marginBottom: "auto" }}>
+					w/c {date.toLocaleDateString("en-GB")}
+				</p>
 				<button
 					className="button"
 					onClick={() => {
 						setDate(addWeek(date));
 					}}
 				>
-					Next week
+					<p className="mobile">Next</p>
+					<p className="desktop">Next Week</p>
 				</button>
 			</div>
 			<div className="columns">
