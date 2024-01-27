@@ -49,7 +49,7 @@ LICENSE
 drizzle
 scripts
 .github
-drizzle
 .gitignore
 .npmrc
 coverage
+jest.config.ts
