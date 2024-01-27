@@ -55,3 +55,4 @@
 # .vscode
 
 drizzle.config.ts
+jest.config.ts
