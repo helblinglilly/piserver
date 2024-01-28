@@ -7,6 +7,8 @@ import {
 	insertBreakOut,
 	setClockOut,
 	ITimesheet,
+	overrideTimesheet,
+	overrideTimesheetBreaks,
 } from "@/db/Timesheet";
 import { addDays, getPreviousMonday } from "@/utilities/dateUtils";
 import type { NextApiRequest, NextApiResponse } from "next";
@@ -211,6 +213,48 @@ const POST = async (req: NextApiRequest, res: NextApiResponse) => {
 	}
 };
 
+export interface IPatchTimesheet {
+	username: string | undefined;
+	date: string | undefined;
+	timesheet: ITimesheet | undefined;
+}
+const PATCH = async (req: NextApiRequest, res: NextApiResponse) => {
+	let body: IPatchTimesheet | undefined;
+
+	try {
+		body = JSON.parse(req.body) as IPatchTimesheet;
+	} catch {
+		res.status(400).json({ error: "Invalid body" });
+		return;
+	}
+
+	if (!body.username || !body.date || !body.timesheet) {
+		res.status(400).json({ error: "Invalid body" });
+		return;
+	}
+
+	try {
+		await overrideTimesheet(
+			body.username,
+			new Date(body.date),
+			new Date(body.timesheet.clockIn),
+			body.timesheet.clockOut ? new Date(body.timesheet.clockOut) : undefined,
+		);
+
+		// await overrideTimesheetBreaks(
+		// 	body.username,
+		// 	new Date(body.date),
+		// 	body.timesheet.breaks,
+		// );
+	} catch (err) {
+		console.error(err);
+		res.status(500).json({ error: err });
+		return;
+	}
+
+	res.status(200).end();
+};
+
 export default async function handler(
 	req: NextApiRequest,
 	res: NextApiResponse,
@@ -218,6 +262,7 @@ export default async function handler(
 	const lookup = {
 		GET: GET,
 		POST: POST,
+		PATCH: PATCH,
 	};
 
 	const result = lookup[req.method as "GET"];

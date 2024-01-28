@@ -197,3 +197,59 @@ export async function getTimesheet(
 		breaks: breaks.length > 0 ? breaks : [],
 	};
 }
+
+export async function overrideTimesheet(
+	username: string,
+	day: Date,
+	clockIn: Date,
+	clockOut: Date | null | undefined,
+) {
+	const normalisedDay = toMidnightUTC(new Date(day));
+
+	await db
+		.insert(Timesheet)
+		.values({
+			username: username,
+			date: normalisedDay.toISOString(),
+			clockIn: clockIn,
+			clockOut: clockOut,
+		})
+		.onConflictDoUpdate({
+			target: [Timesheet.username, Timesheet.date],
+			set: {
+				clockIn: clockIn,
+				clockOut: clockOut,
+			},
+		});
+}
+
+export async function overrideTimesheetBreaks(
+	username: string,
+	day: Date,
+	breaks: {
+		breakIn: Date;
+		breakOut: Date | null;
+	}[],
+) {
+	const normalisedDay = toMidnightUTC(day);
+
+	await db
+		.delete(TimesheetBreaks)
+		.where(
+			and(
+				eq(TimesheetBreaks.username, username),
+				eq(TimesheetBreaks.date, normalisedDay.toISOString()),
+			),
+		);
+
+	await db.insert(TimesheetBreaks).values(
+		breaks.map((entry) => {
+			return {
+				username: username,
+				date: normalisedDay.toISOString(),
+				breakIn: entry.breakIn,
+				breakOut: entry.breakOut,
+			};
+		}),
+	);
+}
