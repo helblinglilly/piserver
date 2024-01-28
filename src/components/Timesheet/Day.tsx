@@ -25,7 +25,7 @@ const Day = ({
 					</h1>
 
 					<Link
-						href={`/timesheet/edit?${new Date(day).toISOString().split("T")[0]}`}
+						href={`/timesheet/edit?date=${new Date(day).toISOString().split("T")[0]}`}
 					>
 						Edit
 					</Link>

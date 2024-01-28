@@ -22,7 +22,6 @@ export default function EnergyBillAdd() {
 		useState(0);
 	const [electricityCost, setElectricityCost] = useState<number | undefined>();
 	const [electricityCharged, setElectricityCharged] = useState<
-		// eslint-disable-next-line @typescript-eslint/indent
 		number | undefined
 	>();
 

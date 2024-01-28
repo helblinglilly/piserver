@@ -8,7 +8,7 @@ import {
 	setClockOut,
 	ITimesheet,
 } from "@/db/Timesheet";
-import { getPreviousMonday } from "@/utilities/dateUtils";
+import { addDays, getPreviousMonday } from "@/utilities/dateUtils";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 interface IWeeklyResponseDay {
@@ -40,23 +40,23 @@ const getWeeklyHours = async (username: string, date: Date) => {
 		fri: IWeeklyResponseDay;
 	} = {
 		mon: {
-			date: currentIterationDate,
+			date: addDays(currentIterationDate, 0),
 			timesheet: undefined,
 		},
 		tue: {
-			date: new Date(currentIterationDate.getDate() + 1),
+			date: addDays(currentIterationDate, 1),
 			timesheet: undefined,
 		},
 		wed: {
-			date: new Date(currentIterationDate.getDate() + 2),
+			date: addDays(currentIterationDate, 2),
 			timesheet: undefined,
 		},
 		thu: {
-			date: new Date(currentIterationDate.getDate() + 3),
+			date: addDays(currentIterationDate, 3),
 			timesheet: undefined,
 		},
 		fri: {
-			date: new Date(currentIterationDate.getDate() + 4),
+			date: addDays(currentIterationDate, 4),
 			timesheet: undefined,
 		},
 	};
