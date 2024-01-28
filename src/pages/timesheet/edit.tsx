@@ -1,5 +1,7 @@
 import { ITimesheet } from "@/db/Timesheet";
+import { toHHMM } from "@/utilities/dateUtils";
 import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import { useQuery } from "react-query";
 
 export default function EditTimesheet() {
@@ -18,6 +20,29 @@ export default function EditTimesheet() {
 			}),
 	});
 
+	const [modifiedData, setModifiedData] = useState(data);
+
+	useEffect(() => {
+		setModifiedData(data);
+	}, [data]);
+
+	const handleOnSubmit = () => {
+		console.log(modifiedData);
+	};
+
+	const handleOnReset = () => {
+		setModifiedData(data);
+	};
+
+	if (error) {
+		return (
+			<>
+				<p>An error has occurred</p>
+				<p>{JSON.stringify(error)}</p>
+			</>
+		);
+	}
+
 	return (
 		<>
 			<div className="columns">
@@ -30,7 +55,28 @@ export default function EditTimesheet() {
 						</div>
 
 						<div className="card-content">
-							<p>{new Date(data?.clockIn ?? 0).toLocaleTimeString("en-GB")}</p>
+							<input
+								type="time"
+								style={{ width: "100%", height: "2rem" }}
+								max={
+									modifiedData?.clockOut
+										? toHHMM(new Date(modifiedData.clockOut))
+										: "23:59"
+								}
+								defaultValue={
+									modifiedData?.clockIn
+										? toHHMM(new Date(modifiedData.clockIn))
+										: "01:00"
+								}
+								onChange={(val) => {
+									// @ts-ignore Stupid
+									setModifiedData({
+										...modifiedData,
+										clockIn: new Date(editDateParam + "T" + val.target.value),
+									});
+								}}
+								required
+							/>
 						</div>
 					</div>
 				</div>
@@ -44,7 +90,27 @@ export default function EditTimesheet() {
 						</div>
 
 						<div className="card-content">
-							<p>{new Date(data?.clockOut ?? 0).toLocaleTimeString("en-GB")}</p>
+							<input
+								type="time"
+								style={{ width: "100%", height: "2rem" }}
+								defaultValue={
+									modifiedData?.clockOut
+										? toHHMM(new Date(modifiedData.clockOut))
+										: "23:00"
+								}
+								min={
+									modifiedData?.clockIn
+										? toHHMM(new Date(modifiedData.clockIn))
+										: "02:00"
+								}
+								onChange={(val) => {
+									// @ts-ignore Stupid
+									setModifiedData({
+										...modifiedData,
+										clockOut: new Date(editDateParam + "T" + val.target.value),
+									});
+								}}
+							/>
 						</div>
 					</div>
 				</div>
@@ -81,6 +147,27 @@ export default function EditTimesheet() {
 					</div>
 				);
 			})}
+
+			<div className="columns">
+				<div className="column">
+					<button
+						className="button"
+						style={{ width: "100%" }}
+						onClick={handleOnReset}
+					>
+						Reset
+					</button>
+				</div>
+				<div className="column">
+					<button
+						className="button is-success"
+						style={{ width: "100%" }}
+						onClick={handleOnSubmit}
+					>
+						Save
+					</button>
+				</div>
+			</div>
 		</>
 	);
 }
