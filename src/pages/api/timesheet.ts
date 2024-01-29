@@ -241,11 +241,11 @@ const PATCH = async (req: NextApiRequest, res: NextApiResponse) => {
 			body.timesheet.clockOut ? new Date(body.timesheet.clockOut) : undefined,
 		);
 
-		// await overrideTimesheetBreaks(
-		// 	body.username,
-		// 	new Date(body.date),
-		// 	body.timesheet.breaks,
-		// );
+		await overrideTimesheetBreaks(
+			body.username,
+			new Date(body.date),
+			body.timesheet.breaks,
+		);
 	} catch (err) {
 		console.error(err);
 		res.status(500).json({ error: err });

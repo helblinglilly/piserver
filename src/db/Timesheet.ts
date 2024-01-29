@@ -247,8 +247,8 @@ export async function overrideTimesheetBreaks(
 			return {
 				username: username,
 				date: normalisedDay.toISOString(),
-				breakIn: entry.breakIn,
-				breakOut: entry.breakOut,
+				breakIn: new Date(entry.breakIn),
+				breakOut: entry.breakOut ? new Date(entry.breakOut) : undefined,
 			};
 		}),
 	);
