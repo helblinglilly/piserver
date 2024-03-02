@@ -1,15 +1,10 @@
+import React from "react";
 import config from "@/config";
-import { TodaysTimesheet } from "@/pages/timesheet";
+import useTimesheet from "@/hooks/useDailyTimesheet";
 import { addMinutesToDate, toHHMM } from "@/utilities/dateUtils";
 import { useEffect, useState } from "react";
 
-const PredictedFinish = ({
-	timesheet,
-	currentTime,
-}: {
-	timesheet: TodaysTimesheet;
-	currentTime: Date;
-}) => {
+const PredictedFinish = () => {
 	const targetMinutes =
 		config.timesheet.hours * 60 +
 		config.timesheet.minutes +
@@ -17,14 +12,17 @@ const PredictedFinish = ({
 		config.timesheet.lunch.minutes;
 
 	const [finish, setFinish] = useState(new Date(0));
+	const { clockIn } = useTimesheet().timesheet;
 
 	useEffect(() => {
-		if (timesheet.clockIn) {
-			setFinish(addMinutesToDate(timesheet.clockIn, targetMinutes));
+		if (clockIn) {
+			setFinish(addMinutesToDate(clockIn, targetMinutes));
 		} else {
-			setFinish(addMinutesToDate(currentTime, targetMinutes));
+			setFinish(addMinutesToDate(new Date(), targetMinutes));
 		}
-	}, [currentTime, targetMinutes, timesheet.clockIn]);
+		// adding clockIn causes loops
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [targetMinutes]);
 
 	return <p>Predicted Finish: {toHHMM(finish)} </p>;
 };
