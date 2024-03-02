@@ -26,3 +26,11 @@
 		display: none;
 	}
 }
+
+button.timesheetActionButton {
+	min-width: 8rem;
+}
+
+td.timesheetWorkdayBreakdown {
+	min-width: 4em;
+}

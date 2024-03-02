@@ -1,3 +1,4 @@
+import React from "react";
 import { ITimesheet } from "@/db/Timesheet";
 import { Weekdays } from "@/utilities/dateUtils";
 import Link from "next/link";
@@ -32,7 +33,7 @@ const Day = ({
 				</div>
 			</div>
 			<div className="card-content">
-				{data ? (
+				{data?.clockIn ? (
 					<TodaysEntries
 						clockIn={new Date(data.clockIn)}
 						breaks={data.breaks.map((a) => {

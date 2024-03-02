@@ -1,4 +1,4 @@
-// import styles from "@/styles/Home.module.css";
+import React from "react";
 import RootAppCard from "@/components/rootAppCard";
 
 export default function Home() {
@@ -49,11 +49,11 @@ export default function Home() {
 				<div className="column">
 					<RootAppCard
 						link={{
-							url: "http://192.168.0.11:32400/web",
+							url: "http://192.168.0.11:8096",
 							newTab: false,
 						}}
-						image={{ url: "/plex.png", altText: "Plex Icon" }}
-						title={"Plex"}
+						image={{ url: "/jellyfin.png", altText: "Jellyfin Icon" }}
+						title={"Jellyfin"}
 					/>
 				</div>
 				<div className="column">

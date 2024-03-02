@@ -1,5 +1,4 @@
-/* eslint-disable no-unused-vars */
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 
 export default function BillInput({
 	setUsage,

@@ -40,7 +40,7 @@ export const TimesheetBreaks = pgTable(
 
 export interface IBreak {
 	breakIn: Date;
-	breakOut: Date | null;
+	breakOut: Date | null | undefined;
 }
 
 /**
@@ -151,11 +151,11 @@ export async function setClockOut(username: string, day: Date, clockOut: Date) {
 }
 
 export interface ITimesheet {
-	clockIn: Date;
-	clockOut: Date | null | undefined;
+	clockIn: Date | undefined;
+	clockOut: Date  | undefined;
 	breaks: {
 		breakIn: Date;
-		breakOut: Date | null;
+		breakOut: Date | undefined | null;
 	}[];
 }
 
@@ -195,6 +195,7 @@ export async function getTimesheet(
 	return {
 		...timesheet[0],
 		breaks: breaks.length > 0 ? breaks : [],
+		clockOut: timesheet[0].clockOut ?? undefined,
 	};
 }
 

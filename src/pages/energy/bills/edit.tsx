@@ -1,8 +1,8 @@
+import React, { useEffect, useState } from "react";
 import { getBillByDate } from "@/db/EnergyBill";
 import { GetServerSidePropsContext } from "next";
 import Notification from "@/components/Notification";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
 import BillInput from "@/components/Energy/BillInput";
 import DatePicker from "@/components/DatePicker";
 import config from "@/config";

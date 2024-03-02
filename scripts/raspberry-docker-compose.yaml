@@ -20,24 +20,23 @@ services:
     volumes:
       - /mnt/hdd/docker_storage/postgres_data:/var/lib/postgresql/data
 
-  plex:
-    depends_on:
-      - "db"
-    image: lscr.io/linuxserver/plex:latest
-    container_name: plex
-    network_mode: host
+  jellyfin:
+    image: jellyfin/jellyfin:latest
+    container_name: jellyfin
+    restart: unless-stopped
     environment:
       - PUID=1000
       - PGID=1000
-      - VERSION=docker
+      - TZ=Europe/London
     volumes:
-      - /mnt/hdd/filebrowser/files/plex/config:/config
-      - /mnt/hdd/filebrowser/files/plex/tvshows:/tv
-      - /mnt/hdd/filebrowser/files/plex/movies:/movies
-      - /mnt/hdd/filebrowser/files/plex/music:/music
-      - /mnt/hdd/filebrowser/files/plex/videos:/videos
-      - plexappstate:/var/lib/plexmediaserver/Library/Application Support/Plex Media Server/
-    restart: unless-stopped
+      - /mnt/hdd/filebrowser/files/media/jellyfin-config:/config
+      - /mnt/hdd/filebrowser/files/media/tvshows:/tvshows:ro
+      - /mnt/hdd/filebrowser/files/media/movies:/movies:ro
+      - /mnt/hdd/filebrowser/files/media/music:/music:ro
+      - /mnt/hdd/filebrowser/files/media/videos:/videos:ro
+      - jellyfin_cache_new:/cache
+    ports:
+      - 8096:8096
 
   filebrowser:
     image: filebrowser/filebrowser

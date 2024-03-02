@@ -1,7 +1,7 @@
+import React, { useEffect, useState } from "react";
 import DailyRundownChart from "@/components/Energy/DailyRundownChart";
 import HourlyRundownChart from "@/components/Energy/HourlyRundownChart";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
 
 export default function EnergyIndex() {
 	const router = useRouter();

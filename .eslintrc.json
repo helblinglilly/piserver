@@ -1,10 +1,11 @@
 {
-	"plugins": ["testing-library"],
+	"plugins": ["testing-library", "react"],
 	"extends": [
 		"next/core-web-vitals",
 		"airbnb-typescript",
 		"plugin:react-hooks/recommended",
 		"plugin:jest/recommended",
+		"plugin:react/recommended",
 		"eslint:recommended"
 	],
 	"parserOptions": {
