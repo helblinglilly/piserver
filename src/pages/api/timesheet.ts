@@ -233,6 +233,11 @@ const PATCH = async (req: NextApiRequest, res: NextApiResponse) => {
 		return;
 	}
 
+	if (!body.timesheet.clockIn) {
+		res.status(400).json({ error: "Not providing a clock in time is not yet supported" });
+		return;
+	}
+
 	try {
 		await overrideTimesheet(
 			body.username,
@@ -244,7 +249,10 @@ const PATCH = async (req: NextApiRequest, res: NextApiResponse) => {
 		await overrideTimesheetBreaks(
 			body.username,
 			new Date(body.date),
-			body.timesheet.breaks,
+			body.timesheet.breaks.map((breakItem) => ({
+				breakIn: new Date(breakItem.breakIn),
+				breakOut: breakItem.breakOut ?? null,
+			})),
 		);
 	} catch (err) {
 		console.error(err);

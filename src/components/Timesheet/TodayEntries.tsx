@@ -1,9 +1,10 @@
-import { TodaysTimesheet } from "@/pages/timesheet";
+import React from "react";
+import { ITimesheet } from "@/db/Timesheet";
 import { minutesWorkedInDay, toHHMM } from "@/utilities/dateUtils";
 import leftPad from "@/utilities/formatting";
 import { Fragment } from "react";
 
-const TodaysEntries = ({ clockIn, breaks, clockOut }: TodaysTimesheet) => {
+const TodaysEntries = ({ clockIn, breaks, clockOut }: ITimesheet) => {
 	const summaryTableCellStyle = {
 		minWidth: "4em",
 	};
@@ -18,7 +19,7 @@ const TodaysEntries = ({ clockIn, breaks, clockOut }: TodaysTimesheet) => {
 								<td style={summaryTableCellStyle}>{toHHMM(clockIn)}</td>
 								<td>Day started</td>
 							</tr>
-							{breaks?.map((breakEntry, i) => {
+							{breaks.map((breakEntry, i) => {
 								return (
 									<Fragment key={i}>
 										<tr>

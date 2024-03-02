@@ -1,3 +1,4 @@
+import React from "react";
 import { ITimesheet } from "@/db/Timesheet";
 import { toDayDDMM, toHHMM } from "@/utilities/dateUtils";
 import { useSearchParams } from "next/navigation";
@@ -89,7 +90,9 @@ export default function EditTimesheet() {
 											? toHHMM(new Date(modifiedData.clockOut))
 											: "23:59"
 									}
-									defaultValue={toHHMM(new Date(modifiedData.clockIn))}
+									defaultValue={
+										modifiedData.clockIn ? toHHMM(new Date(modifiedData.clockIn)) : ""
+									}
 									onChange={(val) => {
 										// @ts-ignore Stupid
 										setModifiedData({
@@ -120,7 +123,7 @@ export default function EditTimesheet() {
 											? toHHMM(new Date(modifiedData.clockOut))
 											: "23:59"
 									}
-									min={toHHMM(new Date(modifiedData.clockIn))}
+									min={toHHMM(new Date(modifiedData.clockIn ?? ""))}
 									onChange={(val) => {
 										// @ts-ignore Stupid
 										setModifiedData({
@@ -149,7 +152,7 @@ export default function EditTimesheet() {
 											type="time"
 											style={{ width: "100%", height: "2rem" }}
 											defaultValue={toHHMM(new Date(entry.breakIn))}
-											min={toHHMM(new Date(modifiedData.clockIn))}
+											min={toHHMM(new Date(modifiedData.clockIn ?? ""))}
 											onChange={(val) => {
 												const breakCopy = [...modifiedData.breaks];
 												breakCopy[i].breakIn = new Date(
@@ -178,7 +181,7 @@ export default function EditTimesheet() {
 											type="time"
 											style={{ width: "100%", height: "2rem" }}
 											defaultValue={entry.breakOut ? toHHMM(new Date()) : "23:59"}
-											min={toHHMM(new Date(modifiedData.clockIn))}
+											min={toHHMM(new Date(modifiedData.clockIn ?? ""))}
 											onChange={(val) => {
 												const breakCopy = [...modifiedData.breaks];
 												breakCopy[i].breakOut = new Date(
@@ -206,7 +209,7 @@ export default function EditTimesheet() {
 							onClick={() => {
 								const breaks = [...modifiedData.breaks];
 								breaks.push({
-									breakIn: modifiedData.clockIn,
+									breakIn: modifiedData.clockIn ?? new Date(),
 									breakOut: null,
 								});
 								setModifiedData({
