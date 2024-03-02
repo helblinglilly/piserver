@@ -21,3 +21,7 @@ sudo udevadm control --reload-rules
 # Add fstab entry to ensure permissions
 echo "UUID=$UUID /media/hdd exfat defaults,uid=1000,gid=1000 0 0"
 echo "^ into /etc/fstab" 
+
+sudo apt update
+sudo apt install dns-utils -y
+sudo apt install jq -y

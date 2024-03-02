@@ -1,0 +1,6 @@
+EMAIL=your_cloudflare@email.com
+DOMAIN=your_base_domain
+ZONE_ID=cloudlfare_zone_id_for_site
+TOKEN=your_cloudflare_api_token
+A_RECORD=ip_v4_record_to_update
+AAAA_RECORD=ip_v6_record_to_update
