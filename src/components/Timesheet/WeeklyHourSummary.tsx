@@ -1,7 +1,7 @@
+import React, { useEffect, useState } from "react";
 import config from "@/config";
 import { IWeeklyResponse } from "@/pages/api/timesheet";
 import { minutesWorkedInDay } from "@/utilities/dateUtils";
-import { useEffect, useState } from "react";
 
 const WeeklyHourSummary = ({
 	weeklySummary,

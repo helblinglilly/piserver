@@ -1,6 +1,6 @@
+import React, { useEffect, useState } from "react";
 import StandingChargeChart from "@/components/Energy/StandingChargeChart";
 import RootAppCard from "@/components/rootAppCard";
-import { useEffect, useState } from "react";
 
 export interface StandingCharges {
 	standingCharge: number;

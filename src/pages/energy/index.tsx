@@ -1,4 +1,6 @@
+import React from "react";
 import RootAppCard from "@/components/rootAppCard";
+
 export default function EnergyIndex() {
 	return (
 		<>

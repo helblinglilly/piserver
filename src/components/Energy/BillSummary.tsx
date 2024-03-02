@@ -1,7 +1,7 @@
+import React, { useRef } from "react";
 import { EnergyBillRow } from "@/db/EnergyBill";
 import { daysBetweenDates } from "@/utilities/dateUtils";
 import Link from "next/link";
-import { useRef } from "react";
 
 export default function BillSummary({
 	electricityBill,

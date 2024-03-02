@@ -1,5 +1,5 @@
 import { EnergyUsageRow } from "@/db/EnergyUsage";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
 	ResponsiveContainer,
 	AreaChart,

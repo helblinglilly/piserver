@@ -1,3 +1,4 @@
+import React from "react";
 import { StandingCharges } from "@/pages/energy/bills";
 import {
 	ResponsiveContainer,

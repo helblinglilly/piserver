@@ -1,5 +1,5 @@
+import React, { useEffect, useState } from "react";
 import { EnergyUsageRow } from "@/db/EnergyUsage";
-import { useEffect, useState } from "react";
 import DatePicker from "../DatePicker";
 import SpikeChart from "./SpikeChart";
 import CummulativeChart from "./CummulativeChart";
