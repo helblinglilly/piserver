@@ -1,3 +1,4 @@
+import { useNotification } from "@/contexts/Notification";
 import { ITimesheet } from "@/db/Timesheet";
 import { useEffect, useState } from "react";
 import { useQuery } from "react-query";
@@ -25,6 +26,14 @@ async function getDailyTimesheet(day: Date, username: string) {
 export const useTimesheet = () => {
 	const [date, setDate] = useState(new Date());
 	const [user, setUser] = useState("joel");
+	const { addNotification } = useNotification();
+
+	const displayActions = {
+		"clockIn": "Clock In",
+		"breakIn": "Break In",
+		"breakOut": "Break Out",
+		"clockOut": "Clock Out",
+	};
 
 	const {
 		data: timesheet = intialTimesheet,
@@ -52,8 +61,11 @@ export const useTimesheet = () => {
 		refetch();
 
 		if (!response.ok) {
+			addNotification({ message: `Failed to record ${displayActions[action]}`, type: "error" });
 			throw new Error("Network response was not ok");
 		}
+
+		addNotification({ message: `Recorded ${displayActions[action]}`, type: "success" });
 	};
 
 	useEffect(() => {

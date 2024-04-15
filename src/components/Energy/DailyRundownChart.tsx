@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Selector from "../Selector";
 import { EnergyUsageRow } from "@/db/EnergyUsage";
-import Notification from "../Notification";
 import DatePicker from "../DatePicker";
 import {
 	Bar,
@@ -14,6 +13,7 @@ import {
 	XAxis,
 	YAxis,
 } from "recharts";
+import { useNotification } from "@/contexts/Notification";
 
 interface DailyChartData {
 	date: string;
@@ -22,6 +22,7 @@ interface DailyChartData {
 }
 export default function DailyRundownChart() {
 	const router = useRouter();
+	const { addNotification } = useNotification();
 
 	const [toDate, setToDate] = useState(
 		router.query.date ? new Date(router.query.date as string) : new Date(),
@@ -32,8 +33,6 @@ export default function DailyRundownChart() {
 
 	const [days, setDays] = useState(3);
 	const [chartData, setChartData] = useState<DailyChartData[]>([]);
-
-	const [infoNotification, setInfoNotification] = useState<string[]>([]);
 
 	// Need to refactor the URL change thingy into a helper function. Currently in index.tsx
 	// chart mode will not be needed here, but we can't affect it for the hourly mode
@@ -52,21 +51,19 @@ export default function DailyRundownChart() {
 				`/api/energy/usage?from=${from.toISOString()}&to=${to.toISOString()}`,
 			);
 			if (response.status === 204) {
-				setInfoNotification(["No data available, trying to refetch..."]);
+				addNotification({ message: "No data available, trying to refetch...", type: "info" });
 
 				const refetchResponse = await fetch("/api/jobs/energy");
 				if (refetchResponse.status === 204) {
-					setInfoNotification(["No more data available, try again later"]);
+					addNotification({ message: "No more data available, try again later", type: "info" });
 					return;
 				}
-				setInfoNotification([]);
 				await fetchData(fromOverride, toOverride);
 			}
 			if (response.status !== 200) {
 				return;
 			}
 			const body = (await response.json()) as EnergyUsageRow[];
-			setInfoNotification([]);
 
 			let accumulatedData: DailyChartData[] = [];
 
@@ -105,7 +102,6 @@ export default function DailyRundownChart() {
 
 	return (
 		<>
-			<Notification message={infoNotification} type="warn" />
 			<div style={{ display: "flex", justifyContent: "space-between" }}>
 				<div>
 					<p className="title is-4">Daily usage in kWh</p>

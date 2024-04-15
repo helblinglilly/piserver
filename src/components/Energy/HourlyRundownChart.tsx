@@ -3,22 +3,22 @@ import { EnergyUsageRow } from "@/db/EnergyUsage";
 import DatePicker from "../DatePicker";
 import SpikeChart from "./SpikeChart";
 import CummulativeChart from "./CummulativeChart";
-import Notification from "../Notification";
 import { useRouter } from "next/router";
+import { useNotification } from "@/contexts/Notification";
 
 export default function HourlyRundownChart() {
 	const router = useRouter();
+	const { addNotification } = useNotification();
 	const [chartMode, setChartMode] = useState<"spike" | "cummulative">(
 		router.query.chartMode === "cummulative" ? "cummulative" : "spike",
 	);
 	const [data, setData] = useState<EnergyUsageRow[]>([]);
 	const [sums, setSums] = useState<
-		{ gas: number; electricity: number } | undefined
+	{ gas: number; electricity: number } | undefined
 	>();
 	const [date, setDate] = useState(
 		router.query.date ? new Date(router.query.date as string) : new Date(),
 	);
-	const [infoNotification, setInfoNotification] = useState<string[]>([]);
 
 	useEffect(() => {
 		const fromOverride = new Date(date);
@@ -32,13 +32,12 @@ export default function HourlyRundownChart() {
 				`/api/energy/usage?from=${from.toISOString()}&to=${to.toISOString()}`,
 			);
 			if (response.status === 204) {
-				setInfoNotification(["No data available, trying to refetch..."]);
+				addNotification({ message: "No data available, trying to refetch...", type: "info" });
 				const refetchResponse = await fetch("/api/jobs/energy");
 				if (refetchResponse.status === 204) {
-					setInfoNotification(["No more data available, try again later"]);
+					addNotification({ message: "No data available, trying to refetch...", type: "info" });
 					return;
 				}
-				setInfoNotification([]);
 				await fetchData(from, to);
 			}
 			if (response.status !== 200) {
@@ -65,14 +64,12 @@ export default function HourlyRundownChart() {
 					.toFixed(3),
 			);
 			setSums({ gas: gasSum, electricity: electricitySum });
-			setInfoNotification([]);
 		};
 		fetchData(fromOverride, toOverride);
 	}, [date]);
 
 	return (
 		<>
-			<Notification message={infoNotification} type="warn" />
 			<div style={{ display: "flex", justifyContent: "space-between" }}>
 				<div>
 					<p className="title is-4">Hourly usage in kWh</p>

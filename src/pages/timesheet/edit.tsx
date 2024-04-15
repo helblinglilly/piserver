@@ -5,8 +5,10 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useQuery } from "react-query";
 import { IPatchTimesheet } from "../api/timesheet";
+import { useRouter } from "next/router";
 
 export default function EditTimesheet() {
+	const router = useRouter();
 	const searchParams = useSearchParams();
 	const editDateParam = searchParams.get("date");
 	const editDate = new Date(editDateParam ?? 0);
@@ -46,6 +48,7 @@ export default function EditTimesheet() {
 				method: "PATCH",
 				body: JSON.stringify(body),
 			});
+			router.push("/timesheet");
 		} catch (err) {
 			console.log(err);
 		}

@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { getBillByDate } from "@/db/EnergyBill";
 import { GetServerSidePropsContext } from "next";
-import Notification from "@/components/Notification";
 import { useRouter } from "next/router";
 import BillInput from "@/components/Energy/BillInput";
 import DatePicker from "@/components/DatePicker";
 import config from "@/config";
 import { daysBetweenDates } from "@/utilities/dateUtils";
 import { validateBillInputFE } from "@/utilities/energyUtils";
+import { useNotification } from "@/contexts/Notification";
 
 interface IBillWeb {
 	charged: number;
@@ -28,8 +28,7 @@ export default function EnergyBillEdit({
 	moveInDate: string;
 }) {
 	const router = useRouter();
-	const [successMessages, setSuccessMessages] = useState<string[]>([]);
-	const [failureMessages, setFailureMessages] = useState<string[]>([]);
+	const { addNotification } = useNotification();
 
 	const [electricityUsage, setElectricityUsage] = useState(
 		bills.electricity ? bills.electricity.usage : 0,
@@ -119,12 +118,12 @@ export default function EnergyBillEdit({
 			if (response.status !== 200) {
 				throw new Error("Failed to update bill.");
 			}
-			setSuccessMessages([...successMessages, "Bill has been updated"]);
+			addNotification({ message: "Bill has been updated", type: "success" });
 			setTimeout(() => {
 				router.push("/energy/bills/history");
 			}, 2000);
 		} catch (err) {
-			setFailureMessages([...failureMessages, "Failed to update bill."]);
+			addNotification({ message: `Failed to update bill - ${err}`, type: "error" });
 		}
 	};
 
@@ -144,7 +143,7 @@ export default function EnergyBillEdit({
 		);
 
 		if (!isValid) {
-			setFailureMessages(messages);
+			addNotification({ message: `Bill is invalid - ${messages}`, type: "error" });
 			return;
 		}
 
@@ -153,9 +152,6 @@ export default function EnergyBillEdit({
 
 	return (
 		<>
-			<Notification message={successMessages} type="success" />
-			<Notification message={failureMessages} type="fail" />
-
 			<p className="title is-4">Dates</p>
 
 			<div className="columns">

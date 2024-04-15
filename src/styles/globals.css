@@ -34,3 +34,23 @@ button.timesheetActionButton {
 td.timesheetWorkdayBreakdown {
 	min-width: 4em;
 }
+
+.notification.success {
+	background-color: #2b9801;
+	color: white;
+}
+
+.notification.success {
+	background-color: #2b9801;
+	color: white;
+}
+
+.notification.error {
+	background-color: #f03a3a;
+	color: white;
+}
+
+.notification.info {
+	background-color: #f2f22a;
+	color: black;
+}

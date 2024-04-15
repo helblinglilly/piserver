@@ -23,7 +23,7 @@ export default function TimesheetActionButtons() {
 						(timesheet.clockIn ? false : true) ||
 						(mostRecentBreak ? !mostRecentBreak.breakOut : false)
 					}
-					onClick={() => recordEntry(TimesheetActions.breakIn)}
+					onClick={() => recordEntry(TimesheetActions.breakIn) }
 				>
 					Start break
 				</button>
