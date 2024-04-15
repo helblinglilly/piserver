@@ -1,7 +1,7 @@
 import React from "react";
 import config from "@/config";
 import useTimesheet from "@/hooks/useDailyTimesheet";
-import { addMinutesToDate, toHHMM } from "@/utilities/dateUtils";
+import { minutesWorkedInDay, toHHMM } from "@/utilities/dateUtils";
 import { useEffect, useState } from "react";
 
 const PredictedFinish = () => {
@@ -10,21 +10,24 @@ const PredictedFinish = () => {
 		config.timesheet.minutes +
 		config.timesheet.lunch.hours * 60 +
 		config.timesheet.lunch.minutes;
+	
+	const [minutesWorked, setMinutesWorked] = useState(0);
+	const [finishTime, setFinishTime] = useState(new Date(0));
 
-	const [finish, setFinish] = useState(new Date(0));
-	const { clockIn } = useTimesheet().timesheet;
+	const { clockIn, breaks, clockOut } = useTimesheet().timesheet;
 
 	useEffect(() => {
-		if (clockIn) {
-			setFinish(addMinutesToDate(clockIn, targetMinutes));
-		} else {
-			setFinish(addMinutesToDate(new Date(), targetMinutes));
-		}
-		// adding clockIn causes loops
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [targetMinutes]);
+		setMinutesWorked(minutesWorkedInDay(clockIn, breaks, clockOut));
+	}, [clockIn, breaks, clockOut]);
 
-	return <p>Predicted Finish: {toHHMM(finish)} </p>;
+	useEffect(() => {
+		const minutesRemaining = (targetMinutes - (breaks.length >= 1 ? 60 : 0)) - minutesWorked;
+		const currentTime = new Date();
+		const remainingTime = new Date(currentTime.getTime() + minutesRemaining * 60000);
+		setFinishTime(remainingTime);
+	}, [breaks.length, minutesWorked, targetMinutes]);
+
+	return <p>Predicted Finish: {toHHMM(finishTime)} </p>;
 };
 
 export default PredictedFinish;
