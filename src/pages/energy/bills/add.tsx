@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from "react";
 import DatePicker from "@/components/DatePicker";
 import BillInput from "@/components/Energy/BillInput";
-import Notification from "@/components/Notification";
 import { daysBetweenDates } from "@/utilities/dateUtils";
 import { validateBillInputFE } from "@/utilities/energyUtils";
 import { useRouter } from "next/router";
+import { useNotification } from "@/contexts/Notification";
 
 export default function EnergyBillAdd() {
 	const router = useRouter();
-	const [successMessages, setSuccessMessages] = useState<string[]>([]);
-	const [failureMessages, setFailureMessages] = useState<string[]>([]);
+	const { addNotification } = useNotification();
 
 	const [lastBillEndDate, setLastBillEndDate] = useState<Date | undefined>();
 	const [startDate, setStartDate] = useState<Date | undefined>();
@@ -22,7 +21,7 @@ export default function EnergyBillAdd() {
 		useState(0);
 	const [electricityCost, setElectricityCost] = useState<number | undefined>();
 	const [electricityCharged, setElectricityCharged] = useState<
-		number | undefined
+	number | undefined
 	>();
 
 	const [gasUsage, setGasUsage] = useState(0);
@@ -42,10 +41,7 @@ export default function EnergyBillAdd() {
 			const result = await fetch("/api/energy/bills/latest");
 
 			if (result.status !== 200) {
-				setFailureMessages([
-					...failureMessages,
-					"Failed to fetch latest bill end date.",
-				]);
+				addNotification({ message: `Failed to fetch latest bill end date - ${result.status}`, type: "error" });
 				return;
 			}
 			const body = await result.json();
@@ -94,12 +90,12 @@ export default function EnergyBillAdd() {
 			if (response.status !== 200) {
 				throw new Error("Failed to submit bill.");
 			}
-			setSuccessMessages([...successMessages, "Bill has been added"]);
+			addNotification({ message: "Bill has been added", type: "success" });
 			setTimeout(() => {
 				router.push("/energy/bills");
 			}, 2000);
 		} catch (err) {
-			setFailureMessages([...failureMessages, "Failed to submit bill."]);
+			addNotification({ message: "Failed to submit bill.", type: "error" });
 		}
 	};
 
@@ -119,7 +115,7 @@ export default function EnergyBillAdd() {
 		);
 
 		if (!isValid) {
-			setFailureMessages(messages);
+			addNotification({ message: `Bill is in an invalid state - ${messages}`, type: "error" });
 			return;
 		}
 
@@ -128,9 +124,6 @@ export default function EnergyBillAdd() {
 
 	return (
 		<>
-			<Notification message={successMessages} type="success" />
-			<Notification message={failureMessages} type="fail" />
-
 			<p className="title is-4">Dates</p>
 
 			<div className="columns">
