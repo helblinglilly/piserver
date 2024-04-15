@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import { useNotification } from "@/contexts/Notification";
+import React from "react";
 
 export default function Notification() {
 	const { notifications, removeNotification } = useNotification();
