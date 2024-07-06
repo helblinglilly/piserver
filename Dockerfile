@@ -3,11 +3,14 @@ FROM node:20
 WORKDIR /app
 ENV NODE_ENV production
 
+COPY package.json package.json
+COPY package-lock.json package-lock.json
+
+RUN npm ci --no-audit
+
 COPY . .
 
-RUN npm install --no-audit --no-cache
-
-RUN ls -a && ls -a node_modules && npm run build
+RUN npm run build
 
 EXPOSE 3000
 
