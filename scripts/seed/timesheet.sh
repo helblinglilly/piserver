@@ -3,7 +3,7 @@
 # Define the path to the SQLite database file
 DATABASE="timesheet.sqlite3"
 
-rm $DATABASE
+# rm $DATABASE
 
 # Check if the database file exists, if not, create it
 if [ ! -f "$DATABASE" ]; then
