@@ -26,11 +26,9 @@ export default function BillSummary({
 					{new Date(electricityBill.startDate).toLocaleDateString("en-GB")} -{" "}
 					{new Date(electricityBill.endDate).toLocaleDateString("en-GB")}
 					<Link
-						href={`/energy/bills/edit?startDate=${
-							new Date(electricityBill.startDate).toISOString().split("T")[0]
-						}&endDate=${
-							new Date(electricityBill.endDate).toISOString().split("T")[0]
-						}`}
+						href={`/energy/bills/edit?startDate=${new Date(electricityBill.startDate).toISOString().split("T")[0]
+							}&endDate=${new Date(electricityBill.endDate).toISOString().split("T")[0]
+							}`}
 						style={{ marginLeft: "auto" }}
 					>
 						<button className="button">Edit</button>

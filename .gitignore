@@ -43,3 +43,5 @@ proddata.sql
 .vscode
 
 scripts/dynamicDNS/dyndns.config
+
+*.sqlite3
