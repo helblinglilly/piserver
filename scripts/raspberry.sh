@@ -25,3 +25,14 @@ echo "^ into /etc/fstab"
 sudo apt update
 sudo apt install dns-utils -y
 sudo apt install jq -y
+
+mkdir actions-runner
+cd actions-runner
+
+# Set up self-hosted runner
+curl -o actions-runner-linux-arm-2.317.0.tar.gz -L https://github.com/actions/runner/releases/download/v2.317.0/actions-runner-linux-arm-2.317.0.tar.gz
+tar xzf ./actions-runner-linux-arm-2.317.0.tar.gz
+
+./config.sh --url https://github.com/helblinglilly/piserver --token grab-token-from-github
+
+cd ..

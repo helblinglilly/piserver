@@ -15,7 +15,7 @@ jobs:
       - name: Install Node
         uses: actions/setup-node@v2
         with:
-          node-version: "18"
+          node-version: "20"
       - name: Install dependencies
         run: npm install
       - name: Run unit tests
@@ -32,7 +32,7 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: "18"
+          node-version: "20"
       - name: Run tests
         run: npm audit
 
@@ -79,7 +79,7 @@ jobs:
   update-image:
     needs: docker
     name: Pull new image
-    runs-on: self-hosted
+    runs-on: raspberry
     steps:
       - name: Login to DockerHub
         uses: docker/login-action@v1
@@ -102,7 +102,7 @@ jobs:
   run-container:
     needs: update-image
     name: Start container
-    runs-on: self-hosted
+    runs-on: raspberry
     steps:
       - name: Set current date as env variable
         run: echo "::set-output name=date::$(date +'%Y%m%d')"
