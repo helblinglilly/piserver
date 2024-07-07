@@ -18,8 +18,7 @@ export default function Weekly() {
 		queryKey: [`weeklyData-${date.toISOString()}`],
 		queryFn: () =>
 			fetch(
-				`/api/timesheet?username=joel&mode=weekly&date=${
-					addDays(date, 6).toISOString().split("T")[0]
+				`/api/timesheet?username=lilly&mode=weekly&date=${addDays(date, 6).toISOString().split("T")[0]
 				}`,
 			).then((res) => res.json() as Promise<IWeeklyResponse>),
 	});

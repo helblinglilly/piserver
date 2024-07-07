@@ -25,7 +25,7 @@ async function getDailyTimesheet(day: Date, username: string) {
 
 export const useTimesheet = () => {
 	const [date, setDate] = useState(new Date());
-	const [user, setUser] = useState("joel");
+	const [user, setUser] = useState("lilly");
 	const { addNotification } = useNotification();
 
 	const displayActions = {

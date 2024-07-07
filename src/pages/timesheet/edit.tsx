@@ -18,7 +18,7 @@ export default function EditTimesheet() {
 		queryKey: [`dailyData-${editDate.toISOString()}`],
 		queryFn: (): Promise<ITimesheet> =>
 			fetch(
-				`/api/timesheet?username=joel&date=${editDate.toISOString()}&mode=daily`,
+				`/api/timesheet?username=lilly&date=${editDate.toISOString()}&mode=daily`,
 			).then((res) => {
 				if (res.status === 204) {
 					return {
@@ -40,7 +40,7 @@ export default function EditTimesheet() {
 	const handleOnSubmit = async () => {
 		try {
 			const body: IPatchTimesheet = {
-				username: "joel",
+				username: "lilly",
 				date: new Date(editDate).toISOString(),
 				timesheet: modifiedData,
 			};
