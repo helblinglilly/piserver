@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import { EnergyBillRow } from "@/db/EnergyBill";
+import { EnergyBillRow } from "@/db/old/EnergyBill";
 import { daysBetweenDates } from "@/utilities/dateUtils";
 import Link from "next/link";
 

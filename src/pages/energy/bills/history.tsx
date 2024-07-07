@@ -1,6 +1,6 @@
 import React from "react";
 import BillSummary from "@/components/Energy/BillSummary";
-import { EnergyBillRow, getAllBills } from "@/db/EnergyBill";
+import { EnergyBillRow, getAllBills } from "@/db/old/EnergyBill";
 import Link from "next/link";
 
 export default function EnergyBillHistory({

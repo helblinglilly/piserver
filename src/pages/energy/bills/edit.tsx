@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { getBillByDate } from "@/db/EnergyBill";
+import { getBillByDate } from "@/db/old/EnergyBill";
 import { GetServerSidePropsContext } from "next";
 import { useRouter } from "next/router";
 import BillInput from "@/components/Energy/BillInput";

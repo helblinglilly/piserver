@@ -9,6 +9,13 @@ export interface ITimesheet {
 	}[];
 }
 
+interface ITimesheetRow {
+    clock_in: string;
+    clock_out: string | null;
+    break_in: string | null;
+    break_out: string | null;
+}
+
 export interface IBreak {
 	breakIn: Date;
 	breakOut: Date | null | undefined;
@@ -126,7 +133,7 @@ export async function getTimesheet(username: string, day: Date): Promise<ITimesh
             WHERE timesheet.username = $username AND timesheet.date = $date`, {
             $username: username,
             $date: normalisedDay,
-        }).then((rows) => {
+        }).then((rows: Array<ITimesheetRow>) => {
             if (!rows || rows.length === 0){
                 return undefined;
             }

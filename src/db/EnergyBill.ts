@@ -2,6 +2,30 @@ import { date, decimal, pgTable, primaryKey } from "drizzle-orm/pg-core";
 import { energyTypeEnum } from "./EnergyUsage";
 import PoolFactory from "./poolFactory";
 import { and, desc, eq } from "drizzle-orm";
+import { openEnergyDb } from "./db";
+
+
+interface IEnergyBillRow {
+    energy_type: 'electricity' | 'gas',
+    start_date: string,
+    end_date: string,
+    usage: number | null,
+    usage_rate: number | null,
+    standing_charge: number | null,
+    cost: number | null,
+    charged: number | null
+}
+
+export interface EnergyBill {
+	energyType: "electricity" | "gas";
+	startDate: string;
+	endDate: string;
+	usage: number;
+	usageRate: number;
+	standingCharge: number;
+	cost: number;
+	charged: number;
+}
 
 export const EnergyBills = pgTable(
 	"energy_bills",
@@ -24,54 +48,48 @@ export const EnergyBills = pgTable(
 
 const db = PoolFactory();
 
-export interface EnergyBillRow {
-	energyType: "electricity" | "gas";
-	startDate: Date;
-	endDate: Date;
-	usage: number;
-	usageRate: number;
-	standingCharge: number;
-	cost: number;
-	charged: number;
+
+function getDateString(date: Date | string){
+    return new Date(date).toISOString().split('T')[0];
 }
 
 export async function insertEnergyBill(
-	gas: EnergyBillRow,
-	electricity: EnergyBillRow,
+	gas: EnergyBill,
+	electricity: EnergyBill,
 ) {
-	await db.transaction(async (transactionDb) => {
-		await transactionDb
-			.insert(EnergyBills)
-			.values([
-				{
-					energyType: "gas",
-					startDate: new Date(gas.startDate),
-					endDate: new Date(gas.endDate),
-					usage: Number(gas.usage).toString(),
-					usageRate: Number(gas.usageRate).toString(),
-					standingCharge: Number(gas.standingCharge).toString(),
-					cost: Number(gas.cost).toString(),
-					charged: Number(gas.charged).toString(),
-				},
-				{
-					energyType: "electricity",
-					startDate: new Date(electricity.startDate),
-					endDate: new Date(electricity.endDate),
-					usage: Number(electricity.usage).toString(),
-					usageRate: Number(electricity.usageRate).toString(),
-					standingCharge: Number(electricity.standingCharge).toString(),
-					cost: Number(electricity.cost).toString(),
-					charged: Number(electricity.charged).toString(),
-				},
-			])
-			.onConflictDoNothing();
-	});
+    const db = await openEnergyDb();
+
+    try {
+        await db.run(`INSERT INTO energy_bills 
+            (energy_type, start_date, end_date, usage, usage_rate, standing_charge, cost, charged)
+            VALUES
+            ('gas', $gas_start, $gas_end, $gas_usage, $gas_usage_rate, $gas_standing_charge, $gas_cost, $gas_charged),
+            ('electricity, $elec_start, $elec_end, $elec_usage, $elec_usage_rate, $elec_standing_charge, $elec_cost, $elec_charged)`,{
+                $gas_start: getDateString(gas.startDate),
+                $gas_end: getDateString(gas.endDate),
+                $gas_usage: gas.usage,
+                $gas_usage_rate: gas.usageRate,
+                $gas_cost: gas.cost,
+                $gas_charged: gas.charged,
+                $elec_start: getDateString(electricity.startDate),
+                $elec_end: getDateString(electricity.endDate),
+                $elec_usage: electricity.usage,
+                $elec_usage_rate: electricity.usageRate,
+                $elec_cost: electricity.cost,
+                $elec_charged: electricity.charged
+            })
+    } catch(err){
+        console.log(`Failed to insert into DB with data`, gas, electricity, err);
+        throw new Error('Failed to insert into Database')
+    } finally {
+        await db.close();
+    }
 }
 
 export async function updateEnergyBill(
 	startDate: Date,
 	endDate: Date,
-	newBills: { gas: EnergyBillRow; electricity: EnergyBillRow },
+	newBills: { gas: EnergyBill; electricity: EnergyBill },
 ) {
 	let electricityReturned: unknown[] | undefined;
 	let gasReturned: unknown[] | undefined;
@@ -129,10 +147,32 @@ export async function updateEnergyBill(
 	};
 }
 
-export async function getAllBills() {
-	const result = await db.select().from(EnergyBills);
+export async function getAllBills(): Promise<EnergyBill[]> {
+    const db = await openEnergyDb();
 
-	return result;
+    try {
+        return db.all(`SELECT energy_type, start_date, end_date, usage, usage_rate, standing_charge, cost, charged FROM energy_bills`)
+        .then((rows: Array<IEnergyBillRow>) => {
+            return rows.map((row) => {
+                return {
+                    energyType: row.energy_type,
+                    startDate: new Date(row.start_date).toISOString(),
+                    endDate: new Date(row.end_date).toISOString(),
+                    usage: row.usage ?? 0,
+                    usageRate: row.usage_rate ?? 0,
+                    standingCharge: row.standing_charge ?? 0,
+                    cost: row.cost ?? 0,
+                    charged: row.charged ?? 0
+                }
+
+            })
+        });
+    } catch(err){
+        console.log(`Failed to select from DB with data`, err);
+        throw new Error('Failed to insert into Database')
+    } finally {
+        await db.close();
+    }
 }
 
 export async function getBillByDate(startDate: Date, endDate: Date) {
@@ -155,7 +195,6 @@ export async function getLatestBillEndDate() {
 		? new Date(process.env.MOVE_IN_DATE)
 		: new Date("2000-01-01");
 
-	console.log(result, moveIndate);
 	return result.length === 0 ? moveIndate : result[0].date;
 }
 

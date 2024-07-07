@@ -1,5 +1,5 @@
 import {
-	EnergyBillRow,
+	EnergyBill,
 	getStandingChargeRates,
 	insertEnergyBill,
 	updateEnergyBill,
@@ -19,8 +19,8 @@ const POST = async (req: NextApiRequest, res: NextApiResponse) => {
 	let body;
 	try {
 		body = JSON.parse(req.body) as {
-			gas: EnergyBillRow;
-			electricity: EnergyBillRow;
+			gas: EnergyBill;
+			electricity: EnergyBill;
 		};
 	} catch {
 		res.status(400).end();
@@ -74,8 +74,8 @@ const PATCH = async (req: NextApiRequest, res: NextApiResponse) => {
 				endDate: string;
 			};
 			newBills: {
-				gas: EnergyBillRow;
-				electricity: EnergyBillRow;
+				gas: EnergyBill;
+				electricity: EnergyBill;
 			};
 		};
 	} catch {
