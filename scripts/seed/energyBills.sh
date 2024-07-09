@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the path to the SQLite database file
-DATABASE="energy.sqlite3"
+DATABASE="energyBills.sqlite3"
 
 # rm $DATABASE
 

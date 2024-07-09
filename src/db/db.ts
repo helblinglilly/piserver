@@ -8,9 +8,9 @@ export async function openTimesheetDb() {
     })
 }
 
-export async function openEnergyDb(){
+export async function openEnergyBillsDb(){
     return open({
-        filename: './energy.sqlite',
+        filename: './energyBills.sqlite3',
         driver: sqlite3.Database
     })
 }

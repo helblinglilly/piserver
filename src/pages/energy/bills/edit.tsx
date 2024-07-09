@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { getBillByDate } from "@/db/old/EnergyBill";
+import { getBillByDate } from "@/db/EnergyBill";
 import { GetServerSidePropsContext } from "next";
 import { useRouter } from "next/router";
 import BillInput from "@/components/Energy/BillInput";
@@ -264,8 +264,8 @@ export const getServerSideProps = async (
 		return {
 			charged: Number(entry.charged),
 			cost: Number(entry.cost),
-			endDate: entry.endDate.toISOString(),
-			startDate: entry.startDate.toISOString(),
+			endDate: entry.endDate,
+			startDate: entry.startDate,
 			energyType: entry.energyType,
 			standingCharge: Number(entry.standingCharge),
 			usage: Number(entry.usage),

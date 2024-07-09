@@ -17,6 +17,7 @@ services:
     restart: unless-stopped
     volumes:
       - /mnt/hdd/sqlite/timesheet.sqlite3:/app/timesheet.sqlite3
+      - /mnt/hdd/sqlite/energyBills.sqlite3:/app/energyBills.sqlite3
     environment:
       DATABASE_URL: "no_longer_needed"
       OCTOPUS_ACCOUNT_NUMBER: "A-1D7C8FF7"

@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import { EnergyBillRow } from "@/db/old/EnergyBill";
+import { EnergyBill } from "@/db/EnergyBill";
 import { daysBetweenDates } from "@/utilities/dateUtils";
 import Link from "next/link";
 
@@ -8,8 +8,8 @@ export default function BillSummary({
 	gasBill,
 	isHidden,
 }: {
-	electricityBill: EnergyBillRow;
-	gasBill: EnergyBillRow;
+	electricityBill: EnergyBill;
+	gasBill: EnergyBill;
 	isHidden?: boolean;
 }) {
 	const cardContentRef = useRef<HTMLDivElement>(null);

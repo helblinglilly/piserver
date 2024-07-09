@@ -1,12 +1,12 @@
 import React from "react";
 import BillSummary from "@/components/Energy/BillSummary";
-import { EnergyBillRow, getAllBills } from "@/db/old/EnergyBill";
+import { EnergyBill, getAllBills } from "@/db/EnergyBill";
 import Link from "next/link";
 
 export default function EnergyBillHistory({
 	energyBills,
 }: {
-	energyBills: { electric: EnergyBillRow; gas: EnergyBillRow }[];
+	energyBills: { electric: EnergyBill; gas: EnergyBill }[];
 }) {
 	return (
 		<>
@@ -37,8 +37,8 @@ export default function EnergyBillHistory({
 }
 
 export const getServerSideProps = async () => {
-	interface TransmittableEnergyBillRow
-		extends Omit<EnergyBillRow, "startDate" | "endDate"> {
+	interface TransmittableEnergyBill
+		extends Omit<EnergyBill, "startDate" | "endDate"> {
 		startDate: string;
 		endDate: string;
 	}
@@ -47,16 +47,16 @@ export const getServerSideProps = async () => {
 		a.startDate < b.startDate ? 1 : -1,
 	);
 	const groupedBills: {
-		electric: TransmittableEnergyBillRow;
-		gas: TransmittableEnergyBillRow;
+		electric: TransmittableEnergyBill;
+		gas: TransmittableEnergyBill;
 	}[] = [];
 
-	let previousBill: TransmittableEnergyBillRow | undefined;
+	let previousBill: TransmittableEnergyBill | undefined;
 	sortedBills.forEach((bill) => {
 		const parsedBill = {
 			energyType: bill.energyType,
-			startDate: bill.startDate.toISOString(),
-			endDate: bill.endDate.toISOString(),
+			startDate: bill.startDate,
+			endDate: bill.endDate,
 			usage: Number(bill.usage),
 			usageRate: Number(bill.usageRate),
 			standingCharge: Number(bill.standingCharge),
