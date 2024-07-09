@@ -1,5 +1,5 @@
 import {
-	EnergyBillRow,
+	EnergyBill,
 	getStandingChargeRates,
 	insertEnergyBill,
 	updateEnergyBill,
@@ -19,8 +19,8 @@ const POST = async (req: NextApiRequest, res: NextApiResponse) => {
 	let body;
 	try {
 		body = JSON.parse(req.body) as {
-			gas: EnergyBillRow;
-			electricity: EnergyBillRow;
+			gas: EnergyBill;
+			electricity: EnergyBill;
 		};
 	} catch {
 		res.status(400).end();
@@ -51,10 +51,10 @@ const POST = async (req: NextApiRequest, res: NextApiResponse) => {
 	}
 
 	try {
-		body.gas.startDate = new Date(body.gas.startDate);
-		body.gas.endDate = new Date(body.gas.endDate);
-		body.electricity.startDate = new Date(body.electricity.startDate);
-		body.electricity.endDate = new Date(body.electricity.endDate);
+		body.gas.startDate = new Date(body.gas.startDate).toISOString();
+		body.gas.endDate = new Date(body.gas.endDate).toISOString();
+		body.electricity.startDate = new Date(body.electricity.startDate).toISOString();
+		body.electricity.endDate = new Date(body.electricity.endDate).toISOString();
 
 		await insertEnergyBill(body.gas, body.electricity);
 		res.status(200).end();
@@ -74,8 +74,8 @@ const PATCH = async (req: NextApiRequest, res: NextApiResponse) => {
 				endDate: string;
 			};
 			newBills: {
-				gas: EnergyBillRow;
-				electricity: EnergyBillRow;
+				gas: EnergyBill;
+				electricity: EnergyBill;
 			};
 		};
 	} catch {
@@ -107,14 +107,14 @@ const PATCH = async (req: NextApiRequest, res: NextApiResponse) => {
 	}
 
 	try {
-		body.newBills.gas.startDate = new Date(body.newBills.gas.startDate);
-		body.newBills.gas.endDate = new Date(body.newBills.gas.endDate);
+		body.newBills.gas.startDate = new Date(body.newBills.gas.startDate).toISOString();
+		body.newBills.gas.endDate = new Date(body.newBills.gas.endDate).toISOString();
 		body.newBills.electricity.startDate = new Date(
 			body.newBills.electricity.startDate,
-		);
+		).toISOString();
 		body.newBills.electricity.endDate = new Date(
 			body.newBills.electricity.endDate,
-		);
+		).toISOString();
 
 		const updatedEntries = await updateEnergyBill(
 			new Date(body.originalBills.startDate),

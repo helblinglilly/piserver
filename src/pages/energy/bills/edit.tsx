@@ -264,8 +264,8 @@ export const getServerSideProps = async (
 		return {
 			charged: Number(entry.charged),
 			cost: Number(entry.cost),
-			endDate: entry.endDate.toISOString(),
-			startDate: entry.startDate.toISOString(),
+			endDate: entry.endDate,
+			startDate: entry.startDate,
 			energyType: entry.energyType,
 			standingCharge: Number(entry.standingCharge),
 			usage: Number(entry.usage),
