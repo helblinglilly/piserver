@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 
 export default function DatePicker(props: {
-	// eslint-disable-next-line no-unused-vars
 	changeHandler: (_a: Date) => void;
 	name: string;
 	isReadOnly?: boolean;

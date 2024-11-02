@@ -1,14 +1,7 @@
 const nextConfig = {
 	reactStrictMode: true,
 	images: {
-		remotePatterns: [
-			{
-				protocol: "https",
-				hostname: "pokemon.helbling.uk",
-				port: "",
-				pathname: "/static/**",
-			},
-		],
+		remotePatterns: [],
 	},
 	eslint: {
 		// Warning: This allows production builds to successfully complete even if

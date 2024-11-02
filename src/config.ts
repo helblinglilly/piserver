@@ -13,7 +13,6 @@ const config = {
 			? new Date(process.env.MOVE_IN_DATE)
 			: new Date(0),
 	},
-	axiomDataset: "piserver",
 };
 
 export default config;

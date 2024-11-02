@@ -1,18 +1,18 @@
 import sqlite3 from "sqlite3";
-import { open } from 'sqlite';
+import { open } from "sqlite";
 
 export async function openTimesheetDb() {
-    return open({
-        filename: './timesheet.sqlite3',
-        driver: sqlite3.Database
-    })
+	return open({
+		filename: "./timesheet.sqlite3",
+		driver: sqlite3.Database,
+	});
 }
 
-export async function openEnergyBillsDb(){
-    return open({
-        filename: './energyBills.sqlite3',
-        driver: sqlite3.Database
-    })
+export async function openEnergyBillsDb() {
+	return open({
+		filename: "./energyBills.sqlite3",
+		driver: sqlite3.Database,
+	});
 }
 
 /**

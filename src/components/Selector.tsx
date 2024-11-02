@@ -4,8 +4,7 @@ export default function Selector(props: {
 	possibleValues: number[];
 	initialValue: number;
 	supplementary: string;
-	// eslint-disable-next-line no-unused-vars
-	onSelectHandler: (amount: number) => void;
+	onSelectHandler: (_amount: number) => void;
 	className?: string;
 	style?: CSSProperties;
 }) {

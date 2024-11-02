@@ -15,24 +15,13 @@ export default function Home() {
 
 				<div className="column">
 					<RootAppCard
-						link={{
-							url: "/energy",
-							newTab: false,
-						}}
-						image={{ url: "/energy.png", altText: "Energy" }}
-						title={"Energy"}
-					/>
-				</div>
-			</div>
-			<div className="columns">
-				<div className="column">
-					<RootAppCard
 						link={{ url: "http://192.168.0.10:81/admin", newTab: false }}
 						image={{ url: "/pihole.svg", altText: "Pi Hole Icon" }}
 						title={"Pi Hole"}
 					/>
 				</div>
-
+			</div>
+			<div className="columns">
 				<div className="column">
 					<RootAppCard
 						link={{
@@ -42,10 +31,9 @@ export default function Home() {
 						image={{ url: "/files.png", altText: "File Icon" }}
 						title={"Files"}
 					/>
-				</div>
-			</div>
 
-			<div className="columns">
+				</div>
+
 				<div className="column">
 					<RootAppCard
 						link={{
@@ -56,6 +44,9 @@ export default function Home() {
 						title={"Jellyfin"}
 					/>
 				</div>
+			</div>
+
+			<div className="columns">
 				<div className="column">
 					<RootAppCard
 						link={{
@@ -66,9 +57,6 @@ export default function Home() {
 						title={"Portainer"}
 					/>
 				</div>
-			</div>
-
-			<div className="columns">
 				<div className="column">
 					<RootAppCard
 						link={{ url: "http://blackberry.local:8080/", newTab: true }}
@@ -76,8 +64,8 @@ export default function Home() {
 						title={"qBittorrent"}
 					/>
 				</div>
-				<div className="column" />
 			</div>
+
 		</main>
 	);
 }
