@@ -49,13 +49,19 @@ export default function Home() {
 			<div className="columns">
 				<div className="column">
 					<RootAppCard
+						link={{ url: "http://blackberry.local:8989/", newTab: true }}
+						image={{ url: "/sonarr.png", altText: "Sonarr Icon" }}
+						title={"Sonarr"}
+					/>
+				</div>
+
+				<div className="column">
+					<RootAppCard
 						link={{ url: "http://strawberry.local:8080/", newTab: true }}
 						image={{ url: "/qbittorrent.png", altText: "qBittorent Icon" }}
 						title={"qBittorrent"}
 					/>
 				</div>
-
-				<div className="column" />
 			</div>
 
 		</main>
