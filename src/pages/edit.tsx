@@ -4,7 +4,7 @@ import { toDayDDMM, toHHMM } from "@/utilities/dateUtils";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useQuery } from "react-query";
-import { IPatchTimesheet } from "../api/timesheet";
+import { IPatchTimesheet } from "./api/timesheet";
 import { useRouter } from "next/router";
 
 export default function EditTimesheet() {

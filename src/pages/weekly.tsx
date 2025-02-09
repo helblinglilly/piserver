@@ -9,7 +9,7 @@ import {
 	getClosestMonday,
 	previousWeek,
 } from "@/utilities/dateUtils";
-import { IWeeklyResponse } from "../api/timesheet";
+import { IWeeklyResponse } from "./api/timesheet";
 
 export default function Weekly() {
 	const [date, setDate] = useState(getClosestMonday(new Date()));

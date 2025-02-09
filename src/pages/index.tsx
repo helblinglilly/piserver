@@ -1,69 +1,39 @@
+import useTime from "@/hooks/useTime";
+import { toDayDDMM, toHHMM } from "@/utilities/dateUtils";
 import React from "react";
-import RootAppCard from "@/components/rootAppCard";
+import TimesheetActionButtons from "../components/Timesheet/Daily/ActionButtons";
+import PredictedFinish from "../components/Timesheet/Daily/PredictedFinish";
+import WorkdayBreakdown from "../components/Timesheet/Daily/WorkdayBreakdown";
+import Link from "next/link";
 
-export default function Home() {
+export default function Timesheet() {
+	const currentTime = useTime();
+
 	return (
-		<main>
-			<div className="columns">
-				<div className="column">
-					<RootAppCard
-						link={{ url: "/timesheet", newTab: false }}
-						image={{ url: "/clock.png", altText: "Clock" }}
-						title={"Timesheet"}
-					/>
-				</div>
+		<>
+			<p className="title is-3">{toDayDDMM(new Date())}</p>
+			<p className="title is-3">{toHHMM(currentTime)}</p>
 
-				<div className="column">
-					<RootAppCard
-						link={{ url: "http://192.168.0.10:81/admin", newTab: false }}
-						image={{ url: "/pihole.svg", altText: "Pi Hole Icon" }}
-						title={"Pi Hole"}
-					/>
-				</div>
-			</div>
-			<div className="columns">
-				<div className="column">
-					<RootAppCard
-						link={{
-							url: "http://192.168.0.11:5000/files/login?redirect=%2Ffiles%2F",
-							newTab: false,
-						}}
-						image={{ url: "/files.png", altText: "File Icon" }}
-						title={"Files"}
-					/>
+			<TimesheetActionButtons />
 
-				</div>
-
-				<div className="column">
-					<RootAppCard
-						link={{
-							url: "http://192.168.0.11:8096",
-							newTab: false,
-						}}
-						image={{ url: "/jellyfin.png", altText: "Jellyfin Icon" }}
-						title={"Jellyfin"}
-					/>
-				</div>
-			</div>
+			<hr />
 
 			<div className="columns">
 				<div className="column">
-					<RootAppCard
-						link={{ url: "http://blackberry.local:8989/", newTab: true }}
-						image={{ url: "/sonarr.png", altText: "Sonarr Icon" }}
-						title={"Sonarr"}
-					/>
-				</div>
-
-				<div className="column">
-					<RootAppCard
-						link={{ url: "http://strawberry.local:8080/", newTab: true }}
-						image={{ url: "/qbittorrent.png", altText: "qBittorent Icon" }}
-						title={"qBittorrent"}
-					/>
+					<PredictedFinish />
 				</div>
 			</div>
 
-		</main>
+			<hr />
+
+			<p className="title is-4 mb-2">Workday</p>
+			<WorkdayBreakdown />
+
+			<hr />
+
+			<button className="button" type="button">
+				<Link href="/weekly">Weekly view</Link>
+			</button>
+		</>
 	);
 }
