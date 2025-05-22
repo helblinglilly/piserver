@@ -48,7 +48,7 @@ export default function EditTimesheet() {
 				method: "PATCH",
 				body: JSON.stringify(body),
 			});
-			router.push("/timesheet");
+			router.push("/");
 		} catch (err) {
 			console.log(err);
 		}
