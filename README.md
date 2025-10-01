@@ -1,3 +1,5 @@
+> ⚠️ This repo is no longer in use. All custom apps written here have either been deprecated, or replaced by public alternatives.
+
 # Piserver
 
 This repository should allow for a quick and simple deployment of essential web apps to a Raspberry Pi.
